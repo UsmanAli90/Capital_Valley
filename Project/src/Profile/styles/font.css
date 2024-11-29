@@ -1,0 +1,35 @@
+font-face {
+  font-display: swap;
+
+  font-style: normal;
+
+  src: url("/public/fonts/PoppinsRegular.ttf");
+
+  font-family: "Poppins";
+
+  font-weight: 400;
+}
+
+@font-face {
+  font-display: swap;
+
+  font-style: normal;
+
+  src: url("/public/fonts/RobotoRegular.ttf");
+
+  font-family: "Roboto";
+
+  font-weight: 400;
+}
+
+@font-face {
+  font-display: swap;
+
+  font-style: normal;
+
+  src: url("/public/fonts/PoppinsSemiBold.ttf");
+
+  font-family: "Poppins";
+
+  font-weight: 600;
+}
