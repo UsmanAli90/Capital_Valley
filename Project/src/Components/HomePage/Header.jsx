@@ -1,32 +1,29 @@
 import React, { useState } from "react";
-import logo from "../img/logo.png"; // Adjust the path if needed
-import { FiAlignJustify } from "react-icons/fi"; // Sidebar toggle icon
-import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes } from "react-icons/fa"; // Additional FaTimes for close icon
-import { FaSearch } from "react-icons/fa"; // Search icon
+import logo from '../../assets/Home/logo.png'
+import { FiAlignJustify } from "react-icons/fi";
+import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="bg-gray-100 pt-10">
-      {/* Header */}
       <header className="bg-white shadow-md px-4 py-3 flex items-center justify-between fixed top-0 left-0 w-full z-10">
-        {/* Logo */}
         <div className="flex items-center">
           <img src={logo} alt="Logo" className="h-10 rounded-full" />
         </div>
 
-        {/* Search Bar (Visible on all screen sizes) */}
-        <div className="flex-1 mx-4 flex items-center relative">
-          <FaSearch className="absolute left-3 text-gray-400" size={18} />
+        <div className="flex-1 flex items-center justify-center mx-4 relative">
           <input
             type="text"
             placeholder="Search..."
-            className="w-full pl-10 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full max-w-sm pl-10 pr-4 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-400"
           />
+          <FaSearch className="left text-gray-400" size={18} />
         </div>
 
-        {/* Icons for PC */}
+
         <div className="hidden lg:flex items-center space-x-6">
           <button className="text-gray-600 hover:text-blue-500 flex items-center">
             <FaHome size={20} />
@@ -42,7 +39,6 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Sidebar Toggle for Small Screens */}
         <button
           className="text-gray-600 hover:text-blue-500 lg:hidden"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -51,7 +47,6 @@ const Header = () => {
         </button>
       </header>
 
-      {/* Sidebar */}
       {isSidebarOpen && (
         <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-20">
           <div className="p-4 flex justify-between items-center border-b">

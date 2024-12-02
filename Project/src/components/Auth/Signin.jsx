@@ -50,7 +50,7 @@ function Signin() {
     e.preventDefault();
     if (validateForm()) {
 
-      navigate("/signup"); 
+      navigate("/"); 
     }
   };
 
