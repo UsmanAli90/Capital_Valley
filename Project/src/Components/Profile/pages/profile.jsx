@@ -1,8 +1,10 @@
 import { Helmet } from "react-helmet";
-import Text from "../components/text";
-import Img from "../components/img";
-import Button from "../components/button";
+import Text from "../component/text";
+import Img from "../component/img";
+import Button from "../component/button";
 import { useNavigate } from "react-router-dom";
+import Header from '../../HomePage/Header'
+import { Link } from 'react-router-dom';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ export default function ProfilePage() {
           content="Access your user profile to update settings, manage notifications, and log out. Personalize your experience with our user-friendly options."
         />
       </Helmet>
+      <Header></Header>
       <div className="flex w-full flex-col items-center gap-3.5 bg-white-a700 px-3.5 py-5 shadow-xs sm:gap-3.5">
         <div className="container-xs flex flex-col items-start gap-4 self-stretch sm:gap-4">
           <div className="flex items-center gap-4 self-stretch">
@@ -77,13 +80,15 @@ export default function ProfilePage() {
               Settings
             </Text>
           </div>
-          <Button>
-            <Img
-              src="profileAssets/images/next.png"
-              alt="Arrow Right"
-              className="h-[24px]"
-            />
-          </Button>
+          <Link to="/profileSetting">
+            <Button>
+              <Img
+                src="profileAssets/images/next.png"
+                alt="Arrow Right"
+                className="h-[24px]"
+              />
+            </Button>
+          </Link>
         </div>
 
         <div className="mx-2.5 flex self-stretch sm:mx-0 my-2 py-2">
@@ -105,16 +110,19 @@ export default function ProfilePage() {
 
         <div className="mx-2.5 mb-2 flex self-stretch sm:mx-0 my-2 py-2">
           <div className="flex items-center gap-2.5">
-            <Button className="mx-2.5 mb-2 flex self-stretch items-center gap-2.5 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded sm:mx-0 my-2">
-              <Img
-                src="profileAssets/images/power-off.png"
-                alt="Arrow Right Blue"
-                className="h-[24px]"
-              />
-              <Text as="p" className="text-[14px] font-normal">
-                Log Out
-              </Text>
-            </Button>
+            <Link to='/signin'>
+              <Button className="mx-2.5 mb-2 flex self-stretch items-center gap-2.5 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded sm:mx-0 my-2">
+                <Img
+                  src="profileAssets/images/power-off.png"
+                  alt="Arrow Right Blue"
+                  className="h-[24px]"
+                />
+
+                <Text as="p" className="text-[14px] font-normal">
+                  Log Out
+                </Text>
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

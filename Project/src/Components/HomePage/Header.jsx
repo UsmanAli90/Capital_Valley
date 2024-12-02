@@ -3,6 +3,7 @@ import logo from '../../assets/Home/logo.png'
 import { FiAlignJustify } from "react-icons/fi";
 import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,9 +26,11 @@ const Header = () => {
 
 
         <div className="hidden lg:flex items-center space-x-6">
-          <button className="text-gray-600 hover:text-blue-500 flex items-center">
-            <FaHome size={20} />
-          </button>
+          <Link to='/'>
+            <button className="text-gray-600 hover:text-blue-500 flex items-center">
+              <FaHome size={20} />
+            </button>
+          </Link>
           <button className="text-gray-600 hover:text-blue-500 flex items-center">
             <FaCommentAlt size={20} />
           </button>
@@ -35,7 +38,9 @@ const Header = () => {
             <FaBell size={20} />
           </button>
           <button className="text-gray-600 hover:text-blue-500 flex items-center">
-            <FaUserCircle size={20} />
+            <Link to="/profile">
+              <FaUserCircle size={20} />
+            </Link>
           </button>
         </div>
 
