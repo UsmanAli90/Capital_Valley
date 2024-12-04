@@ -3,6 +3,8 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require('./db.js');
 const Startup = require('./models/Startupdb.js'); 
+const {createStartup} =require('./controllers/startupsignup.js')
+const {signIn}= require('./controllers/Signin.js')
 
 
 dotenv.config();
@@ -12,26 +14,8 @@ app.use(express.json());
 app.use(cors());
 connectDB(process.env.MONGO_URI);
 
-app.post('/')
-
-
-app.post("/startupsignup", async (req, res) => {
-    try {
-        const { email, username, password, cnic, description } = req.body;
-        startupDescription= description;
-        const newStartup = new Startup({ email, username, password, cnic, startupDescription });
-        const savedStartup = await newStartup.save();
-
-        res.status(201).json({ message: "Startup created successfully", savedStartup });
-    } catch (err) {
-        if (err.code === 11000) {
-            return res.status(400).json({ message: "Email or CNIC already exists" });
-        }
-        console.error(err);
-        res.status(500).json({ message: "Internal server error" });
-    }
-});
-
+app.post("/startupsignup", createStartup);
+app.post('/signin',signIn)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

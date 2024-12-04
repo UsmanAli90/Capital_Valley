@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 
 function StartupForm() {
   const [formData, setFormData] = useState({
@@ -68,6 +68,7 @@ function StartupForm() {
         const data = await response.json();
         alert("Account created successfully!");
         console.log("Response Data:", data);
+        window.location.href = "/signin";
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.message}`);
