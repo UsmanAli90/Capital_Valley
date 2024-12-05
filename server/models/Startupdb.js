@@ -31,11 +31,13 @@ const startupSchema = new mongoose.Schema({
             'Please provide a valid CNIC (format: 12345-1234567-1)',
         ],
     },
+
     startupDescription: {
         type: String,
         required: true,
         maxlength: 500,
     },
+
     createdAt: {
         type: Date,
         default: Date.now,

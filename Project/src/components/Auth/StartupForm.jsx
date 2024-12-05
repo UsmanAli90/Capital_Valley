@@ -71,7 +71,7 @@ function StartupForm() {
         window.location.href = "/signin";
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.message}`);
+        alert("ERROR IS",errorData);
       }
     } catch (error) {
       console.error("Error creating account:", error);

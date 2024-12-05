@@ -43,9 +43,9 @@ function Signup() {
                         </div>
 
                         {usertype === 'startup' ? (
-                            <StartupForm />
+                            <StartupForm usertype={usertype} />
                         ) : (
-                            <InvestorForm />
+                            <InvestorForm usertype={usertype} />
                         )}
                     </div>
 

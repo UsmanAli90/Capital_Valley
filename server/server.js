@@ -4,7 +4,10 @@ const dotenv = require("dotenv");
 const connectDB = require('./db.js');
 const Startup = require('./models/Startupdb.js'); 
 const {createStartup} =require('./controllers/startupsignup.js')
-const {signIn}= require('./controllers/Signin.js')
+const {createInvestor} =require('./controllers/investorsignup.js')
+const {StartupsignIn}=require('./controllers/startupsignin.js')
+const {InvestorsignIn}=require('./controllers/investorsignin.js')
+
 
 
 dotenv.config();
@@ -15,7 +18,9 @@ app.use(cors());
 connectDB(process.env.MONGO_URI);
 
 app.post("/startupsignup", createStartup);
-app.post('/signin',signIn)
+app.post("/investorsignup", createInvestor);
+app.post("/startupsignin", StartupsignIn);
+app.post("/investorsignin", InvestorsignIn);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -4,6 +4,11 @@ import { useState } from "react";
 
 function Signin() {
   const navigate = useNavigate();
+
+  const [usertype, steusertype] = useState('startup');
+  const handleuser = (type) => {
+    steusertype(type)
+  }
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,41 +45,81 @@ function Signin() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
+    e.preventDefault(); 
 
     if (!formData.email || !formData.password) {
-      setErrors({ email: "Email is required", password: "Password is required" });
+      alert("Please fill in both email and password.");
+      return;
+    }
+
+    if (!usertype) {
+      alert("Please select a user type (Startup Founder or Investor).");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:3000/signin", {
+      const endpoint =
+        usertype === "startup"
+          ? "http://localhost:3000/startupsignin"
+          : "http://localhost:3000/investorsignin";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ email: formData.email, password: formData.password }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        alert("Sign-in successful!");
-        navigate("/"); // Redirect to homepage
+        alert("Login successful!");
+        console.log("Logged-in User Data:", data);
+
+        if (usertype === "startup") {
+          navigate("/");
+        } else {
+          navigate("/");
+        }
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.message}`);
+        alert(`Error: ${errorData.message || "Invalid credentials"}`);
       }
     } catch (error) {
-      console.error("Error during sign-in:", error);
-      alert("Something went wrong. Please try again later.");
+      console.error("Error during login:", error);
+      alert("An error occurred. Please try again.");
     }
   };
+
 
   return (
     <div className="bg-image d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4 shadow" style={{ width: "350px" }}>
-        <h3 className="text-center mb-4">Sign in</h3>
+        <h1 className="text-center mb-4">Sign in</h1>
+
+        <div>
+          <input
+            type="checkbox"
+            id="startup-checkbox"
+            checked={usertype === 'startup'}
+            onChange={() => handleuser('startup')}
+          />
+          <label className="ms-2" htmlFor="startup-checkbox">Startup Founder</label>
+        </div>
+        <div>
+          <input
+            type="checkbox"
+            id="investor-checkbox"
+            checked={usertype === 'investor'}
+            onChange={() => handleuser('investor')}
+          />
+          <label className="ms-2" htmlFor="investor-checkbox">Investor</label>
+        </div>
+
+
+        <br /><br />
+
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">

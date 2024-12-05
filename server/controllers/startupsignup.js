@@ -9,8 +9,11 @@ const createStartup = async (req, res) => {
     }
 
     const newStartup = new Startup({ email, username, password, cnic, startupDescription: description });
-    const savedStartup = await newStartup.save();
+    console.log("New Startup is",newStartup)
 
+
+    const savedStartup = await newStartup.save();
+    console.log("New Startup is",Startup)
     res.status(201).json({ message: "Startup created successfully", savedStartup });
   } catch (err) {
     if (err.code === 11000) {
