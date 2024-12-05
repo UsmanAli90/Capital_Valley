@@ -22,7 +22,7 @@ app.post("/startupsignup", createStartup);
 app.post("/investorsignup", createInvestor);
 app.post("/startupsignin", StartupsignIn);
 app.post("/investorsignin", InvestorsignIn);
-app.get("/search", searchProfiles)
+app.get("/search", searchProfiles  )
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

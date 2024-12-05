@@ -25,9 +25,6 @@ const Header = () => {
       setIsSearching(false);
     }
   };
-  const handleSearchClick = (id, role) => {
-    navigate(`/profile/${id}?role=${role}`);
-  };
 
   return (
     <div className="bg-gray-100 pt-10">
@@ -72,7 +69,6 @@ const Header = () => {
             </div>
           )}
         </div>
-        
 
         {/* Navigation Links */}
         <div className="hidden lg:flex items-center space-x-6">
