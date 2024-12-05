@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../Auth/signin.css";
 import Header from './Header'
 import logo from '../../assets/Home/logo.png'
 import { UserCircleIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
