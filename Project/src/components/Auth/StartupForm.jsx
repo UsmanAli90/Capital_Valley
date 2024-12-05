@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 
 function StartupForm() {
   const [formData, setFormData] = useState({
@@ -12,9 +12,10 @@ function StartupForm() {
   });
 
   const [formErrors, setFormErrors] = useState({});
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  const validateForm = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const errors = {};
 
 
@@ -50,23 +51,31 @@ function StartupForm() {
     }
 
     if (!formData.agree) {
-      errors.agree = "You must agree to receive updates.";
+      alert("You must agree to the terms and conditions.");
+      return;
     }
 
-    return errors;
-  };
+    try {
+      const response = await fetch("http://localhost:3000/startupsignup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const errors = validateForm();
-    if (Object.keys(errors).length === 0) {
-      console.log("Form submitted successfully:", formData);
-
-      setTimeout(() => {
-        navigate("/signin");
-      }, 500);
-    } else {
-      setFormErrors(errors);
+      if (response.ok) {
+        const data = await response.json();
+        alert("Account created successfully!");
+        console.log("Response Data:", data);
+        window.location.href = "/signin";
+      } else {
+        const errorData = await response.json();
+        alert("ERROR IS",errorData);
+      }
+    } catch (error) {
+      console.error("Error creating account:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 

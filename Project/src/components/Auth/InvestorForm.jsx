@@ -9,7 +9,6 @@ function InvestorForm() {
     username: "",
     password: "",
     cnic: "",
-    investmentAmount: "",
     areasOfInterest: "",
     agreed: false,
   });
@@ -44,12 +43,10 @@ function InvestorForm() {
         "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.";
     }
 
-    if (!formData.cnic.match(/^\d{13}$/)) {
-      newErrors.cnic = "CNIC must be exactly 13 digits.";
-    }
-
-    if (!formData.investmentAmount) {
-      newErrors.investmentAmount = "Investment amount is required.";
+    if (!formData.cnic) {
+      errors.cnic = "CNIC is required.";
+    } else if (!/^\d{13}$/.test(formData.cnic)) {
+      errors.cnic = "CNIC must be exactly 13 digits.";
     }
 
     if (!formData.areasOfInterest) {
@@ -65,19 +62,42 @@ function InvestorForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); 
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
 
+    // Validate form data
     if (validate()) {
-      navigate("/signin");
+      try {
+        const response = await fetch("http://localhost:3000/investorsignup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData), // Pass the form data
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert("Investor account created successfully!");
+          console.log("Response Data:", data);
+          navigate("/signin"); // Redirect to the Sign-in page
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message || "Something went wrong!"}`);
+        }
+      } catch (error) {
+        console.error("Error creating investor account:", error);
+        alert("An error occurred. Please try again.");
+      }
     }
   };
+
 
   return (
     <form
       className="card p-4 shadow-lg"
       style={{ maxWidth: "500px", margin: "0 auto", borderRadius: "15px" }}
-      onSubmit={handleSubmit} 
+      onSubmit={handleSubmit}
     >
       <h2 className="text-center mb-4 fw-bold">Sign Up</h2>
 
@@ -86,9 +106,8 @@ function InvestorForm() {
         <input
           type="email"
           name="email"
-          className={`form-control rounded-pill ${
-            errors.email ? "is-invalid" : ""
-          }`}
+          className={`form-control rounded-pill ${errors.email ? "is-invalid" : ""
+            }`}
           placeholder="Enter your email"
           value={formData.email}
           onChange={handleChange}
@@ -101,9 +120,8 @@ function InvestorForm() {
         <input
           type="text"
           name="username"
-          className={`form-control rounded-pill ${
-            errors.username ? "is-invalid" : ""
-          }`}
+          className={`form-control rounded-pill ${errors.username ? "is-invalid" : ""
+            }`}
           placeholder="Enter your username"
           value={formData.username}
           onChange={handleChange}
@@ -118,9 +136,8 @@ function InvestorForm() {
         <input
           type="password"
           name="password"
-          className={`form-control rounded-pill ${
-            errors.password ? "is-invalid" : ""
-          }`}
+          className={`form-control rounded-pill ${errors.password ? "is-invalid" : ""
+            }`}
           placeholder="Enter your password"
           value={formData.password}
           onChange={handleChange}
@@ -139,9 +156,8 @@ function InvestorForm() {
         <input
           type="text"
           name="cnic"
-          className={`form-control rounded-pill ${
-            errors.cnic ? "is-invalid" : ""
-          }`}
+          className={`form-control rounded-pill ${errors.cnic ? "is-invalid" : ""
+            }`}
           placeholder="Enter your CNIC"
           value={formData.cnic}
           onChange={handleChange}
@@ -149,30 +165,14 @@ function InvestorForm() {
         {errors.cnic && <div className="invalid-feedback">{errors.cnic}</div>}
       </div>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Investment Amount</label>
-        <input
-          type="text"
-          name="investmentAmount"
-          className={`form-control rounded-pill ${
-            errors.investmentAmount ? "is-invalid" : ""
-          }`}
-          placeholder="Enter your investment range"
-          value={formData.investmentAmount}
-          onChange={handleChange}
-        />
-        {errors.investmentAmount && (
-          <div className="invalid-feedback">{errors.investmentAmount}</div>
-        )}
-      </div>
+
 
       <div className="mb-3">
         <label className="form-label fw-semibold">Areas of Interest</label>
         <textarea
           name="areasOfInterest"
-          className={`form-control rounded-pill ${
-            errors.areasOfInterest ? "is-invalid" : ""
-          }`}
+          className={`form-control rounded-pill ${errors.areasOfInterest ? "is-invalid" : ""
+            }`}
           rows="2"
           placeholder="Enter areas of interest"
           value={formData.areasOfInterest}
