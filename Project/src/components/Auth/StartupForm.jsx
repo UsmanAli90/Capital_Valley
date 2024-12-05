@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function StartupForm() {
   const [formData, setFormData] = useState({
@@ -11,71 +11,71 @@ function StartupForm() {
     agree: false,
   });
 
-  const [formErrors, setFormErrors] = useState({});
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errors = {};
+  const validate = () => {
+    const newErrors = {};
 
-
-    if (!formData.email) {
-      errors.email = "Email is required.";
-    } else if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(formData.email)) {
-      errors.email = "Please enter a valid email address.";
+    if (!formData.email.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/)) {
+      newErrors.email = "Please enter a valid email address.";
     }
 
     if (!formData.username) {
-      errors.username = "Username is required.";
+      newErrors.username = "Username is required.";
     }
 
-    if (!formData.password) {
-      errors.password = "Password is required.";
-    } else if (
-      !/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(
-        formData.password
+    if (
+      !formData.password.match(
+        /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/
       )
     ) {
-      errors.password =
-        "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.";
+      newErrors.password =
+        "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.";
     }
 
     if (!formData.cnic) {
-      errors.cnic = "CNIC is required.";
+      newErrors.cnic = "CNIC is required.";
     } else if (!/^\d{13}$/.test(formData.cnic)) {
-      errors.cnic = "CNIC must be exactly 13 digits.";
+      newErrors.cnic = "CNIC must be exactly 13 digits.";
     }
 
     if (!formData.description) {
-      errors.description = "Startup description is required.";
+      newErrors.description = "Startup description is required.";
     }
 
     if (!formData.agree) {
-      alert("You must agree to the terms and conditions.");
-      return;
+      newErrors.agree = "You must agree to the terms and conditions.";
     }
 
-    try {
-      const response = await fetch("http://localhost:3000/startupsignup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-      if (response.ok) {
-        const data = await response.json();
-        alert("Account created successfully!");
-        console.log("Response Data:", data);
-        window.location.href = "/signin";
-      } else {
-        const errorData = await response.json();
-        alert("ERROR IS",errorData);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (validate()) {
+      try {
+        const response = await fetch("http://localhost:3000/startupsignup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          alert("Account created successfully!");
+          navigate("/signin");
+        } else {
+          const errorData = await response.json();
+          alert("Error: " + errorData.message || "Unable to sign up.");
+        }
+      } catch (error) {
+        console.error("Error creating account:", error);
+        alert("An error occurred. Please try again.");
       }
-    } catch (error) {
-      console.error("Error creating account:", error);
-      alert("An error occurred. Please try again.");
     }
   };
 
@@ -105,9 +105,7 @@ function StartupForm() {
           value={formData.email}
           onChange={handleChange}
         />
-        {formErrors.email && (
-          <small className="text-danger">{formErrors.email}</small>
-        )}
+        {errors.email && <small className="text-danger">{errors.email}</small>}
       </div>
 
       <div className="mb-3">
@@ -120,8 +118,8 @@ function StartupForm() {
           value={formData.username}
           onChange={handleChange}
         />
-        {formErrors.username && (
-          <small className="text-danger">{formErrors.username}</small>
+        {errors.username && (
+          <small className="text-danger">{errors.username}</small>
         )}
       </div>
 
@@ -137,10 +135,10 @@ function StartupForm() {
         />
         <small className="text-muted">
           • Use 8 or more characters<br />
-          • One Uppercase character, lowercase, special character, and number
+          • One uppercase, lowercase, special character, and number
         </small>
-        {formErrors.password && (
-          <small className="text-danger">{formErrors.password}</small>
+        {errors.password && (
+          <small className="text-danger">{errors.password}</small>
         )}
       </div>
 
@@ -154,23 +152,21 @@ function StartupForm() {
           value={formData.cnic}
           onChange={handleChange}
         />
-        {formErrors.cnic && (
-          <small className="text-danger">{formErrors.cnic}</small>
-        )}
+        {errors.cnic && <small className="text-danger">{errors.cnic}</small>}
       </div>
 
       <div className="mb-3">
         <label className="form-label fw-semibold">Startup Description</label>
         <textarea
-          className="form-control rounded-pill"
+          className="form-control"
           rows="2"
           placeholder="Enter your startup description"
           name="description"
           value={formData.description}
           onChange={handleChange}
         ></textarea>
-        {formErrors.description && (
-          <small className="text-danger">{formErrors.description}</small>
+        {errors.description && (
+          <small className="text-danger">{errors.description}</small>
         )}
       </div>
 
@@ -187,9 +183,7 @@ function StartupForm() {
           I want to receive emails about the product, feature updates, and
           events.
         </label>
-        {formErrors.agree && (
-          <small className="text-danger">{formErrors.agree}</small>
-        )}
+        {errors.agree && <small className="text-danger">{errors.agree}</small>}
       </div>
 
       <p className="small text-muted">

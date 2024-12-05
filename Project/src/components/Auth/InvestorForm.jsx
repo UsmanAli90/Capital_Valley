@@ -63,9 +63,8 @@ function InvestorForm() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault(); 
 
-    // Validate form data
     if (validate()) {
       try {
         const response = await fetch("http://localhost:3000/investorsignup", {
@@ -73,14 +72,14 @@ function InvestorForm() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData), // Pass the form data
+          body: JSON.stringify(formData),
         });
 
         if (response.ok) {
           const data = await response.json();
           alert("Investor account created successfully!");
           console.log("Response Data:", data);
-          navigate("/signin"); // Redirect to the Sign-in page
+          navigate("/signin"); 
         } else {
           const errorData = await response.json();
           alert(`Error: ${errorData.message || "Something went wrong!"}`);
@@ -91,7 +90,6 @@ function InvestorForm() {
       }
     }
   };
-
 
   return (
     <form
