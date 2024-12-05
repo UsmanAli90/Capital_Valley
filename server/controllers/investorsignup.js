@@ -1,4 +1,5 @@
 const Investor = require("../models/Investordb"); // Assuming you have an Investor model
+const bcrypt = require('bcrypt');
 
 const createInvestor = async (req, res) => {
   try {
@@ -8,6 +9,10 @@ const createInvestor = async (req, res) => {
     if (!email || !username || !password || !cnic || !areasOfInterest || agreed === undefined) {
       return res.status(400).json({ message: "All fields are required" });
     }
+    // Hash the password before saving
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    password = hashedPassword;
 
     // Create a new investor instance
     const newInvestor = new Investor({

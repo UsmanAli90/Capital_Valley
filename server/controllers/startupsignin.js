@@ -1,4 +1,5 @@
 const startupuser = require('../models/Startupdb');
+const bcrypt = require('bcrypt');
 
 
 const StartupsignIn = async (req, res) => {
@@ -15,9 +16,9 @@ const StartupsignIn = async (req, res) => {
     if (!startupuser1) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    
-    if (startupuser1.password !== password) {
-      console.log("password is ", req.password)
+
+    const isMatch = await bcrypt.compare(password, startupuser1.password);
+    if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
