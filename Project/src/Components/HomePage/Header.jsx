@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import logo from '../../assets/Home/logo.png';
+import logo from '../../assets/Home/CapitalValleyLogo.png';
 import { FiAlignJustify } from "react-icons/fi";
 import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes, FaSearch } from "react-icons/fa";
 import { Link } from 'react-router-dom';
@@ -28,10 +28,14 @@ const Header = () => {
 
   return (
     <div className="bg-gray-100 pt-10">
-      <header className="bg-gradient-to-r from-blue-700 via-purple-900 to-pink-500 shadow-lg px-4 py-3 flex items-center justify-between fixed top-0 left-0 w-full z-10">
-        <div className="flex items-center">
-        <a href="/"><img src={logo}  alt="Logo" className="h-10 rounded-full shadow-lg" /></a>
+      <header className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg px-4 py-3 flex items-center justify-between fixed top-0 left-0 w-full z-10">
+        <div className="flex items-center space-x-3">
+          <a href="/" className="flex items-center">
+            <img src={logo} alt="Logo" className="h-10 w-auto rounded-full shadow-lg" />
+            <span className="ml-2 text-lg font-semibold text-white ">Capital Valley</span>
+          </a>
         </div>
+
 
         {/* Search Bar */}
         <div className="flex-1 flex items-center justify-center mx-4 relative">
@@ -77,17 +81,17 @@ const Header = () => {
         {/* Navigation Links */}
         <div className="hidden lg:flex items-center space-x-6">
           <Link to="/">
-            <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
+            <button className="text-grey hover:text-green-400 flex items-center transition duration-300">
               <FaHome size={20} />
             </button>
           </Link>
-          <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
+          <button className="text-grey hover:text-green-400 flex items-center transition duration-300">
             <FaCommentAlt size={20} />
           </button>
-          <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
+          <button className="text-grey hover:text-green-400 flex items-center transition duration-300">
             <FaBell size={20} />
           </button>
-          <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
+          <button className="text-grey hover:text-green-400 flex items-center transition duration-300">
             <Link to="/profile">
               <FaUserCircle size={20} />
             </Link>
