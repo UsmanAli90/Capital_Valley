@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "../Auth/signin.css";
 import Header from './Header'
 import logo from '../../assets/Home/logo.png'
 import { UserCircleIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
@@ -116,12 +115,12 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen ">
+    <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 shadow-lg min-h-screen ">
       <Header />
 
   
-      <div className="flex justify-between min-h-screen bg-gray-100">
-        <div className="flex flex-col flex-1 p-4 bg-white shadow-lg rounded-lg max-w-5xl mx-auto">
+      <div className="flex justify-between min-h-screen ">
+        <div className="flex flex-col flex-1 p-4 rounded-lg max-w-5xl mx-auto">
           <header className="bg-white shadow-sm p-4 flex items-center justify-between rounded-lg">
             <button className="text-gray-600 hover:text-blue-500">
               <UserCircleIcon className="h-6 w-6" />
@@ -141,7 +140,7 @@ const HomePage = () => {
                 onChange={handleFileChange} 
               />
               <button
-                className="bg-blue-500 text-white py-2 px-4 rounded-lg"
+                className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 shadow-lg text-white py-2 px-4 rounded-lg"
                 onClick={() => document.getElementById("fileInput").click()} 
               >
                 Upload Photo

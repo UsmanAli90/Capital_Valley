@@ -12,7 +12,7 @@ const Header = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async () => {
-    if (!query) return; 
+    if (!query) return;
 
     setIsSearching(true);
     try {
@@ -28,9 +28,9 @@ const Header = () => {
 
   return (
     <div className="bg-gray-100 pt-10">
-      <header className="bg-white shadow-md px-4 py-3 flex items-center justify-between fixed top-0 left-0 w-full z-10">
+      <header className="bg-gradient-to-r from-blue-700 via-purple-900 to-pink-500 shadow-lg px-4 py-3 flex items-center justify-between fixed top-0 left-0 w-full z-10">
         <div className="flex items-center">
-          <img src={logo} alt="Logo" className="h-10 rounded-full" />
+        <a href="/"><img src={logo}  alt="Logo" className="h-10 rounded-full shadow-lg" /></a>
         </div>
 
         {/* Search Bar */}
@@ -41,9 +41,13 @@ const Header = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full max-w-sm pl-10 pr-4 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full max-w-sm pl-10 pr-4 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
           />
-          <FaSearch className="left text-gray-400 cursor-pointer" size={18} onClick={handleSearch} />
+          <FaSearch
+            className="aleft text-white pl-1 cursor-pointer"
+            size={18}
+            onClick={handleSearch}
+          />
           {/* Search Results Dropdown */}
           {results.length > 0 && (
             <div className="absolute top-12 left-0 w-full bg-white border border-gray-300 rounded-lg shadow-md max-h-60 overflow-y-auto">
@@ -51,7 +55,7 @@ const Header = () => {
                 <Link
                   to={`/profile/${result._id}`}
                   key={result._id}
-                  className="block px-4 py-2 text-gray-700 hover:bg-blue-100"
+                  className="block px-4 py-2 text-gray-700 hover:bg-purple-100"
                 >
                   {result.username}
                 </Link>
@@ -72,18 +76,18 @@ const Header = () => {
 
         {/* Navigation Links */}
         <div className="hidden lg:flex items-center space-x-6">
-          <Link to='/'>
-            <button className="text-gray-600 hover:text-blue-500 flex items-center">
+          <Link to="/">
+            <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
               <FaHome size={20} />
             </button>
           </Link>
-          <button className="text-gray-600 hover:text-blue-500 flex items-center">
+          <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
             <FaCommentAlt size={20} />
           </button>
-          <button className="text-gray-600 hover:text-blue-500 flex items-center">
+          <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
             <FaBell size={20} />
           </button>
-          <button className="text-gray-600 hover:text-blue-500 flex items-center">
+          <button className="text-grey hover:text-gray-200 flex items-center transition duration-300">
             <Link to="/profile">
               <FaUserCircle size={20} />
             </Link>
@@ -92,7 +96,7 @@ const Header = () => {
 
         {/* Sidebar Toggle */}
         <button
-          className="text-gray-600 hover:text-blue-500 lg:hidden"
+          className="text-white hover:text-gray-200 lg:hidden transition duration-300"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
           {isSidebarOpen ? <FaTimes size={24} /> : <FiAlignJustify size={24} />}
@@ -101,11 +105,11 @@ const Header = () => {
 
       {/* Sidebar Menu */}
       {isSidebarOpen && (
-        <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-20">
-          <div className="p-4 flex justify-between items-center border-b">
-            <h2 className="font-bold text-lg">Menu</h2>
+        <div className="fixed top-0 right-0 w-64 h-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg z-20">
+          <div className="p-4 flex justify-between items-center border-b border-purple-300">
+            <h2 className="font-bold text-white text-lg">Menu</h2>
             <button
-              className="text-gray-600 hover:text-blue-500"
+              className="text-white hover:text-gray-200 transition duration-300"
               onClick={() => setIsSidebarOpen(false)}
             >
               <FaTimes size={20} />
@@ -113,16 +117,16 @@ const Header = () => {
           </div>
           <nav className="p-4">
             <ul className="space-y-4">
-              <li className="text-gray-700 hover:text-blue-500 flex items-center">
+              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
                 <FaHome className="mr-2" /> Home
               </li>
-              <li className="text-gray-700 hover:text-blue-500 flex items-center">
+              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
                 <FaCommentAlt className="mr-2" /> Chat
               </li>
-              <li className="text-gray-700 hover:text-blue-500 flex items-center">
+              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
                 <FaBell className="mr-2" /> Notifications
               </li>
-              <li className="text-gray-700 hover:text-blue-500 flex items-center">
+              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
                 <FaUserCircle className="mr-2" /> Profile
               </li>
             </ul>
