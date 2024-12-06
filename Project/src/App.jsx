@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Signin from './Components/Auth/Signin.jsx'
-import Signup from './Components/Auth/Signup.jsx'
-import HomePage from './Components/HomePage/HomePage.jsx';
-import Profile from './Components/Profile/pages/profile.jsx'
-import ProfileSetting from './Components/Profile/pages/profileSetting.jsx'
-import Notfound from './Components/Profile/pages/NotFound.jsx'
+import Signin from './components/Auth/Signin.jsx'
+import Signup from './components/Auth/Signup.jsx'
+import HomePage from './components/HomePage/HomePage.jsx'
+import Profile from './components/Profile/pages/profile.jsx'
+import ProfileSetting from './components/Profile/pages/profileSetting.jsx'
+import Notfound from './components/Profile/pages/NotFound.jsx'
 
 
 function App() {
