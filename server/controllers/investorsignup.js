@@ -42,6 +42,13 @@ const createInvestor = async (req, res) => {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });
     }
-  };
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ message: "Email or CNIC already exists" });
+    }
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
-  module.exports = { createInvestor };
+module.exports = { createInvestor };
