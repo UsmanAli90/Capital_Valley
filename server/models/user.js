@@ -1,23 +1,28 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
+// Define the schema for the User
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, "Email is required"],
-    // match: [
-    //   /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-    //   "Please provide a valid email address",
-    // ],
+    required: true,
+    unique: true, // Ensure the email is unique
   },
   password: {
     type: String,
-    required: [true, "Password is required"],
-    minlength: [6, "Password must be at least 6 characters long"],
+    required: true,
   },
-  createdAt: {
+  otp: {
+    type: String,
+    required: false, // This field can be used for OTP verification
+  },
+  otpExpires: {
     type: Date,
-    default: Date.now,
+    required: false, // This field can be used to set an expiration time for OTP
   },
+  // Add any other fields as necessary
 });
 
-module.exports = mongoose.model("user", userSchema);
+// Create and export the User model based on the schema
+const User = mongoose.model('User', userSchema);
+
+module.exports = { User };
