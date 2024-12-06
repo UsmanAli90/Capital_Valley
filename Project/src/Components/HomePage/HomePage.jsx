@@ -3,10 +3,38 @@ import Header from './Header'
 import logo from '../../assets/Home/logo.png'
 import { UserCircleIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 
+
+const handleFormSubmit = (e) => {
+  e.preventDefault();
+
+  if (niche && title && description && costRange) {
+    const newPost = {
+      id: posts.length + 1,
+      user: "User3", // Update this with Dynamic User asap(Usman Ali)
+      image: null, 
+      upvotes: 0,
+      comments: [],
+      description: `${title}: ${description} (${niche}, Cost: ${costRange})`,
+      timestamp: new Date(),
+      hasUpvoted: false,
+      isCommenting: false,
+      newComment: "",
+    };
+
+    setPosts([newPost, ...posts]);
+    setNiche("");
+    setTitle("");
+    setDescription("");
+    setCostRange("");
+    setIsFormVisible(false); 
+  } else {
+    alert("Please fill in all fields.");
+  }
+};
+
 const HomePage = () => {
   const [upvotes, setUpvotes] = useState([0, 0]);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [description, setDescription] = useState("");
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -32,9 +60,13 @@ const HomePage = () => {
       isCommenting: false,
       newComment: ""
     },
-  ]);
 
-  // Function to handle upvotes
+  ]);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  const toggleFormVisibility = () => {
+    setIsFormVisible(!isFormVisible);
+  };
   const handleUpvote = (index) => {
     const newPosts = [...posts];
     if (!newPosts[index].hasUpvoted) {
@@ -44,7 +76,6 @@ const HomePage = () => {
     }
   };
 
-  // Function to handle adding a comment
   const handleAddComment = (index) => {
     const newPosts = [...posts];
     const comment = newPosts[index].newComment.trim();
@@ -56,27 +87,23 @@ const HomePage = () => {
     }
   };
 
-  // Function to handle comment input change
   const handleCommentChange = (index, event) => {
     const newPosts = [...posts];
     newPosts[index].newComment = event.target.value;
     setPosts(newPosts);
   };
 
-  // Function to handle file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       setSelectedFile(URL.createObjectURL(file));
     }
   };
-
-  // Function to handle description change
+ 
   const handleDescriptionChange = (event) => {
     setDescription(event.target.value);
   };
 
-  // Function to format time difference (e.g., "5 minutes ago")
   const timeAgo = (timestamp) => {
     const now = new Date();
     const diff = now - new Date(timestamp);
@@ -93,7 +120,6 @@ const HomePage = () => {
     }
   };
 
-  // Function to handle post submission
   const handlePostSubmit = () => {
     if (description) {
       const newPost = {
@@ -114,6 +140,11 @@ const HomePage = () => {
     }
   };
 
+  const [niche, setNiche] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [costRange, setCostRange] = useState("");
+
   return (
     <div className="bg-white shadow-lg min-h-screen ">
       <Header />
@@ -121,32 +152,88 @@ const HomePage = () => {
 
       <div className="max-w-6xl mx-auto py-8 ">
         <div className="flex flex-col flex-1 p-4 rounded-lg max-w-5xl mx-auto">
-          <header className="border-2 border-green-800 rounded-lg p-4 bg-white shadow-sm flex items-center justify-between">
-            <button className="text-gray-600 hover:text-green-400">
-              <UserCircleIcon className="h-6 w-6" />
+          <div className="flex items-center justify-center p-4">
+            <button
+              onClick={toggleFormVisibility}
+              className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
+            >
+              {isFormVisible ? "Cancel" : "Post Idea"}
             </button>
-            <input
-              type="text"
-              placeholder="What's on your mind..."
-              className="border border-gray-300 rounded-lg p-2 w-1/3 outline-none focus:ring-2 focus:ring-blue-400"
-              value={description}
-              onChange={handleDescriptionChange}
-            />
-            <div className="relative ">
-              <input
-                type="file"
-                id="fileInput"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-              <button
-                className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
-                onClick={() => document.getElementById("fileInput").click()}
-              >
-                Upload Photo
-              </button>
+          </div>
+
+          {isFormVisible && (
+            <div className="p-4 border border-gray-300 rounded-lg mt-4">
+              <h2 className="text-lg font-bold mb-4">Post Your Idea</h2>
+              <form onSubmit={handleFormSubmit}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Select Niche
+                  </label>
+                  <select
+                    value={niche}
+                    onChange={(e) => setNiche(e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  >
+                    <option value="">Select a Niche</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Tech">Tech</option>
+                    <option value="Health">Health</option>
+                    <option value="Education">Education</option>
+                    <option value="E-commerce">E-commerce</option>
+                    {/* Add more niches as needed */}
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Problem Statement
+                  </label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    placeholder="Enter the problem statement of your idea"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Proposed Solution
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    placeholder="Enter the proposed solution for your idea"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Cost Range
+                  </label>
+                  <input
+                    type="text"
+                    value={costRange}
+                    onChange={(e) => setCostRange(e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    placeholder="Enter cost range (e.g., $1000 - $5000)"
+                  />
+                </div>
+
+              
+
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
+                >
+                  Submit
+                </button>
+              </form>
             </div>
-          </header>
+          )}
+
 
 
           {selectedFile && (
