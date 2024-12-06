@@ -27,8 +27,8 @@ const startupSchema = new mongoose.Schema({
         required: true,
         unique: true,
         match: [
-            /^\d{5}-\d{7}-\d$/,
-            'Please provide a valid CNIC (format: 12345-1234567-1)',
+            /^(?:\d{5}-\d{7}-\d|\d{13})$/,
+            'Please provide a valid CNIC (format: 12345-1234567-1 or 1234512345671)',
         ],
     },
 

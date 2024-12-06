@@ -10,10 +10,18 @@ const createStartup = async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    password = hashedPassword;
+    const securePassword = hashedPassword;
 
-    const newStartup = new Startup({ email, username, password, cnic, startupDescription: description });
-    console.log("New Startup is", newStartup)
+    const newStartup = new Startup({ email, username, password: securePassword, cnic, startupDescription: description });
+
+    try {
+      await newStartup.save();
+      console.log("New Startup is", newStartup);
+      res.status(201).json({ message: "Startup created successfully", startup: newStartup });
+    } catch (error) {
+      console.error("Error creating startup:", error);
+      res.status(500).json({ message: "Error creating startup", error: error.message });
+    }
 
 
     const savedStartup = await newStartup.save();

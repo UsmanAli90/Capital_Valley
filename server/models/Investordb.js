@@ -26,10 +26,14 @@ const investorSchema = new mongoose.Schema({
   },
   cnic: {
     type: String,
-    required: [true, "CNIC is required"],
-    match: [/^\d{5}-\d{7}-\d$/, "Invalid CNIC format (XXXXX-XXXXXXX-X)"],
+    required: true,
+    unique: true,
+    match: [
+      /^(?:\d{5}-\d{7}-\d|\d{13})$/,
+      'Please provide a valid CNIC (format: 12345-1234567-1 or 1234512345671)',
+    ],
   },
-  
+
   areasOfInterest: {
     type: String,
     required: [true, "Areas of interest are required"],
