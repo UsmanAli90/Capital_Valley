@@ -39,6 +39,7 @@ const InvestorsignIn = async (req, res) => {
       email: investoruser1.email,
       // Add other details as needed
     };
+  
 
     const investorDetails = await investoruser.findById(investoruser1._id);
     console.log(investorDetails);
