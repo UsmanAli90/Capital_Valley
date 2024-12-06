@@ -5,10 +5,10 @@ import { useState } from "react";
 function Signin() {
   const navigate = useNavigate();
 
-  const [usertype, steusertype] = useState('startup');
+  const [usertype, steusertype] = useState("startup");
   const handleuser = (type) => {
-    steusertype(type)
-  }
+    steusertype(type);
+  };
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,25 +27,58 @@ function Signin() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email) {
-      newErrors.email = "Email is required.";
-    } else if (
-      !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(formData.email)
+    if (
+      !formData.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
     ) {
       newErrors.email = "Please enter a valid email address.";
+    } else if (/\s/.test(formData.email)) {
+      newErrors.email = "Email should not contain spaces.";
+    } else if (/[^a-zA-Z0-9._%+-@]/.test(formData.email)) {
+      newErrors.email = "Email contains invalid characters.";
+    } else if (/[+-]/.test(formData.email)) {
+      newErrors.email =
+        "Email should not contain negative signs or plus signs.";
+    } else {
+      // Additional check to ensure the email domain is valid
+      const domain = formData.email.split("@")[1];
+      const validDomains = [
+        "gmail.com",
+        "yahoo.com",
+        "hotmail.com",
+        "outlook.com",
+        "aol.com",
+        "icloud.com",
+        "mail.com",
+        "zoho.com",
+        // Add more valid domains as needed
+      ];
+      if (!validDomains.includes(domain)) {
+        newErrors.email =
+          "Please enter a valid email address with a commonly used domain.";
+      }
     }
 
-    if (!formData.password) {
-      newErrors.password = "Password is required.";
+    if (
+      !formData.password.match(
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+    ) {
+      newErrors.password =
+        "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.";
+    } else if (/\s/.test(formData.password)) {
+      newErrors.password = "Password should not contain spaces.";
     }
-
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     if (!formData.email || !formData.password) {
       alert("Please fill in both email and password.");
@@ -68,7 +101,10 @@ function Signin() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
       if (response.ok) {
@@ -91,7 +127,6 @@ function Signin() {
     }
   };
 
-
   return (
     <div className="bg-image d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4 shadow" style={{ width: "350px" }}>
@@ -101,24 +136,27 @@ function Signin() {
           <input
             type="checkbox"
             id="startup-checkbox"
-            checked={usertype === 'startup'}
-            onChange={() => handleuser('startup')}
+            checked={usertype === "startup"}
+            onChange={() => handleuser("startup")}
           />
-          <label className="ms-2" htmlFor="startup-checkbox">Startup Founder</label>
+          <label className="ms-2" htmlFor="startup-checkbox">
+            Startup Founder
+          </label>
         </div>
         <div>
           <input
             type="checkbox"
             id="investor-checkbox"
-            checked={usertype === 'investor'}
-            onChange={() => handleuser('investor')}
+            checked={usertype === "investor"}
+            onChange={() => handleuser("investor")}
           />
-          <label className="ms-2" htmlFor="investor-checkbox">Investor</label>
+          <label className="ms-2" htmlFor="investor-checkbox">
+            Investor
+          </label>
         </div>
 
-
-        <br /><br />
-
+        <br />
+        <br />
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -127,14 +165,18 @@ function Signin() {
             </label>
             <input
               type="email"
-              className={`form-control rounded-pill ${errors.email ? "is-invalid" : ""}`}
+              className={`form-control rounded-pill ${
+                errors.email ? "is-invalid" : ""
+              }`}
               id="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Enter your email"
             />
-            {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+            {errors.email && (
+              <div className="invalid-feedback">{errors.email}</div>
+            )}
           </div>
           <div className="mb-2 position-relative">
             <label htmlFor="password" className="form-label">
@@ -142,14 +184,18 @@ function Signin() {
             </label>
             <input
               type="password"
-              className={`form-control rounded-pill ${errors.password ? "is-invalid" : ""}`}
+              className={`form-control rounded-pill ${
+                errors.password ? "is-invalid" : ""
+              }`}
               id="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
               placeholder="Enter your password"
             />
-            {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+            {errors.password && (
+              <div className="invalid-feedback">{errors.password}</div>
+            )}
           </div>
           <div className="mb-3 text-end">
             <a href="#" className="text-decoration-none">
@@ -168,7 +214,6 @@ function Signin() {
         </div>
       </div>
     </div>
-
   );
 }
 
