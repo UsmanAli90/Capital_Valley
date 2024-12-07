@@ -1,5 +1,5 @@
 const Startup = require("../models/Startupdb.js");
-
+const bcrypt = require('bcrypt');
 const createStartup = async (req, res) => {
   try {
     const { email, username, password, cnic, description } = req.body;

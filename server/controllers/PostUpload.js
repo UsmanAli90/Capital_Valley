@@ -14,18 +14,21 @@ const createPost = async (req, res) => {
     isFullTime,
   } = req.body;
 
+
   try {
     const newPost = await Post.create({
       problem,
       solution,
       niches,
       costRange,
+
       companyName,
       companyUrl,
       productLink,
       companyLocation,
       activeUsers,
       isFullTime,
+
     });
 
     res.status(201).json(newPost);

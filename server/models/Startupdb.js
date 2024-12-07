@@ -31,13 +31,17 @@ const startupSchema = new mongoose.Schema({
             'Please provide a valid CNIC (format: 12345-1234567-1)',
         ],
     },
-
     startupDescription: {
         type: String,
         required: true,
         maxlength: 500,
     },
-
+    otp: {
+        type: String, // Store the generated OTP
+    },
+    otpExpires: {
+        type: Date, // Store the expiration time for the OTP
+    },
     createdAt: {
         type: Date,
         default: Date.now,
