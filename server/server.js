@@ -8,6 +8,7 @@ const { createInvestor } = require('./controllers/investorsignup.js')
 const { StartupsignIn } = require('./controllers/startupsignin.js')
 const { InvestorsignIn } = require('./controllers/investorsignin.js')
 const { searchProfiles } = require('./controllers/searchcontroller.js')
+const { createPost } = require('./controllers/PostUpload.js')
 
 
 
@@ -22,6 +23,7 @@ app.post("/startupsignup", createStartup);
 app.post("/investorsignup", createInvestor);
 app.post("/startupsignin", StartupsignIn);
 app.post("/investorsignin", InvestorsignIn);
+app.post("/posts", createPost);
 app.get("/search", searchProfiles  )
 
 const PORT = process.env.PORT || 3000;

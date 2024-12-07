@@ -1,45 +1,27 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import Header from './Header'
 import logo from '../../assets/Home/logo.png'
 import { UserCircleIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 
 
-const handleFormSubmit = (e) => {
-  e.preventDefault();
-
-  if (niche && title && description && costRange) {
-    const newPost = {
-      id: posts.length + 1,
-      user: "User3", // Update this with Dynamic User asap(Usman Ali)
-      image: null, 
-      upvotes: 0,
-      comments: [],
-      description: `${title}: ${description} (${niche}, Cost: ${costRange})`,
-      timestamp: new Date(),
-      hasUpvoted: false,
-      isCommenting: false,
-      newComment: "",
-    };
-
-    setPosts([newPost, ...posts]);
-    setNiche("");
-    setTitle("");
-    setDescription("");
-    setCostRange("");
-    setIsFormVisible(false); 
-  } else {
-    alert("Please fill in all fields.");
-  }
-};
-
 const HomePage = () => {
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const [upvotes, setUpvotes] = useState([0, 0]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [niche, setNiche] = useState([]);
+  const [problem, setProblem] = useState("");
+  const [solution, setSolution] = useState("");
+  const [description, setDescription] = useState("");
+  const [costRange, setCostRange] = useState("");
+  const [feed, setFeed] = useState([]);
   const [posts, setPosts] = useState([
     {
       id: 1,
       user: "User1",
       image: logo,
+      problem: "None",
+      solution: "None",
       upvotes: 0,
       comments: [],
       description: "Sample description",
@@ -52,6 +34,8 @@ const HomePage = () => {
       id: 2,
       user: "User2",
       image: logo,
+      problem: "None",
+      solution: "None",
       upvotes: 0,
       comments: [],
       description: "Another description",
@@ -62,19 +46,36 @@ const HomePage = () => {
     },
 
   ]);
-  const [isFormVisible, setIsFormVisible] = useState(false);
+
 
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
+
+  // const handleUpvote = (index) => {
+  //   const newPosts = [...posts];
+  //   if (!newPosts[index].hasUpvoted) {
+  //     newPosts[index].upvotes += 1;
+  //     newPosts[index].hasUpvoted = true;
+  //     setPosts(newPosts);
+  //   }
+  // };
+
   const handleUpvote = (index) => {
     const newPosts = [...posts];
-    if (!newPosts[index].hasUpvoted) {
-      newPosts[index].upvotes += 1;
-      newPosts[index].hasUpvoted = true;
-      setPosts(newPosts);
+    const post = newPosts[index];
+  
+    if (post.hasUpvoted) {
+      post.upvotes -= 1;
+      post.hasUpvoted = false;
+    } else {
+      post.upvotes += 1;
+      post.hasUpvoted = true;
     }
+  
+    setPosts(newPosts);
   };
+  
 
   const handleAddComment = (index) => {
     const newPosts = [...posts];
@@ -99,7 +100,7 @@ const HomePage = () => {
       setSelectedFile(URL.createObjectURL(file));
     }
   };
- 
+
   const handleDescriptionChange = (event) => {
     setDescription(event.target.value);
   };
@@ -120,35 +121,180 @@ const HomePage = () => {
     }
   };
 
-  const handlePostSubmit = () => {
-    if (description) {
+  //handleFormSubmit is not called anywhere commented myself(Usman Ali)
+
+
+  // const handleFormSubmit = (e) => {
+  //   e.preventDefault();
+
+
+  //   if (niche.length > 0 && problem && solution && costRange) {
+  //     const newPost = {
+  //       user: "User3", // Update this with Dynamic User asap(Usman Ali)
+  //       image: null,
+  //       upvotes: 0,
+  //       comments: [],
+  //       problem,
+  //       solution,
+  //       niches: niche,
+  //       costRange,
+  //       description: `Problem Statement: ${problem} Solution: ${solution} Niche: ${niche} Cost: ${costRange}`,
+  //       // description: `Problem Statement: <strong>${problem}</strong><br>Solution: <strong>${solution}</strong><br>Niche: <strong>(${niche.join(", ")})</strong><br>Cost: <strong>${costRange}</strong>`,
+
+  //       timestamp: new Date(),
+  //       hasUpvoted: false,
+  //       isCommenting: false,
+  //       newComment: "",
+  //     };
+
+  //     setPosts([newPost, ...posts]);
+  //     setNiche(niche);
+  //     setProblem(problem);
+  //     setSolution(solution);
+  //     setCostRange(costRange);
+  //     setIsFormVisible(false);
+  //   } else {
+  //     alert("Please fill in all fields and select at least one niche.");
+  //   }
+  // };
+
+  // const handlePostSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   // Validation check for required fields
+  //   if (!niche.length || !problem || !solution || !costRange) {
+  //     alert("Please fill in all fields and select at least one niche.");
+  //     return;
+  //   }
+
+  //   // Prepare the new post object
+  //   const newPost = {
+  //     problem,
+  //     solution,
+  //     niches: niche, // Array of selected niches
+  //     costRange,
+  //   };
+
+  //   try {
+  //     // Send a POST request to save the post to the backend
+  //     const response = await fetch("http://localhost:3000/posts", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(newPost),
+  //     });
+
+  //     if (response.ok) {
+  //       const savedPost = await response.json();
+
+  //       // Fetch all posts after adding the new post
+  //       fetch("http://localhost:3000/posts")
+  //         .then((response) => response.json())
+  //         .then((data) => setPosts(data)) // Update the feed with the fetched posts
+  //         .catch((error) => console.error("Error fetching posts:", error));
+
+  //       // Update the feed with the saved post (optimistic update)
+  //       setFeed((prevFeed) => [savedPost, ...prevFeed]);
+
+  //       // Clear form fields
+  //       setProblem("");
+  //       setSolution("");
+  //       setCostRange("");
+  //       setNiche([]);
+  //     } else {
+  //       alert("Failed to save the post. Please try again.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error saving post:", error);
+  //     alert("An error occurred while saving the post.");
+  //   }
+  // };
+
+
+
+
+  ////////////////////////////////////////////Working handlepostsubmit..////////////////////////////////////////////////////////////
+  const handlePostSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!niche.length || !problem || !solution || !costRange) {
+      alert("Please fill in all fields and select at least one niche.");
+      return;
+    }
+    if (niche.length > 0 && problem && solution && costRange) {
       const newPost = {
-        id: posts.length + 1,
-        user: "User3",
-        image: selectedFile || null,
+        user: "User3", // Update this with Dynamic User asap(Usman Ali)
+        image: null,
         upvotes: 0,
         comments: [],
-        description: description,
+        problem,
+        solution,
+        niches: niche,
+        costRange,
+        description: `Problem Statement: ${problem} Solution: ${solution} Niche: ${niche} Cost: ${costRange}`,
         timestamp: new Date(),
         hasUpvoted: false,
         isCommenting: false,
         newComment: "",
       };
-      setPosts([newPost, ...posts]);
-      setSelectedFile(null);
-      setDescription("");
+
+
+      try {
+        const response = await fetch("http://localhost:3000/posts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newPost),
+        });
+        if (response.ok) {
+          const savedPost = await response.json();
+          setFeed((prevFeed) => [savedPost, ...prevFeed]);
+
+          setPosts([newPost, ...posts]);
+          setProblem("");
+          setSolution("");
+          setCostRange("");
+          setNiche([]);
+          // fetchPosts();
+          setIsFormVisible(false);
+        }
+
+        else {
+          alert("Failed to save the post. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error saving post:", error);
+        alert("An error occurred while saving the post.");
+      }
+
+    } else {
+      alert("Please fill in all fields and select at least one niche.");
     }
+
   };
 
-  const [niche, setNiche] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [costRange, setCostRange] = useState("");
+  // const fetchPosts = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:3000/posts");
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setPosts(data); // Set the posts in state
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching posts:", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchPosts();
+  // }, []);
+
+
 
   return (
     <div className="bg-white shadow-lg min-h-screen ">
       <Header />
-
 
       <div className="max-w-6xl mx-auto py-8 ">
         <div className="flex flex-col flex-1 p-4 rounded-lg max-w-5xl mx-auto">
@@ -161,131 +307,97 @@ const HomePage = () => {
             </button>
           </div>
 
-          {isFormVisible && (
-            <div className="p-4 border border-gray-300 rounded-lg mt-4">
-              <h2 className="text-lg font-bold mb-4">Post Your Idea</h2>
-              <form onSubmit={handleFormSubmit}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Select Niche
-                  </label>
-                  <select
-                    value={niche}
-                    onChange={(e) => setNiche(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+
+
+          <div className="border-2 border-green-800 rounded-lg">
+            {isFormVisible && (
+              <div className="p-4 border border-gray-300 rounded-lg mt-4">
+                <h2 className="text-lg font-bold mb-4">Post Your Idea</h2>
+                <form onSubmit={handlePostSubmit}>
+
+
+                  <div className="mb-4  ">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Select Niches (You can choose multiple)
+                    </label>
+                    <div className="mt-1 space-y-2">
+                      {["Finance", "Tech", "Health", "Education", "E-commerce"].map((nicheOption) => (
+                        <label key={nicheOption} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            value={nicheOption}
+                            checked={niche.includes(nicheOption)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setNiche([...niche, nicheOption]);
+                              } else {
+                                setNiche(niche.filter((n) => n !== nicheOption));
+                              }
+                            }}
+                            className="form-checkbox text-green-600"
+                          />
+                          <span>{nicheOption}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+
+
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Problem Statement
+                    </label>
+                    <input
+                      type="text"
+                      value={problem}
+                      onChange={(e) => setProblem(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      placeholder="Enter the problem statement of your idea"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Solution Overview
+                    </label>
+                    <textarea
+                      value={solution}
+                      onChange={(e) => setSolution(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      placeholder="Enter the overview of your solution"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Cost Range
+                    </label>
+                    <input
+                      type="text"
+                      value={costRange}
+                      onChange={(e) => setCostRange(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      placeholder="Enter cost range (e.g., $1000 - $5000)"
+                    />
+                  </div>
+
+
+
+                  <button
+                    type="submit"
+                    className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
                   >
-                    <option value="">Select a Niche</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Tech">Tech</option>
-                    <option value="Health">Health</option>
-                    <option value="Education">Education</option>
-                    <option value="E-commerce">E-commerce</option>
-                    {/* Add more niches as needed */}
-                  </select>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Problem Statement
-                  </label>
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    placeholder="Enter the problem statement of your idea"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Proposed Solution
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    placeholder="Enter the proposed solution for your idea"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Cost Range
-                  </label>
-                  <input
-                    type="text"
-                    value={costRange}
-                    onChange={(e) => setCostRange(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    placeholder="Enter cost range (e.g., $1000 - $5000)"
-                  />
-                </div>
-
-              
-
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
-                >
-                  Submit
-                </button>
-              </form>
-            </div>
-          )}
-
-
-
-          {selectedFile && (
-            <div className="border-2 border-green-800 rounded-lg p-4 mt-4 bg-white shadow-md">
-              <div className="flex flex-col space-y-2">
-                <textarea
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                  placeholder="Write something about your photo..."
-                  value={description}
-                  onChange={handleDescriptionChange}
-                />
-                <button
-                  className="self-start bg-gradient-to-r from-green-600 to-green-800 text-white py-2 px-4 rounded-lg"
-                  onClick={handlePostSubmit}
-                >
-                  Post
-                </button>
+                    Submit
+                  </button>
+                </form>
               </div>
+            )}
+          </div>
 
 
-              <div className="mt-4">
-                <h3 className="font-bold text-lg mb-2">Selected Photo:</h3>
-                <div className="flex justify-center items-center">
-                  <img
-                    src={selectedFile}
-                    alt="Uploaded"
-                    className="w-full max-w-sm object-contain rounded-lg"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!selectedFile && description && (
-            <div className="border-2 border-green-800 rounded-lg p-4 mt-4 bg-white shadow-md">
-              <h3 className="font-bold text-lg">Write a Post:</h3>
-              <textarea
-                className="w-full p-2 border border-gray-300 rounded-lg"
-                placeholder="Write your description..."
-                value={description}
-                onChange={handleDescriptionChange}
-              />
-              <button
-                className="mt-4 bg-gradient-to-r from-green-600 to-green-800 text-white py-2 px-4 rounded-lg"
-                onClick={handlePostSubmit}
-              >
-                Post
-              </button>
-            </div>
-          )}
-
-
+          {/* To display posts after form submissions (but description needs fixing(Try splitting up the form conten)) */}
           <div className="mt-6 space-y-4">
             {posts.map((post, index) => (
               <div key={post.id} className="border-2 border-green-800 rounded-lg p-4 bg-white shadow-md overflow-hidden">
@@ -332,6 +444,7 @@ const HomePage = () => {
                     className="flex items-center gap-1 text-gray-600 hover:text-green-400"
                   >
                     <ChatBubbleLeftIcon className="h-5 w-5" />
+
                     {post.comments.length} {post.comments.length === 1 ? "Comment" : "Comments"}
                   </button>
                 </div>
@@ -345,7 +458,7 @@ const HomePage = () => {
                       onChange={(e) => handleCommentChange(index, e)}
                     />
                     <button
-                      className="mt-2 bg-blue-500 text-white py-2 px-4 rounded-lg"
+                      className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
                       onClick={() => handleAddComment(index)}
                     >
                       Post Comment
@@ -354,12 +467,12 @@ const HomePage = () => {
                 )}
 
                 {post.comments.length > 0 && (
-                  <div className="p-4 border-t border-gray-200">
-                    {post.comments.map((comment, idx) => (
-                      <div key={idx} className="text-gray-600">{comment}</div>
-                    ))}
-                  </div>
-                )}
+                <div className="p-4 border-t border-gray-200">
+                  {post.comments.map((comment, idx) => (
+                    <div key={idx} className="text-gray-600">{comment}</div>
+                  ))}
+                </div>
+              )}
               </div>
             ))}
           </div>
