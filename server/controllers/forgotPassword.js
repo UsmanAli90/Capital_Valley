@@ -5,16 +5,19 @@ const mongoose = require('mongoose');
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
-  
+
   try {
     // Check if user exists
     const user = await User.findOne({ email });
-    const userId = user._id.toString();  // Convert ObjectId to string
-    
-    console.log(userId);
-      if (!user) {
+
+    // If user not found, return error early
+    if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
+
+    // Proceed if user exists
+    const userId = user._id.toString();  // Now safe to access _id since user exists
+    console.log("User ID:", userId);
 
     // Generate OTP and expiration time
     const otp = generateOTP();
@@ -25,12 +28,13 @@ const forgotPassword = async (req, res) => {
     // Send OTP via email
     await sendEmail(email, "Password Reset OTP", `Your OTP is ${otp}. It is valid for 10 minutes.`);
 
-    res.status(200).json({ message: "OTP sent. Check your email.", id:userId });
+    res.status(200).json({ message: "OTP sent. Check your email.", id: userId });
   } catch (error) {
     console.error("Error in forgotPassword:", error.message);
     res.status(500).json({ message: "Error processing request." });
   }
 };
+
 
 
 
