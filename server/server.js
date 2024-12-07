@@ -8,7 +8,9 @@ const { createInvestor } = require('./controllers/investorsignup.js');
 const { StartupsignIn } = require('./controllers/startupsignin.js');
 const { InvestorsignIn } = require('./controllers/investorsignin.js');
 const { forgotPassword,verifyOTP } = require("./controllers/forgotPassword");
+const { forgotPassword1,verifyOTP1 } = require("./controllers/forgotPasswordInvestor.js");
 const {resetPassword} = require('./controllers/resetPassword.js');
+const {resetPassword1} = require('./controllers/resetPasswordIvestor.js');
 const {searchProfiles}=require('./controllers/searchcontroller.js')
 
 
@@ -25,9 +27,12 @@ app.post("/investorsignup", createInvestor);
 app.post("/startupsignin", StartupsignIn);
 app.post("/investorsignin", InvestorsignIn);
 app.post("/forgot-password", forgotPassword);
+app.post("/forgot-password1", forgotPassword1);
 app.post("/verify-otp", verifyOTP);
 app.use('/reset-password', resetPassword);
+app.use('/reset-password1', resetPassword1);
 app.get('/search',searchProfiles)
+app.post("/verify-otp1", verifyOTP1);
 
 
 const PORT = process.env.PORT || 3000;

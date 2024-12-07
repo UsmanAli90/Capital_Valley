@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import './ForgotPassword'
+import './ForgotPassword';
 
 function Signin() {
   const navigate = useNavigate();
@@ -9,6 +9,7 @@ function Signin() {
   const handleuser = (type) => {
     steusertype(type)
   }
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -38,7 +39,6 @@ function Signin() {
     if (!formData.password) {
       newErrors.password = "Password is required.";
     }
-
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -77,9 +77,9 @@ function Signin() {
         console.log("Logged-in User Data:", data);
 
         if (usertype === "startup") {
-          navigate("/");
+          navigate("/"); // Redirect to the startup dashboard or home
         } else {
-          navigate("/");
+          navigate("/"); // Redirect to the investor dashboard or home
         }
       } else {
         const errorData = await response.json();
@@ -90,7 +90,6 @@ function Signin() {
       alert("An error occurred. Please try again.");
     }
   };
-
 
   return (
     <div className="bg-green-200 d-flex justify-content-center align-items-center vh-100">
@@ -116,9 +115,7 @@ function Signin() {
           <label className="ms-2" htmlFor="investor-checkbox">Investor</label>
         </div>
 
-
         <br /><br />
-
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -152,10 +149,10 @@ function Signin() {
             {errors.password && <div className="invalid-feedback">{errors.password}</div>}
           </div>
           <div className="mb-3 text-end">
-          <Link to="/forgot-password" className="text-decoration-none">
-            Forgot your password?
-          </Link>
-        </div>
+            <Link to={usertype === "investor" ? "/forgot-password-investor" : "/forgot-password"} className="text-decoration-none">
+              Forgot your password?
+            </Link>
+          </div>
           <button type="submit" className="btn btn-secondary w-100">
             Sign in
           </button>
@@ -168,7 +165,6 @@ function Signin() {
         </div>
       </div>
     </div>
-
   );
 }
 

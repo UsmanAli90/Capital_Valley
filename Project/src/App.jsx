@@ -9,6 +9,9 @@ import Notfound from './components/Profile/pages/NotFound.jsx';
 import ForgotPassword from './Components/Auth/ForgotPassword.jsx';
 import OTPPage from './Components/Auth/OTPPage.jsx';
 import ResetPasswordPage from './Components/Auth/ResetPasswordPage.jsx'
+import ForgotPasswordInvestor from './Components/Auth/ForgotPasswordInvestor.jsx';
+import ResetPasswordPage1 from './Components/Auth/ResetPasswordInvestor.jsx';
+import OTPPage1 from './Components/Auth/OTPInvestor.jsx';
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-otp/:userId" element={<OTPPage />} />
         <Route path="/reset-password/:userId" element={< ResetPasswordPage />} />
+        <Route path="/verify-otp1/:userId" element={<OTPPage1 />} />
+        <Route path="/reset-password1/:userId" element={< ResetPasswordPage1 />} />
+        <Route path="/forgot-password-investor" element={<ForgotPasswordInvestor />} />
         <Route path="*" element={<Notfound />} />
       </Routes>
     </Router>
