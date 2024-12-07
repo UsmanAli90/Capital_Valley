@@ -2,7 +2,6 @@ import { useState } from "react"
 import StartupForm from "./StartupForm";
 import InvestorForm from "./InvestorForm";
 import { Link } from 'react-router-dom';
-import './signin.css'
 
 function Signup() {
     const [usertype, steusertype] = useState('startup');
@@ -10,7 +9,7 @@ function Signup() {
         steusertype(type)
     }
     return (
-        <div className="bg-image">
+        <div className=" bg-green-200 ">
             <div className="container d-flex align-items-center">
                 <div className="row w-100">
                     <div className="mx-auto p-4 shadow rounded">
