@@ -28,6 +28,7 @@ app.post("/forgot-password", forgotPassword);
 app.post("/verify-otp", verifyOTP);
 app.use('/reset-password', resetPassword);
 app.get('/search',searchProfiles)
+app.post("/posts", createPost);
 
 
 const PORT = process.env.PORT || 3000;
