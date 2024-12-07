@@ -44,6 +44,7 @@ function Signin() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Include cookies for session handling
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -51,8 +52,9 @@ function Signin() {
       });
 
       const data = await response.json();
+
       if (response.ok) {
-        // Store user details in local storage or context
+        // Store user details in local storage
         localStorage.setItem("user", JSON.stringify(data.user));
         alert("Login successful!");
         console.log("Logged-in User Data:", data);

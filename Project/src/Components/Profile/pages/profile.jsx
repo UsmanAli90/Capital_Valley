@@ -13,24 +13,60 @@ const Profile = () => {
 
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    console.log("Stored user:", storedUser); // Add logging
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+  // Handle logout functionality
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
+      // Call server-side logout endpoint (ensure session is cleared server-side)
+      const response = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        navigate("/signin");
+      } else {
+        alert("Logout failed. Try again.");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+      alert("Logout failed. Try again.");
     }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    navigate("/signin");
   };
 
-  const toggleNotifications = () => {
-    setNotificationsAllowed(!notificationsAllowed);
-  };
+  // Fetch server-side profile to ensure session validity
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/profile", {
+          method: "GET",
+          credentials: "include",
+        });
 
+        console.log("Response Status:", response.status);
+
+        const data = await response.json();
+        console.log("Server Response:", data);
+
+        if (response.ok && data.success) {
+          setUser(data.user);
+          localStorage.setItem("user", JSON.stringify(data.user));
+        } else {
+          alert("Session expired or could not verify session.");
+          localStorage.removeItem("user");
+          navigate("/signin");
+        }
+      } catch (error) {
+        console.error("Error during server-side fetch:", error);
+        alert("Could not verify session.");
+        navigate("/signin");
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
   return (
     <>
       <Helmet>
@@ -134,7 +170,7 @@ const Profile = () => {
                 </Text>
               </div>
               <Button
-                onClick={toggleNotifications}
+                onClick={() => setNotificationsAllowed(!notificationsAllowed)}
                 className="transform transition duration-700 hover:scale-110"
               >
                 <Text
