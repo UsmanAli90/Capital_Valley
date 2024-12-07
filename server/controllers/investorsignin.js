@@ -23,13 +23,13 @@ const InvestorsignIn = async (req, res) => {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-
     const investoruser1 = await investoruser.findOne({ email });
     const isMatch = await bcrypt.compare(password, investoruser1.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
     if (!investoruser1 || investoruser1.password !== password) {
+
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
@@ -47,7 +47,7 @@ const InvestorsignIn = async (req, res) => {
 
     res.status(200).json({ message: "Sign-in successful", user: investorDetails });
   } catch (err) {
-    console.error(err);
+    console.error("Error in InvestorsignIn:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

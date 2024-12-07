@@ -5,6 +5,9 @@ import HomePage from "./components/HomePage/HomePage.jsx";
 import Profile from "./components/Profile/pages/profile.jsx";
 import ProfileSetting from "./components/Profile/pages/profileSetting.jsx";
 import Notfound from "./components/Profile/pages/NotFound.jsx";
+import ForgotPassword from './Components/Auth/ForgotPassword.jsx';
+import OTPPage from './Components/Auth/OTPPage.jsx';
+import ResetPasswordPage from './Components/Auth/ResetPasswordPage.jsx'
 import ProtectedRoute from "./ProtectedRoute.jsx";
 
 function App() {
@@ -24,6 +27,9 @@ function App() {
             element={<ProtectedRoute element={ProfileSetting} />}
           />
           <Route path="*" element={<Notfound />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-otp/:userId" element={<OTPPage />} />
+          <Route path="/reset-password/:userId" element={< ResetPasswordPage />} />
         </Routes>
       </Router>
     </>

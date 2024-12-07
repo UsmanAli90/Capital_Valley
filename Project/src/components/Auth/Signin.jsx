@@ -1,6 +1,6 @@
-import "./signin.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import './ForgotPassword'
 
 function Signin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -70,7 +70,7 @@ function Signin() {
   };
 
   return (
-    <div className="bg-image d-flex justify-content-center align-items-center vh-100">
+    <div className="bg-green-200 d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4 shadow" style={{ width: "350px" }}>
         <h1 className="text-center mb-4">Sign in</h1>
 
@@ -140,10 +140,10 @@ function Signin() {
             )}
           </div>
           <div className="mb-3 text-end">
-            <a href="#" className="text-decoration-none">
-              Forget your password
-            </a>
-          </div>
+          <Link to="/forgot-password" className="text-decoration-none">
+            Forgot your password?
+          </Link>
+        </div>
           <button type="submit" className="btn btn-secondary w-100">
             Sign in
           </button>
