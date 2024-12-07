@@ -21,6 +21,9 @@ const HomePage = () => {
   const [companyLocation, setCompanyLocation] = useState("");
   const [activeUsers, setActiveUsers] = useState("");
   const [isFullTime, setIsFullTime] = useState("");
+   const [user, setUser] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [description, setDescription] = useState("");
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -48,12 +51,18 @@ const HomePage = () => {
       timestamp: new Date(),
       hasUpvoted: false,
       isCommenting: false,
-      newComment: ""
+      newComment: "",
     },
 
   ]);
 
-
+ useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    console.log("Stored user:", storedUser); // Add logging
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
@@ -63,7 +72,6 @@ const HomePage = () => {
   const handleUpvote = (index) => {
     const newPosts = [...posts];
     const post = newPosts[index];
-
     if (post.hasUpvoted) {
       post.upvotes -= 1;
       post.hasUpvoted = false;
@@ -130,7 +138,7 @@ const HomePage = () => {
     }
     if (niche.length > 0 && problem && solution && costRange) {
       const newPost = {
-        user: "User3", // Update this with Dynamic User asap(Usman Ali)
+        user: user ? user.username : "Your name",
         image: null,
         upvotes: 0,
         comments: [],
@@ -150,8 +158,7 @@ const HomePage = () => {
         isCommenting: false,
         newComment: "",
       };
-
-
+      
       try {
         const response = await fetch("http://localhost:3000/posts", {
           method: "POST",
@@ -213,6 +220,7 @@ const HomePage = () => {
   return (
     <div className="bg-white shadow-lg min-h-screen ">
       <Header />
+
 
       <div className="max-w-6xl mx-auto py-8 ">
         <div className="flex flex-col flex-1 p-4 rounded-lg max-w-5xl mx-auto">
@@ -424,10 +432,11 @@ const HomePage = () => {
           </div>
 
 
-
           <div className="mt-6 space-y-4">
             {posts.map((post, index) => (
+
               <div key={post.id} className="border-2 border-green-800 rounded-lg p-4 bg-white shadow-md overflow-hidden">
+              
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <button className="text-gray-600 hover:text-green-400">
@@ -435,7 +444,9 @@ const HomePage = () => {
                     </button>
                     <h2 className="font-bold">{post.user}</h2>
                   </div>
-                  <span className="text-gray-400">{timeAgo(post.timestamp)}</span>
+                  <span className="text-gray-400">
+                    {timeAgo(post.timestamp)}
+                  </span>
                 </div>
 
 
@@ -503,6 +514,7 @@ const HomePage = () => {
                         <img
                           src={post.image}
                           alt="Post Image"
+
                           className="w-full max-w-sm object-contain rounded-lg shadow-lg"
                         />
                       </div>
@@ -544,6 +556,7 @@ const HomePage = () => {
                       onChange={(e) => handleCommentChange(index, e)}
                     />
                     <button
+
                       className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
                       onClick={() => handleAddComment(index)}
                     >
@@ -555,7 +568,9 @@ const HomePage = () => {
                 {post.comments.length > 0 && (
                   <div className="p-4 border-t border-gray-200">
                     {post.comments.map((comment, idx) => (
-                      <div key={idx} className="text-gray-600">{comment}</div>
+                      <div key={idx} className="text-gray-600">
+                        {comment}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -567,8 +582,6 @@ const HomePage = () => {
         {/* Right Section */}
         <div className="w-1/3"></div>
       </div>
-
-
     </div>
   );
 };

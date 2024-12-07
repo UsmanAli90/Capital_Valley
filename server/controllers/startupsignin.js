@@ -15,9 +15,9 @@ const StartupsignIn = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Compare the hashed password using bcrypt
-    const isPasswordValid = await bcrypt.compare(password, startupuser1.password);
-    if (!isPasswordValid) {
+    const isMatch = await bcrypt.compare(password, startupuser1.password);
+    if (!isMatch) {
+
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
