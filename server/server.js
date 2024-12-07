@@ -10,6 +10,7 @@ const { InvestorsignIn } = require('./controllers/investorsignin.js');
 const { forgotPassword,verifyOTP } = require("./controllers/forgotPassword");
 const {resetPassword} = require('./controllers/resetPassword.js');
 const {searchProfiles}=require('./controllers/searchcontroller.js')
+const {createPost}=require('./controllers/PostUpload.js')
 
 
 dotenv.config();
