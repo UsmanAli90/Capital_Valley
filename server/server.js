@@ -9,6 +9,7 @@ const { StartupsignIn } = require('./controllers/startupsignin.js');
 const { InvestorsignIn } = require('./controllers/investorsignin.js');
 const { forgotPassword,verifyOTP } = require("./controllers/forgotPassword");
 const {resetPassword} = require('./controllers/resetPassword.js');
+const {searchProfiles}=require('./controllers/searchcontroller.js')
 
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.post("/investorsignin", InvestorsignIn);
 app.post("/forgot-password", forgotPassword);
 app.post("/verify-otp", verifyOTP);
 app.use('/reset-password', resetPassword);
+app.get('/search',searchProfiles)
 
 
 const PORT = process.env.PORT || 3000;
