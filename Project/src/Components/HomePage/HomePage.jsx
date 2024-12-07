@@ -15,6 +15,12 @@ const HomePage = () => {
   const [description, setDescription] = useState("");
   const [costRange, setCostRange] = useState("");
   const [feed, setFeed] = useState([]);
+  const [companyName, setCompanyName] = useState("");
+  const [companyUrl, setCompanyUrl] = useState("");
+  const [productLink, setProductLink] = useState("");
+  const [companyLocation, setCompanyLocation] = useState("");
+  const [activeUsers, setActiveUsers] = useState("");
+  const [isFullTime, setIsFullTime] = useState("");
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -52,19 +58,12 @@ const HomePage = () => {
     setIsFormVisible(!isFormVisible);
   };
 
-  // const handleUpvote = (index) => {
-  //   const newPosts = [...posts];
-  //   if (!newPosts[index].hasUpvoted) {
-  //     newPosts[index].upvotes += 1;
-  //     newPosts[index].hasUpvoted = true;
-  //     setPosts(newPosts);
-  //   }
-  // };
+
 
   const handleUpvote = (index) => {
     const newPosts = [...posts];
     const post = newPosts[index];
-  
+
     if (post.hasUpvoted) {
       post.upvotes -= 1;
       post.hasUpvoted = false;
@@ -72,10 +71,10 @@ const HomePage = () => {
       post.upvotes += 1;
       post.hasUpvoted = true;
     }
-  
+
     setPosts(newPosts);
   };
-  
+
 
   const handleAddComment = (index) => {
     const newPosts = [...posts];
@@ -121,100 +120,7 @@ const HomePage = () => {
     }
   };
 
-  //handleFormSubmit is not called anywhere commented myself(Usman Ali)
 
-
-  // const handleFormSubmit = (e) => {
-  //   e.preventDefault();
-
-
-  //   if (niche.length > 0 && problem && solution && costRange) {
-  //     const newPost = {
-  //       user: "User3", // Update this with Dynamic User asap(Usman Ali)
-  //       image: null,
-  //       upvotes: 0,
-  //       comments: [],
-  //       problem,
-  //       solution,
-  //       niches: niche,
-  //       costRange,
-  //       description: `Problem Statement: ${problem} Solution: ${solution} Niche: ${niche} Cost: ${costRange}`,
-  //       // description: `Problem Statement: <strong>${problem}</strong><br>Solution: <strong>${solution}</strong><br>Niche: <strong>(${niche.join(", ")})</strong><br>Cost: <strong>${costRange}</strong>`,
-
-  //       timestamp: new Date(),
-  //       hasUpvoted: false,
-  //       isCommenting: false,
-  //       newComment: "",
-  //     };
-
-  //     setPosts([newPost, ...posts]);
-  //     setNiche(niche);
-  //     setProblem(problem);
-  //     setSolution(solution);
-  //     setCostRange(costRange);
-  //     setIsFormVisible(false);
-  //   } else {
-  //     alert("Please fill in all fields and select at least one niche.");
-  //   }
-  // };
-
-  // const handlePostSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   // Validation check for required fields
-  //   if (!niche.length || !problem || !solution || !costRange) {
-  //     alert("Please fill in all fields and select at least one niche.");
-  //     return;
-  //   }
-
-  //   // Prepare the new post object
-  //   const newPost = {
-  //     problem,
-  //     solution,
-  //     niches: niche, // Array of selected niches
-  //     costRange,
-  //   };
-
-  //   try {
-  //     // Send a POST request to save the post to the backend
-  //     const response = await fetch("http://localhost:3000/posts", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(newPost),
-  //     });
-
-  //     if (response.ok) {
-  //       const savedPost = await response.json();
-
-  //       // Fetch all posts after adding the new post
-  //       fetch("http://localhost:3000/posts")
-  //         .then((response) => response.json())
-  //         .then((data) => setPosts(data)) // Update the feed with the fetched posts
-  //         .catch((error) => console.error("Error fetching posts:", error));
-
-  //       // Update the feed with the saved post (optimistic update)
-  //       setFeed((prevFeed) => [savedPost, ...prevFeed]);
-
-  //       // Clear form fields
-  //       setProblem("");
-  //       setSolution("");
-  //       setCostRange("");
-  //       setNiche([]);
-  //     } else {
-  //       alert("Failed to save the post. Please try again.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error saving post:", error);
-  //     alert("An error occurred while saving the post.");
-  //   }
-  // };
-
-
-
-
-  ////////////////////////////////////////////Working handlepostsubmit..////////////////////////////////////////////////////////////
   const handlePostSubmit = async (e) => {
     e.preventDefault()
 
@@ -232,6 +138,12 @@ const HomePage = () => {
         solution,
         niches: niche,
         costRange,
+        companyName,
+        companyUrl,
+        productLink,
+        companyLocation,
+        activeUsers,
+        isFullTime,
         description: `Problem Statement: ${problem} Solution: ${solution} Niche: ${niche} Cost: ${costRange}`,
         timestamp: new Date(),
         hasUpvoted: false,
@@ -255,8 +167,14 @@ const HomePage = () => {
           setPosts([newPost, ...posts]);
           setProblem("");
           setSolution("");
-          setCostRange("");
           setNiche([]);
+          setCostRange("");
+          setCompanyName("");
+          setCompanyUrl("");
+          setProductLink("");
+          setCompanyLocation("");
+          setActiveUsers("");
+          setIsFullTime("");
           // fetchPosts();
           setIsFormVisible(false);
         }
@@ -366,9 +284,118 @@ const HomePage = () => {
                       value={solution}
                       onChange={(e) => setSolution(e.target.value)}
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                      placeholder="Enter the overview of your solution"
+                      placeholder="Enter your USP/Value reposition"
                     />
                   </div>
+
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      placeholder="Enter your company name"
+                    />
+                  </div>
+
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Company URL
+                    </label>
+                    <input
+                      type="url"
+                      value={companyUrl}
+                      onChange={(e) => setCompanyUrl(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      placeholder="https://example.com"
+                    />
+                  </div>
+
+
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Add Link to Your Product (Optional)
+                    </label>
+                    <input
+                      type="url"
+                      value={productLink}
+                      onChange={(e) => setProductLink(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      placeholder="https://example.com/product"
+                    />
+                  </div>
+
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Where is your company based?
+                    </label>
+                    <select
+                      value={companyLocation}
+                      onChange={(e) => setCompanyLocation(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="">Select City</option>
+                      {["Karachi", "Lahore", "Islamabad", "Faisalabad", "Multan", "Rawalpindi"].map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      How many active users or customers do you have?
+                    </label>
+                    <input
+                      type="number"
+                      value={activeUsers}
+                      onChange={(e) => setActiveUsers(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      placeholder="Enter number of active users/customers"
+                    />
+                  </div>
+
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Are you working full-time on this?
+                    </label>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          value="Yes"
+                          checked={isFullTime === "Yes"}
+                          onChange={(e) => setIsFullTime(e.target.value)}
+                          className="form-radio text-green-600"
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          value="No"
+                          checked={isFullTime === "No"}
+                          onChange={(e) => setIsFullTime(e.target.value)}
+                          className="form-radio text-red-600"
+                        />
+                        <span>No</span>
+                      </label>
+                    </div>
+                  </div>
+
+
+
+
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
@@ -397,7 +424,7 @@ const HomePage = () => {
           </div>
 
 
-          {/* To display posts after form submissions (but description needs fixing(Try splitting up the form conten)) */}
+
           <div className="mt-6 space-y-4">
             {posts.map((post, index) => (
               <div key={post.id} className="border-2 border-green-800 rounded-lg p-4 bg-white shadow-md overflow-hidden">
@@ -411,20 +438,79 @@ const HomePage = () => {
                   <span className="text-gray-400">{timeAgo(post.timestamp)}</span>
                 </div>
 
-                <div className="p-4">
-                  <p className="text-gray-700 mb-4">{post.description}</p>
+
+               
+
+
+                <div className="p-4 border rounded-lg shadow-md bg-white">
+                  <div className="mt-4">
+                    <p className="text-gray-600 mb-2">
+                      <strong>Problem Statement:</strong> {post.problem}
+                    </p>
+                    <p className="text-gray-600 mb-2">
+                      <strong>Solution(USP/Value Reposition):</strong> {post.solution}
+                    </p>
+                    <p className="text-gray-600 mb-2">
+                      <strong>Niche:</strong> {post.niches}
+                    </p>
+                    <p className="text-gray-600 mb-2">
+                      <strong>Money looking to raise:</strong> {post.costRange}
+                    </p>
+                  </div>
+                  <br></br>
+                  <h1 className="text-gray-600 mb-2"><strong> Company Name:</strong></h1>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    {post.companyName}
+                  </h3>
+
+                  {post.companyUrl && (
+                    <a
+                      href={post.companyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-700 hover:text-green-600 font-medium transition-all mb-4 block"
+                      style={{ textDecoration: "none" }}
+                    >
+                      Visit Company Website
+                    </a>
+                  )}
+
+                  {post.productLink && (
+                    <a
+                      href={post.productLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-700 hover:text-green-600 font-medium transition-all mb-4 block"
+                      style={{ textDecoration: "none" }}
+                    >
+                      Check Product
+                    </a>
+                  )}
+
+                  <p className="text-gray-600 mb-2">
+                    <strong>Location:</strong> {post.companyLocation}
+                  </p>
+                  <p className="text-gray-600 mb-2">
+                    <strong>Active Users:</strong> {post.activeUsers}
+                  </p>
+                  <p className="text-gray-600 mb-2">
+                    <strong>Working Full-Time:</strong> {post.isFullTime ? "Yes" : "No"}
+                  </p>
+
                   {post.image && (
-                    <div className="w-full">
+                    <div className="w-full mt-4">
                       <div className="flex justify-center items-center">
                         <img
                           src={post.image}
                           alt="Post Image"
-                          className="w-full max-w-sm object-contain rounded-lg"
+                          className="w-full max-w-sm object-contain rounded-lg shadow-lg"
                         />
                       </div>
                     </div>
                   )}
                 </div>
+
+
 
                 <div className="p-4 border-t border-gray-200 flex justify-between items-center">
                   <button
@@ -467,12 +553,12 @@ const HomePage = () => {
                 )}
 
                 {post.comments.length > 0 && (
-                <div className="p-4 border-t border-gray-200">
-                  {post.comments.map((comment, idx) => (
-                    <div key={idx} className="text-gray-600">{comment}</div>
-                  ))}
-                </div>
-              )}
+                  <div className="p-4 border-t border-gray-200">
+                    {post.comments.map((comment, idx) => (
+                      <div key={idx} className="text-gray-600">{comment}</div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

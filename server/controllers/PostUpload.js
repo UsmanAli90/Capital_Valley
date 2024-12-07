@@ -1,7 +1,18 @@
 const Post = require("../models/Post");
 
 const createPost = async (req, res) => {
-  const { problem, solution, niches, costRange } = req.body;
+  const {
+    problem,
+    solution,
+    niches,
+    costRange,
+    companyName,
+    companyUrl,
+    productLink,
+    companyLocation,
+    activeUsers,
+    isFullTime,
+  } = req.body;
 
   try {
     const newPost = await Post.create({
@@ -9,6 +20,12 @@ const createPost = async (req, res) => {
       solution,
       niches,
       costRange,
+      companyName,
+      companyUrl,
+      productLink,
+      companyLocation,
+      activeUsers,
+      isFullTime,
     });
 
     res.status(201).json(newPost);
