@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Button from "../component/button";
 import Text from "../component/text";
@@ -8,7 +8,24 @@ import Header from "../../HomePage/Header";
 
 const Profile = () => {
   const navigate = useNavigate();
+
   const [notificationsAllowed, setNotificationsAllowed] = useState(false);
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    console.log("Stored user:", storedUser); // Add logging
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/signin");
+  };
 
   const toggleNotifications = () => {
     setNotificationsAllowed(!notificationsAllowed);
@@ -39,13 +56,13 @@ const Profile = () => {
                     as="p"
                     className="text-[12px] font-normal text-blue_gray-900"
                   >
-                    Your name
+                    {user ? user.username : "Your name"}
                   </Text>
                   <Text
                     as="p"
                     className="font-roboto text-[12px] font-normal text-gray-600"
                   >
-                    yourname@gmail.com
+                    {user ? user.email : "yourname@gmail.com"}
                   </Text>
                 </div>
               </div>
@@ -133,18 +150,19 @@ const Profile = () => {
 
             <div className="flex w-full justify-center bg-gray-50 py-2 px-2 transform transition duration-700 hover:bg-gray-100">
               <div className="flex items-center gap-2.5">
-                <Link to="/signin">
-                  <Button className="flex items-center gap-2.5 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transform transition duration-700 hover:scale-110">
-                    <Img
-                      src="profileAssets/images/power-off.png"
-                      alt="Arrow Right Blue"
-                      className="h-[24px]"
-                    />
-                    <Text as="p" className="text-[14px] font-normal">
-                      Log Out
-                    </Text>
-                  </Button>
-                </Link>
+                <Button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2.5 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transform transition duration-700 hover:scale-110"
+                >
+                  <Img
+                    src="profileAssets/images/power-off.png"
+                    alt="Arrow Right Blue"
+                    className="h-[24px]"
+                  />
+                  <Text as="p" className="text-[14px] font-normal">
+                    Log Out
+                  </Text>
+                </Button>
               </div>
             </div>
           </div>

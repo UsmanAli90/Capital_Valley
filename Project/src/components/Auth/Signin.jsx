@@ -3,85 +3,28 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function Signin() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [usertype, setUsertype] = useState("startup");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const [usertype, steusertype] = useState("startup");
-  const handleuser = (type) => {
-    steusertype(type);
-  };
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [errors, setErrors] = useState({});
-
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (
-      !formData.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-    ) {
-      newErrors.email = "Please enter a valid email address.";
-    } else if (/\s/.test(formData.email)) {
-      newErrors.email = "Email should not contain spaces.";
-    } else if (/[^a-zA-Z0-9._%+-@]/.test(formData.email)) {
-      newErrors.email = "Email contains invalid characters.";
-    } else if (/[+-]/.test(formData.email)) {
-      newErrors.email =
-        "Email should not contain negative signs or plus signs.";
-    } else {
-      // Additional check to ensure the email domain is valid
-      const domain = formData.email.split("@")[1];
-      const validDomains = [
-        "gmail.com",
-        "yahoo.com",
-        "hotmail.com",
-        "outlook.com",
-        "aol.com",
-        "icloud.com",
-        "mail.com",
-        "zoho.com",
-        // Add more valid domains as needed
-      ];
-      if (!validDomains.includes(domain)) {
-        newErrors.email =
-          "Please enter a valid email address with a commonly used domain.";
-      }
-    }
-
-    if (
-      !formData.password.match(
-        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-      )
-    ) {
-      newErrors.password =
-        "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.";
-    } else if (/\s/.test(formData.password)) {
-      newErrors.password = "Password should not contain spaces.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleUsertypeChange = (type) => {
+    setUsertype(type);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
-
     if (!formData.email || !formData.password) {
-      alert("Please fill in both email and password.");
+      setErrors({
+        email: !formData.email ? "Email is required" : "",
+        password: !formData.password ? "Password is required" : "",
+      });
       return;
     }
 
@@ -107,19 +50,16 @@ function Signin() {
         }),
       });
 
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
+        // Store user details in local storage or context
+        localStorage.setItem("user", JSON.stringify(data.user));
         alert("Login successful!");
         console.log("Logged-in User Data:", data);
 
-        if (usertype === "startup") {
-          navigate("/");
-        } else {
-          navigate("/");
-        }
+        navigate("/"); // Redirect to home page
       } else {
-        const errorData = await response.json();
-        alert(`Error: ${errorData.message || "Invalid credentials"}`);
+        alert(`Error: ${data.message || "Invalid credentials"}`);
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -137,7 +77,7 @@ function Signin() {
             type="checkbox"
             id="startup-checkbox"
             checked={usertype === "startup"}
-            onChange={() => handleuser("startup")}
+            onChange={() => handleUsertypeChange("startup")}
           />
           <label className="ms-2" htmlFor="startup-checkbox">
             Startup Founder
@@ -148,7 +88,7 @@ function Signin() {
             type="checkbox"
             id="investor-checkbox"
             checked={usertype === "investor"}
-            onChange={() => handleuser("investor")}
+            onChange={() => handleUsertypeChange("investor")}
           />
           <label className="ms-2" htmlFor="investor-checkbox">
             Investor
@@ -171,7 +111,7 @@ function Signin() {
               id="email"
               name="email"
               value={formData.email}
-              onChange={handleInputChange}
+              onChange={handleChange}
               placeholder="Enter your email"
             />
             {errors.email && (
@@ -190,7 +130,7 @@ function Signin() {
               id="password"
               name="password"
               value={formData.password}
-              onChange={handleInputChange}
+              onChange={handleChange}
               placeholder="Enter your password"
             />
             {errors.password && (
