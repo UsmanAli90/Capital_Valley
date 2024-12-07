@@ -36,9 +36,10 @@ function StartupForm() {
 
     if (!formData.cnic) {
       newErrors.cnic = "CNIC is required.";
-    } else if (!/^\d{13}$/.test(formData.cnic)) {
-      newErrors.cnic = "CNIC must be exactly 13 digits.";
+    } else if (!/^\d{5}-\d{7}-\d{1}$/.test(formData.cnic)) {
+      newErrors.cnic = "CNIC must be in the format: 12345-1234567-1";
     }
+    
 
     if (!formData.description) {
       newErrors.description = "Startup description is required.";
