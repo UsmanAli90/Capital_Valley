@@ -1,71 +1,48 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import Header from './Header'
-import logo from '../../assets/Home/logo.png'
-import { UserCircleIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-
+import Header from "./Header";
+import logo from "../../assets/Home/logo.png";
+import {
+  UserCircleIcon,
+  HandThumbUpIcon,
+  ChatBubbleLeftIcon,
+} from "@heroicons/react/24/outline";
 
 const HomePage = () => {
-    const [isFormVisible, setIsFormVisible] = useState(false);
-    const [upvotes, setUpvotes] = useState([0, 0]);
-    const [selectedFile, setSelectedFile] = useState(null); // Declare only once
-    const [niche, setNiche] = useState([]);
-    const [problem, setProblem] = useState("");
-    const [solution, setSolution] = useState("");
-    const [description, setDescription] = useState(""); // Declare only once
-    const [costRange, setCostRange] = useState("");
-    const [feed, setFeed] = useState([]);
-    const [companyName, setCompanyName] = useState("");
-    const [companyUrl, setCompanyUrl] = useState("");
-    const [productLink, setProductLink] = useState("");
-    const [companyLocation, setCompanyLocation] = useState("");
-    const [activeUsers, setActiveUsers] = useState("");
-    const [isFullTime, setIsFullTime] = useState("");
-    const [user, setUser] = useState(null);
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      user: "User1",
-      image: logo,
-      problem: "None",
-      solution: "None",
-      upvotes: 0,
-      comments: [],
-      description: "Sample description",
-      timestamp: new Date(),
-      hasUpvoted: false,
-      isCommenting: false,
-      newComment: ""
-    },
-    {
-      id: 2,
-      user: "User2",
-      image: logo,
-      problem: "None",
-      solution: "None",
-      upvotes: 0,
-      comments: [],
-      description: "Another description",
-      timestamp: new Date(),
-      hasUpvoted: false,
-      isCommenting: false,
-      newComment: "",
-    },
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [upvotes, setUpvotes] = useState([0, 0]);
+  const [selectedFile, setSelectedFile] = useState(null); // Declare only once
+  const [niche, setNiche] = useState([]);
+  const [problem, setProblem] = useState("");
+  const [solution, setSolution] = useState("");
+  const [description, setDescription] = useState(""); // Declare only once
+  const [costRange, setCostRange] = useState("");
+  const [feed, setFeed] = useState([]);
+  const [companyName, setCompanyName] = useState("");
+  const [companyUrl, setCompanyUrl] = useState("");
+  const [productLink, setProductLink] = useState("");
+  const [companyLocation, setCompanyLocation] = useState("");
+  const [activeUsers, setActiveUsers] = useState("");
+  const [isFullTime, setIsFullTime] = useState("");
+  const [user, setUser] = useState(null);
 
-  ]);
+  // Initialize posts as an empty array
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
- useEffect(() => {
+  // Fetch stored user on component mount
+  useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    console.log("Stored user:", storedUser); // Add logging
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
   }, []);
+
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
-
-
 
   const handleUpvote = (index) => {
     const newPosts = [...posts];
@@ -81,24 +58,6 @@ const HomePage = () => {
     setPosts(newPosts);
   };
 
-
-  const handleAddComment = (index) => {
-    const newPosts = [...posts];
-    const comment = newPosts[index].newComment.trim();
-    if (comment) {
-      newPosts[index].comments.push(comment);
-      newPosts[index].newComment = "";
-      newPosts[index].isCommenting = false;
-      setPosts(newPosts);
-    }
-  };
-
-  const handleCommentChange = (index, event) => {
-    const newPosts = [...posts];
-    newPosts[index].newComment = event.target.value;
-    setPosts(newPosts);
-  };
-
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -111,8 +70,22 @@ const HomePage = () => {
   };
 
   const timeAgo = (timestamp) => {
+    console.log("Received timestamp:", timestamp); // Debugging line
+
+    const date = new Date(timestamp);
+
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date parsing:", timestamp);
+      return "Invalid date";
+    }
+
     const now = new Date();
-    const diff = now - new Date(timestamp);
+    const diff = now.getTime() - date.getTime();
+
+    if (diff < 0) {
+      return "Just now"; // Handle future timestamps
+    }
+
     const minutes = Math.floor(diff / 1000 / 60);
     const hours = Math.floor(diff / 1000 / 60 / 60);
     const days = Math.floor(diff / 1000 / 60 / 60 / 24);
@@ -126,9 +99,8 @@ const HomePage = () => {
     }
   };
 
-
   const handlePostSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!niche.length || !problem || !solution || !costRange) {
       alert("Please fill in all fields and select at least one niche.");
@@ -156,20 +128,19 @@ const HomePage = () => {
         isCommenting: false,
         newComment: "",
       };
-      
+
       try {
         const response = await fetch("http://localhost:3000/posts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(newPost),
         });
         if (response.ok) {
           const savedPost = await response.json();
-          setFeed((prevFeed) => [savedPost, ...prevFeed]);
-
-          setPosts([newPost, ...posts]);
+          setPosts((prevPosts) => [savedPost, ...prevPosts]);
           setProblem("");
           setSolution("");
           setNiche([]);
@@ -180,45 +151,43 @@ const HomePage = () => {
           setCompanyLocation("");
           setActiveUsers("");
           setIsFullTime("");
-          // fetchPosts();
           setIsFormVisible(false);
-        }
-
-        else {
+        } else {
           alert("Failed to save the post. Please try again.");
         }
       } catch (error) {
         console.error("Error saving post:", error);
         alert("An error occurred while saving the post.");
       }
-
     } else {
       alert("Please fill in all fields and select at least one niche.");
     }
-
   };
 
-  // const fetchPosts = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:3000/posts");
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setPosts(data); // Set the posts in state
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching posts:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchPosts();
-  // }, []);
-
-
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/posts", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Fetched data from server:", data); // Log the data here
+        setPosts(data);
+      } else {
+        console.error("Failed to fetch posts:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   return (
     <div className="bg-white shadow-lg min-h-screen ">
       <Header />
-
 
       <div className="max-w-6xl mx-auto py-8 ">
         <div className="flex flex-col flex-1 p-4 rounded-lg max-w-5xl mx-auto">
@@ -231,22 +200,27 @@ const HomePage = () => {
             </button>
           </div>
 
-
-
           <div className="border-2 border-green-800 rounded-lg">
             {isFormVisible && (
               <div className="p-4 border border-gray-300 rounded-lg mt-4">
                 <h2 className="text-lg font-bold mb-4">Post Your Idea</h2>
                 <form onSubmit={handlePostSubmit}>
-
-
                   <div className="mb-4  ">
                     <label className="block text-sm font-medium text-gray-700">
                       Select Niches (You can choose multiple)
                     </label>
                     <div className="mt-1 space-y-2">
-                      {["Finance", "Tech", "Health", "Education", "E-commerce"].map((nicheOption) => (
-                        <label key={nicheOption} className="flex items-center space-x-2">
+                      {[
+                        "Finance",
+                        "Tech",
+                        "Health",
+                        "Education",
+                        "E-commerce",
+                      ].map((nicheOption) => (
+                        <label
+                          key={nicheOption}
+                          className="flex items-center space-x-2"
+                        >
                           <input
                             type="checkbox"
                             value={nicheOption}
@@ -255,7 +229,9 @@ const HomePage = () => {
                               if (e.target.checked) {
                                 setNiche([...niche, nicheOption]);
                               } else {
-                                setNiche(niche.filter((n) => n !== nicheOption));
+                                setNiche(
+                                  niche.filter((n) => n !== nicheOption)
+                                );
                               }
                             }}
                             className="form-checkbox text-green-600"
@@ -265,9 +241,6 @@ const HomePage = () => {
                       ))}
                     </div>
                   </div>
-
-
-
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
@@ -294,7 +267,6 @@ const HomePage = () => {
                     />
                   </div>
 
-
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
                       Company Name
@@ -307,7 +279,6 @@ const HomePage = () => {
                       placeholder="Enter your company name"
                     />
                   </div>
-
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
@@ -322,8 +293,6 @@ const HomePage = () => {
                     />
                   </div>
 
-
-
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
                       Add Link to Your Product (Optional)
@@ -337,7 +306,6 @@ const HomePage = () => {
                     />
                   </div>
 
-
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
                       Where is your company based?
@@ -348,14 +316,20 @@ const HomePage = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                     >
                       <option value="">Select City</option>
-                      {["Karachi", "Lahore", "Islamabad", "Faisalabad", "Multan", "Rawalpindi"].map((city) => (
+                      {[
+                        "Karachi",
+                        "Lahore",
+                        "Islamabad",
+                        "Faisalabad",
+                        "Multan",
+                        "Rawalpindi",
+                      ].map((city) => (
                         <option key={city} value={city}>
                           {city}
                         </option>
                       ))}
                     </select>
                   </div>
-
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
@@ -369,7 +343,6 @@ const HomePage = () => {
                       placeholder="Enter number of active users/customers"
                     />
                   </div>
-
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
@@ -399,10 +372,6 @@ const HomePage = () => {
                     </div>
                   </div>
 
-
-
-
-
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
                       Cost Range
@@ -416,8 +385,6 @@ const HomePage = () => {
                     />
                   </div>
 
-
-
                   <button
                     type="submit"
                     className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
@@ -429,12 +396,12 @@ const HomePage = () => {
             )}
           </div>
 
-
           <div className="mt-6 space-y-4">
             {posts.map((post, index) => (
-
-              <div key={post.id} className="border-2 border-green-800 rounded-lg p-4 bg-white shadow-md overflow-hidden">
-              
+              <div
+                key={post.id}
+                className="border-2 border-green-800 rounded-lg p-4 bg-white shadow-md overflow-hidden"
+              >
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <button className="text-gray-600 hover:text-green-400">
@@ -443,13 +410,10 @@ const HomePage = () => {
                     <h2 className="font-bold">{post.user}</h2>
                   </div>
                   <span className="text-gray-400">
-                    {timeAgo(post.timestamp)}
+                    {timeAgo(post.timestamp)}{" "}
+                    {/* Will show proper values or 'Invalid date' */}
                   </span>
                 </div>
-
-
-               
-
 
                 <div className="p-4 border rounded-lg shadow-md bg-white">
                   <div className="mt-4">
@@ -457,7 +421,8 @@ const HomePage = () => {
                       <strong>Problem Statement:</strong> {post.problem}
                     </p>
                     <p className="text-gray-600 mb-2">
-                      <strong>Solution(USP/Value Reposition):</strong> {post.solution}
+                      <strong>Solution(USP/Value Reposition):</strong>{" "}
+                      {post.solution}
                     </p>
                     <p className="text-gray-600 mb-2">
                       <strong>Niche:</strong> {post.niches}
@@ -467,11 +432,12 @@ const HomePage = () => {
                     </p>
                   </div>
                   <br></br>
-                  <h1 className="text-gray-600 mb-2"><strong> Company Name:</strong></h1>
+                  <h1 className="text-gray-600 mb-2">
+                    <strong> Company Name:</strong>
+                  </h1>
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">
                     {post.companyName}
                   </h3>
-
                   {post.companyUrl && (
                     <a
                       href={post.companyUrl}
@@ -503,7 +469,8 @@ const HomePage = () => {
                     <strong>Active Users:</strong> {post.activeUsers}
                   </p>
                   <p className="text-gray-600 mb-2">
-                    <strong>Working Full-Time:</strong> {post.isFullTime ? "Yes" : "No"}
+                    <strong>Working Full-Time:</strong>{" "}
+                    {post.isFullTime ? "Yes" : "No"}
                   </p>
 
                   {post.image && (
@@ -512,15 +479,12 @@ const HomePage = () => {
                         <img
                           src={post.image}
                           alt="Post Image"
-
                           className="w-full max-w-sm object-contain rounded-lg shadow-lg"
                         />
                       </div>
                     </div>
                   )}
                 </div>
-
-
 
                 <div className="p-4 border-t border-gray-200 flex justify-between items-center">
                   <button
@@ -530,48 +494,7 @@ const HomePage = () => {
                     <HandThumbUpIcon className="h-5 w-5" />
                     {post.upvotes} {post.upvotes === 1 ? "Upvote" : "Upvotes"}
                   </button>
-
-                  <button
-                    onClick={() => {
-                      const newPosts = [...posts];
-                      newPosts[index].isCommenting = true;
-                      setPosts(newPosts);
-                    }}
-                    className="flex items-center gap-1 text-gray-600 hover:text-green-400"
-                  >
-                    <ChatBubbleLeftIcon className="h-5 w-5" />
-
-                    {post.comments.length} {post.comments.length === 1 ? "Comment" : "Comments"}
-                  </button>
                 </div>
-
-                {post.isCommenting && (
-                  <div className="p-4">
-                    <textarea
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                      placeholder="Write your comment..."
-                      value={post.newComment}
-                      onChange={(e) => handleCommentChange(index, e)}
-                    />
-                    <button
-
-                      className="bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg"
-                      onClick={() => handleAddComment(index)}
-                    >
-                      Post Comment
-                    </button>
-                  </div>
-                )}
-
-                {post.comments.length > 0 && (
-                  <div className="p-4 border-t border-gray-200">
-                    {post.comments.map((comment, idx) => (
-                      <div key={idx} className="text-gray-600">
-                        {comment}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             ))}
           </div>

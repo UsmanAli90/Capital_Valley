@@ -11,6 +11,7 @@ const PostSchema = new mongoose.Schema({
   companyLocation: { type: String, required: true },
   activeUsers: { type: Number, required: true },
   isFullTime: { type: String, enum: ["Yes", "No"], required: true },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "Startup", required: true },
   createdAt: {
     type: Date,
     default: Date.now,

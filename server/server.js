@@ -12,6 +12,7 @@ const { forgotPassword, verifyOTP } = require("./controllers/forgotPassword");
 const { resetPassword } = require('./controllers/resetPassword.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
+const Post = require('./models/Post.js')
 
 
 
@@ -64,7 +65,6 @@ app.get("/profile", (req, res) => {
 });
 
 
-// Endpoint to handle user profile updates
 app.post("/updateProfile", async (req, res) => {
     const { name, email } = req.body;
 
@@ -87,6 +87,25 @@ app.post("/updateProfile", async (req, res) => {
     } catch (error) {
         console.error("Error updating user profile:", error);
         res.status(500).json({ message: "Server encountered an error" });
+    }
+});
+
+// Route to get all posts
+app.get("/posts", async (req, res) => {
+    const { sortBy = "createdAt", order = "desc" } = req.query; // Default to sorting by createdAt in descending order
+
+    try {
+        // Determine the sort order
+        const sortOrder = order === "asc" ? 1 : -1;
+
+        // Fetch all posts from the database and sort them based on user choice
+        const posts = await Post.find().populate("owner", "name email").sort({ [sortBy]: sortOrder });
+
+        // Send the posts as a response
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error("Error fetching posts:", error);
+        res.status(500).json({ message: "Server error while fetching posts." });
     }
 });
 
