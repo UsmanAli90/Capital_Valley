@@ -1,6 +1,5 @@
 const Investor = require("../models/Investordb");
 const bcrypt = require('bcrypt');
-
 const createInvestor = async (req, res) => {
   try {
     const { email, username, password, cnic, areasOfInterest, agreed } = req.body;

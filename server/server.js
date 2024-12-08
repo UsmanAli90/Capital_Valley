@@ -1,23 +1,29 @@
-const express = require("express");
+const express = require("express")
 const session = require("express-session");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require('./db.js');
 const Startup = require('./models/Startupdb.js');
-const { createStartup } = require('./controllers/startupsignup.js');
-const { createInvestor } = require('./controllers/investorsignup.js');
-const { StartupsignIn } = require('./controllers/startupsignin.js');
-const { InvestorsignIn } = require('./controllers/investorsignin.js');
+const { createStartup } = require('./controllers/startupsignup.js')
+const { createInvestor } = require('./controllers/investorsignup.js')
+const { StartupsignIn } = require('./controllers/startupsignin.js')
+const { InvestorsignIn } = require('./controllers/investorsignin.js')
+const { forgotPassword, verifyOTP } = require("./controllers/forgotPassword");
+const { resetPassword } = require('./controllers/resetPassword.js');
+const { searchProfiles } = require('./controllers/searchcontroller.js')
+const { createPost } = require('./controllers/PostUpload.js')
+
+
 
 dotenv.config();
 const app = express();
+
 app.use(express.json());
 
 app.use(cors({
     origin: "http://localhost:5173", // Frontend origin
     credentials: true,
 }));
-
 connectDB(process.env.MONGO_URI);
 
 app.use(
@@ -32,7 +38,16 @@ app.use(
         },
     })
 );
+app.post("/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: "Logout failed" });
+        }
 
+        res.clearCookie("connect.sid");
+        res.status(200).json({ message: "Logged out successfully" });
+    });
+});
 // Endpoint for getting profile data
 app.get("/profile", (req, res) => {
     if (req.session && req.session.user) {
@@ -47,6 +62,7 @@ app.get("/profile", (req, res) => {
         });
     }
 });
+
 
 // Endpoint to handle user profile updates
 app.post("/updateProfile", async (req, res) => {
@@ -78,17 +94,12 @@ app.post("/startupsignup", createStartup);
 app.post("/investorsignup", createInvestor);
 app.post("/startupsignin", StartupsignIn);
 app.post("/investorsignin", InvestorsignIn);
+app.post("/forgot-password", forgotPassword);
+app.post("/verify-otp", verifyOTP);
+app.use('/reset-password', resetPassword);
+app.get('/search', searchProfiles)
+app.post("/posts", createPost);
 
-app.post("/logout", (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).json({ message: "Logout failed" });
-        }
-
-        res.clearCookie("connect.sid");
-        res.status(200).json({ message: "Logged out successfully" });
-    });
-});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

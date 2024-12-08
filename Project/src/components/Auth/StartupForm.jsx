@@ -104,7 +104,9 @@ function StartupForm() {
           newErrors.cnic = "CNIC cannot be dominated by zeros.";
         }
       }
+
     }
+    
 
     if (!formData.description) {
       newErrors.description = "Startup description is required.";
