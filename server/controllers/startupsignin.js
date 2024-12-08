@@ -6,24 +6,38 @@ const StartupsignIn = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
+      console.log("Missing email or password");
       return res.status(400).json({ message: "Email and password are required" });
     }
 
     const startupuser1 = await startupuser.findOne({ email });
 
+
     if (!startupuser1) {
+      console.log("No user found with provided email");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, startupuser1.password);
-    if (!isMatch) {
+    console.log("Password comparison result:", isMatch);
 
+    if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    res.status(200).json({ message: "Sign-in successful", user: startupuser1.email });
+    // Create a session
+    req.session.user = {
+      id: startupuser1._id,
+      email: startupuser1.email,
+      username: startupuser1.username,
+    };
+
+    console.log("Session set with user data:", req.session.user);
+
+    // Send JSON response with session information
+    return res.status(200).json({ message: "Sign-in successful", user: req.session.user });
   } catch (err) {
-    console.error("Error in StartupsignIn:", err);
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -6,24 +6,22 @@ import { UserCircleIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/
 
 
 const HomePage = () => {
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [upvotes, setUpvotes] = useState([0, 0]);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [niche, setNiche] = useState([]);
-  const [problem, setProblem] = useState("");
-  const [solution, setSolution] = useState("");
-  const [description, setDescription] = useState("");
-  const [costRange, setCostRange] = useState("");
-  const [feed, setFeed] = useState([]);
-  const [companyName, setCompanyName] = useState("");
-  const [companyUrl, setCompanyUrl] = useState("");
-  const [productLink, setProductLink] = useState("");
-  const [companyLocation, setCompanyLocation] = useState("");
-  const [activeUsers, setActiveUsers] = useState("");
-  const [isFullTime, setIsFullTime] = useState("");
-   const [user, setUser] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [description, setDescription] = useState("");
+    const [isFormVisible, setIsFormVisible] = useState(false);
+    const [upvotes, setUpvotes] = useState([0, 0]);
+    const [selectedFile, setSelectedFile] = useState(null); // Declare only once
+    const [niche, setNiche] = useState([]);
+    const [problem, setProblem] = useState("");
+    const [solution, setSolution] = useState("");
+    const [description, setDescription] = useState(""); // Declare only once
+    const [costRange, setCostRange] = useState("");
+    const [feed, setFeed] = useState([]);
+    const [companyName, setCompanyName] = useState("");
+    const [companyUrl, setCompanyUrl] = useState("");
+    const [productLink, setProductLink] = useState("");
+    const [companyLocation, setCompanyLocation] = useState("");
+    const [activeUsers, setActiveUsers] = useState("");
+    const [isFullTime, setIsFullTime] = useState("");
+    const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([
     {
       id: 1,

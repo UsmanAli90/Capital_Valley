@@ -42,6 +42,10 @@ const investorSchema = new mongoose.Schema({
     type: Boolean,
     required: [true, "You must agree to the terms"],
   },
+  type: {
+    type: String,
+    value: "investor",
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Investor", investorSchema);

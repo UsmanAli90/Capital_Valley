@@ -1,35 +1,30 @@
-const investoruser = require('../models/Investordb')
-const express = require('express');
-const session = require('express-session');
+const investoruser = require('../models/Investordb');
 const bcrypt = require('bcrypt');
-
-
-const app = express();
-
-app.use(session({
-  secret: 'your_secret_key',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // Set to true if using HTTPS
-}));
-
-app.use(express.json());
 
 const InvestorsignIn = async (req, res) => {
   try {
+    console.log("Received request body:", req.body);
+
     const { email, password } = req.body;
 
     if (!email || !password) {
+      console.log("Missing email or password");
       return res.status(400).json({ message: "Email and password are required" });
     }
 
     const investoruser1 = await investoruser.findOne({ email });
-    const isMatch = await bcrypt.compare(password, investoruser1.password);
-    if (!isMatch) {
+    console.log("User found in database:", investoruser1);
+
+    if (!investoruser1) {
+      console.log("No user found with provided email");
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    if (!investoruser1 || investoruser1.password !== password) {
 
+    const isMatch = await bcrypt.compare(password, investoruser1.password);
+    console.log("Password comparison result:", isMatch);
+
+    if (!isMatch) {
+      console.log("Passwords do not match");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
@@ -37,18 +32,16 @@ const InvestorsignIn = async (req, res) => {
     req.session.user = {
       id: investoruser1._id,
       email: investoruser1.email,
-      // Add other details as needed
+      username: investoruser1.username,
     };
-  
 
-    const investorDetails = await investoruser.findById(investoruser1._id);
-    console.log(investorDetails);
+    console.log("Session set with user data:", req.session.user);
 
-
-    res.status(200).json({ message: "Sign-in successful", user: investorDetails });
+    // Send JSON response with session information
+    return res.status(200).json({ message: "Sign-in successful", user: req.session.user });
   } catch (err) {
-    console.error("Error in InvestorsignIn:", err);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error during login:", err);
+    return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 };
 

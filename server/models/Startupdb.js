@@ -46,6 +46,10 @@ const startupSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    type: {
+        type: String,
+        value: "startup",
+    }
 });
 
 module.exports = mongoose.model('Startup', startupSchema);
