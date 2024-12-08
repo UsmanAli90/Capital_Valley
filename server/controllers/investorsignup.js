@@ -1,4 +1,4 @@
-const Investor = require("../models/Investordb"); // Assuming you have an Investor model
+const Investor = require("../models/Investordb");
 const bcrypt = require('bcrypt');
 
 const createInvestor = async (req, res) => {
@@ -9,7 +9,7 @@ const createInvestor = async (req, res) => {
     if (!email || !username || !password || !cnic || !areasOfInterest || agreed === undefined) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    console.log(req.body.password)
+
     // Hash the password before saving
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -23,6 +23,7 @@ const createInvestor = async (req, res) => {
       cnic,
       areasOfInterest,
       agreed,
+      type: "investor",
     });
 
     console.log("New Investor is:", newInvestor);
@@ -34,20 +35,24 @@ const createInvestor = async (req, res) => {
       console.log("Saved Investor:", savedInvestor);
 
       // Respond with success
-      res.status(201).json({ message: "Investor created successfully", savedInvestor });
+      res.status(201).json({ message: "Investor created successfully", investor: savedInvestor });
     } catch (err) {
       if (err.code === 11000) {
         return res.status(400).json({ message: "Email or CNIC already exists" });
       }
-      console.error(err);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("Error saving investor:", err);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Internal server error" });
+      }
     }
   } catch (err) {
     if (err.code === 11000) {
       return res.status(400).json({ message: "Email or CNIC already exists" });
     }
-    console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error creating investor:", err);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Internal server error" });
+    }
   }
 };
 
