@@ -13,8 +13,8 @@ const { resetPassword } = require('./controllers/resetPassword.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const Post = require('./models/Post.js')
-const ensureAuthenticated = require('./middleware/auth.js'); // Import the middleware
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
+const { forgotPassword1, verifyOTP1 } = require("./controllers/forgotPasswordInvestor.js");
 
 
 
@@ -147,6 +147,17 @@ app.get('/search', searchProfiles)
 app.post("/posts", createPost);
 app.get('/search', searchProfiles)
 app.post("/posts", filterAndValidatePost, createPost);
+
+
+
+app.post("/startupsignup", createStartup);
+app.post("/investorsignup", createInvestor);
+app.post("/startupsignin", StartupsignIn);
+app.post("/investorsignin", InvestorsignIn);
+app.post("/forgot-password", forgotPassword);
+app.post("/forgot-password1", forgotPassword1);
+app.post("/verify-otp", verifyOTP);
+app.use('/reset-password', resetPassword);
 
 
 const PORT = process.env.PORT || 3000;
