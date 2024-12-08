@@ -12,6 +12,7 @@ const PostSchema = new mongoose.Schema({
   activeUsers: { type: Number, required: true },
   isFullTime: { type: String, enum: ["Yes", "No"], required: true },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "Startup", required: true },
+  upvotes: { type: Number, default: 0 }, // New field for upvotes with default value
   createdAt: {
     type: Date,
     default: Date.now,

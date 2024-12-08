@@ -10,12 +10,10 @@ import {
 
 const HomePage = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [upvotes, setUpvotes] = useState([0, 0]);
   const [selectedFile, setSelectedFile] = useState(null); // Declare only once
   const [niche, setNiche] = useState([]);
   const [problem, setProblem] = useState("");
   const [solution, setSolution] = useState("");
-  const [description, setDescription] = useState(""); // Declare only once
   const [costRange, setCostRange] = useState("");
   const [feed, setFeed] = useState([]);
   const [companyName, setCompanyName] = useState("");
@@ -44,36 +42,59 @@ const HomePage = () => {
     setIsFormVisible(!isFormVisible);
   };
 
-  const handleUpvote = (index) => {
+  const handleUpvote = async (index) => {
     const newPosts = [...posts];
     const post = newPosts[index];
-    if (post.hasUpvoted) {
-      post.upvotes -= 1;
-      post.hasUpvoted = false;
-    } else {
-      post.upvotes += 1;
-      post.hasUpvoted = true;
+
+    if (!post) {
+      console.error("No post found at index:", index);
+      return;
     }
+
+    if (!post._id) {
+      console.error("Post is missing a valid _id:", post);
+      return;
+    }
+
+    console.log("Valid post _id:", post._id);
+
+    // Upvote logic: toggle upvote
+    const upvoteChange = post.hasUpvoted ? -1 : 1; // +1 if upvoting, -1 if removing upvote
+    post.upvotes += upvoteChange;
+    post.hasUpvoted = !post.hasUpvoted; // Toggle the upvote state
 
     setPosts(newPosts);
-  };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(URL.createObjectURL(file));
+    try {
+      const response = await fetch(
+        `http://localhost:3000/posts/${post._id}/upvote`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ upvoteChange }), // Send the change (+1 or -1)
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to upvote");
+      }
+    } catch (error) {
+      console.error("Unexpected error during fetch", error);
     }
-  };
-
-  const handleDescriptionChange = (event) => {
-    setDescription(event.target.value);
   };
 
   const timeAgo = (timestamp) => {
-    console.log("Received timestamp:", timestamp); // Debugging line
+    if (!timestamp) {
+      console.error("Invalid or missing timestamp:", timestamp);
+      return "Invalid date";
+    }
 
+    // Parse the timestamp into a Date object
     const date = new Date(timestamp);
 
+    // Check if the date is valid
     if (isNaN(date.getTime())) {
       console.error("Invalid date parsing:", timestamp);
       return "Invalid date";
@@ -125,8 +146,6 @@ const HomePage = () => {
         description: `Problem Statement: ${problem} Solution: ${solution} Niche: ${niche} Cost: ${costRange}`,
         timestamp: new Date(),
         hasUpvoted: false,
-        isCommenting: false,
-        newComment: "",
       };
 
       try {
@@ -175,8 +194,14 @@ const HomePage = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched data from server:", data); // Log the data here
-        setPosts(data);
+        console.log("Fetched data from server:", data); // <-- This logs the response
+        const initializedPosts = data.map((post) => ({
+          ...post,
+          upvotes: post.upvotes || 0, // Ensure all posts have upvote initialized
+          hasUpvoted: false, // To track user-specific upvotes
+        }));
+
+        setPosts(initializedPosts);
       } else {
         console.error("Failed to fetch posts:", response.statusText);
       }
@@ -404,14 +429,18 @@ const HomePage = () => {
               >
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <button className="text-gray-600 hover:text-green-400">
-                      <UserCircleIcon className="h-6 w-6" />
-                    </button>
-                    <h2 className="font-bold">{post.user}</h2>
+                    {/* Replace the UserCircleIcon with the owner's email */}
+                    <div className="h-6 w-6 bg-gray-300 flex items-center justify-center rounded-full text-sm text-white">
+                      {post.owner?.email?.[0] || "U"}{" "}
+                      {/* Display first letter of the owner's email */}
+                    </div>
+                    <h2 className="font-bold">
+                      {post.owner?.email || "Unknown"}{" "}
+                      {/* Show the owner's email */}
+                    </h2>
                   </div>
                   <span className="text-gray-400">
-                    {timeAgo(post.timestamp)}{" "}
-                    {/* Will show proper values or 'Invalid date' */}
+                    {timeAgo(post.createdAt)}
                   </span>
                 </div>
 

@@ -13,6 +13,7 @@ const { resetPassword } = require('./controllers/resetPassword.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const Post = require('./models/Post.js')
+const ensureAuthenticated = require('./middleware/auth.js'); // Import the middleware
 
 
 
@@ -39,6 +40,8 @@ app.use(
         },
     })
 );
+
+
 app.post("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -92,14 +95,12 @@ app.post("/updateProfile", async (req, res) => {
 
 // Route to get all posts
 app.get("/posts", async (req, res) => {
-    const { sortBy = "createdAt", order = "desc" } = req.query; // Default to sorting by createdAt in descending order
 
     try {
         // Determine the sort order
-        const sortOrder = order === "asc" ? 1 : -1;
-
-        // Fetch all posts from the database and sort them based on user choice
-        const posts = await Post.find().populate("owner", "name email").sort({ [sortBy]: sortOrder });
+        const posts = await Post.find()
+            .populate("owner", "name email")
+            .sort({ upvotes: -1 });
 
         // Send the posts as a response
         res.status(200).json(posts);
@@ -109,13 +110,38 @@ app.get("/posts", async (req, res) => {
     }
 });
 
-app.post("/startupsignup", createStartup);
-app.post("/investorsignup", createInvestor);
-app.post("/startupsignin", StartupsignIn);
-app.post("/investorsignin", InvestorsignIn);
-app.post("/forgot-password", forgotPassword);
-app.post("/verify-otp", verifyOTP);
-app.use('/reset-password', resetPassword);
+app.patch('/posts/:id/upvote', async (req, res) => {
+    const { id } = req.params; // Extract the ID from the URL
+    const { upvoteChange } = req.body; // Extract the change (+1 or -1) from the request body
+
+    console.log('Received ID:', id);
+    console.log('Received upvoteChange:', upvoteChange);
+
+    // Validate upvoteChange value
+    if (typeof upvoteChange !== 'number') {
+        return res.status(400).json({ message: 'Invalid upvoteChange value' });
+    }
+
+    try {
+        const updatedPost = await Post.findByIdAndUpdate(
+            id,
+            { $inc: { upvotes: upvoteChange } }, // Adjust the upvotes field by +1 or -1
+            { new: true }
+        );
+
+        if (!updatedPost) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        console.log('Updated Post:', updatedPost);
+        res.status(200).json(updatedPost);
+    } catch (error) {
+        console.error('Error:', error.stack);
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
+
 app.get('/search', searchProfiles)
 app.post("/posts", createPost);
 
