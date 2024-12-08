@@ -171,8 +171,10 @@ const HomePage = () => {
           setActiveUsers("");
           setIsFullTime("");
           setIsFormVisible(false);
-        } else {
-          alert("Failed to save the post. Please try again.");
+        }
+
+        else {
+          alert("Your post contains prohibited content. Please revise and try again.");
         }
       } catch (error) {
         console.error("Error saving post:", error);
@@ -399,14 +401,14 @@ const HomePage = () => {
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
-                      Cost Range
+                      Money looking to raise
                     </label>
                     <input
                       type="text"
                       value={costRange}
                       onChange={(e) => setCostRange(e.target.value)}
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                      placeholder="Enter cost range (e.g., $1000 - $5000)"
+                      placeholder="Enter amount you are looking to raise"
                     />
                   </div>
 

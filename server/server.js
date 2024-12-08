@@ -12,8 +12,12 @@ const { forgotPassword, verifyOTP } = require("./controllers/forgotPassword");
 const { resetPassword } = require('./controllers/resetPassword.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
+<<<<<<< HEAD
 const Post = require('./models/Post.js')
 const ensureAuthenticated = require('./middleware/auth.js'); // Import the middleware
+=======
+const { filterAndValidatePost } = require("./controllers/Postfilter.js");
+>>>>>>> da132470b58102090e8601c827e6950d8881c697
 
 
 
@@ -93,6 +97,7 @@ app.post("/updateProfile", async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
 // Route to get all posts
 app.get("/posts", async (req, res) => {
 
@@ -143,7 +148,22 @@ app.patch('/posts/:id/upvote', async (req, res) => {
 
 
 app.get('/search', searchProfiles)
+=======
+app.post("/startupsignup", createStartup);
+app.post("/investorsignup", createInvestor);
+app.post("/startupsignin", StartupsignIn);
+app.post("/investorsignin", InvestorsignIn);
+app.post("/forgot-password", forgotPassword);
+app.post("/forgot-password1", forgotPassword1);
+app.post("/verify-otp", verifyOTP);
+app.use('/reset-password', resetPassword);
+app.use('/reset-password1', resetPassword1);
+app.get('/search',searchProfiles)
+app.post("/verify-otp1", verifyOTP1);
+>>>>>>> da132470b58102090e8601c827e6950d8881c697
 app.post("/posts", createPost);
+app.get('/search', searchProfiles)
+app.post("/posts", filterAndValidatePost, createPost);
 
 
 const PORT = process.env.PORT || 3000;

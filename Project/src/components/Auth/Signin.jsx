@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import './ForgotPassword'
+import './ForgotPassword';
 
 function Signin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -140,10 +140,10 @@ function Signin() {
             )}
           </div>
           <div className="mb-3 text-end">
-          <Link to="/forgot-password" className="text-decoration-none">
-            Forgot your password?
-          </Link>
-        </div>
+            <Link to={usertype === "investor" ? "/forgot-password-investor" : "/forgot-password"} className="text-decoration-none">
+              Forgot your password?
+            </Link>
+          </div>
           <button type="submit" className="btn btn-secondary w-100">
             Sign in
           </button>
