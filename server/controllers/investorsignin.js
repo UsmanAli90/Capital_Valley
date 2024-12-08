@@ -28,16 +28,15 @@ const InvestorsignIn = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Create a session
     req.session.user = {
       id: investoruser1._id,
       email: investoruser1.email,
       username: investoruser1.username,
+      type: investoruser1.type,
     };
 
     console.log("Session set with user data:", req.session.user);
 
-    // Send JSON response with session information
     return res.status(200).json({ message: "Sign-in successful", user: req.session.user });
   } catch (err) {
     console.error("Error during login:", err);

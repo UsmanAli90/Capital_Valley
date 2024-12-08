@@ -42,23 +42,20 @@ const investorSchema = new mongoose.Schema({
     type: Boolean,
     required: [true, "You must agree to the terms"],
   },
-
   otp: {
-    type: String, // Store the generated OTP
+    type: String, 
   },
   otpExpires: {
-    type: Date, // Store the expiration time for the OTP
+    type: Date, 
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-
   type: {
     type: String,
     value: "investor",
   }
-
 }, { timestamps: true });
 
 module.exports = mongoose.model("Investor", investorSchema);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function StartupForm() {
   const [formData, setFormData] = useState({
@@ -12,8 +13,12 @@ function StartupForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   const validate = () => {
     const newErrors = {};
 
@@ -106,7 +111,7 @@ function StartupForm() {
       }
 
     }
-    
+
 
     if (!formData.description) {
       newErrors.description = "Startup description is required.";
@@ -156,120 +161,120 @@ function StartupForm() {
   };
 
   return (
-    <form
-      className="card p-4 shadow-lg"
-      style={{ maxWidth: "500px", margin: "0 auto", borderRadius: "15px" }}
-      onSubmit={handleSubmit}
-    >
-      <h2 className="text-center mb-4 fw-bold">Sign Up</h2>
+    <div className="min-h-screen flex items-center justify-center bg-green-200">
+      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-center text-green-600 mb-4">Create Your Startup Account</h1>
+        <p className="text-center text-gray-600 mb-8">Join Capital Valley and start your journey</p>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              placeholder="Enter your email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            {errors.email && <small className="text-danger">{errors.email}</small>}
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Email</label>
-        <input
-          type="email"
-          className="form-control rounded-pill"
-          placeholder="Enter your email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        {errors.email && <small className="text-danger">{errors.email}</small>}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Username</label>
+            <input
+              type="text"
+              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              placeholder="Enter your username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+            />
+            {errors.username && <small className="text-danger">{errors.username}</small>}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="input-group">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+                placeholder="Enter your password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <div className="input-group-append">
+                <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+            </div>
+            <small className="text-muted">
+              • Use 8 or more characters
+              <br />• One uppercase, lowercase, special character, and number
+            </small>
+            {errors.password && <small className="text-danger">{errors.password}</small>}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">CNIC</label>
+            <input
+              type="text"
+              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              placeholder="Enter your CNIC"
+              name="cnic"
+              value={formData.cnic}
+              onChange={handleChange}
+            />
+            {errors.cnic && <small className="text-danger">{errors.cnic}</small>}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Startup Description</label>
+            <textarea
+              className="form-control w-full px-3 py-2 border border-gray-300 rounded-lg"
+              rows="2"
+              placeholder="Enter your startup description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            ></textarea>
+            {errors.description && <small className="text-danger">{errors.description}</small>}
+          </div>
+
+          <div className="form-check mb-4">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="email-updates"
+              name="agree"
+              checked={formData.agree}
+              onChange={handleChange}
+            />
+            <label className="form-check-label" htmlFor="email-updates">
+              I want to receive emails about the product, feature updates, and events.
+            </label>
+            {errors.agree && <small className="text-danger">{errors.agree}</small>}
+          </div>
+
+          <p className="small text-muted mb-4">
+            By creating an account, you agree to the{" "}
+            <a href="#" className="text-decoration-none text-green-600 hover:underline">
+              Terms of Use
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-decoration-none text-green-600 hover:underline">
+              Privacy Policy
+            </a>
+            .
+          </p>
+
+          <button type="submit" className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+            Create an account
+          </button>
+        </form>
       </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Username</label>
-        <input
-          type="text"
-          className="form-control rounded-pill"
-          placeholder="Enter your username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-        />
-        {errors.username && (
-          <small className="text-danger">{errors.username}</small>
-        )}
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Password</label>
-        <input
-          type="password"
-          className="form-control rounded-pill"
-          placeholder="Enter your password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        <small className="text-muted">
-          • Use 8 or more characters
-          <br />• One uppercase, lowercase, special character, and number
-        </small>
-        {errors.password && (
-          <small className="text-danger">{errors.password}</small>
-        )}
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">CNIC</label>
-        <input
-          type="text"
-          className="form-control rounded-pill"
-          placeholder="Enter your CNIC"
-          name="cnic"
-          value={formData.cnic}
-          onChange={handleChange}
-        />
-        {errors.cnic && <small className="text-danger">{errors.cnic}</small>}
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Startup Description</label>
-        <textarea
-          className="form-control"
-          rows="2"
-          placeholder="Enter your startup description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-        ></textarea>
-        {errors.description && (
-          <small className="text-danger">{errors.description}</small>
-        )}
-      </div>
-
-      <div className="form-check mb-3">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          id="email-updates"
-          name="agree"
-          checked={formData.agree}
-          onChange={handleChange}
-        />
-        <label className="form-check-label" htmlFor="email-updates">
-          I want to receive emails about the product, feature updates, and
-          events.
-        </label>
-        {errors.agree && <small className="text-danger">{errors.agree}</small>}
-      </div>
-
-      <p className="small text-muted">
-        By creating an account, you agree to the{" "}
-        <a href="#" className="text-decoration-none">
-          Terms of Use
-        </a>{" "}
-        and{" "}
-        <a href="#" className="text-decoration-none">
-          Privacy Policy
-        </a>
-        .
-      </p>
-
-      <button type="submit" className="btn btn-secondary w-100 rounded-pill">
-        Create an account
-      </button>
-    </form>
+    </div>
   );
 }
 

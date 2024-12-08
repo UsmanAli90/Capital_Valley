@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function InvestorForm() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -22,6 +24,11 @@ function InvestorForm() {
       [name]: type === "checkbox" ? checked : value,
     });
   };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
 
   const validate = () => {
     const newErrors = {};
@@ -156,131 +163,120 @@ function InvestorForm() {
   };
 
   return (
-    <form
-      className="card p-4 shadow-lg"
-      style={{ maxWidth: "500px", margin: "0 auto", borderRadius: "15px" }}
-      onSubmit={handleSubmit}
-    >
-      <h2 className="text-center mb-4 fw-bold">Sign Up</h2>
+    <div className="min-h-screen flex items-center justify-center bg-green-200">
+      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-center text-green-600 mb-4">Create Your Investor Account</h1>
+        <p className="text-center text-gray-600 mb-8">Join Capital Valley and start your journey</p>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              placeholder="Enter your email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            {errors.email && <small className="text-danger">{errors.email}</small>}
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Email</label>
-        <input
-          type="email"
-          name="email"
-          className={`form-control rounded-pill ${
-            errors.email ? "is-invalid" : ""
-          }`}
-          placeholder="Enter your email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Username</label>
+            <input
+              type="text"
+              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              placeholder="Enter your username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+            />
+            {errors.username && <small className="text-danger">{errors.username}</small>}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="input-group">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+                placeholder="Enter your password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <div className="input-group-append">
+                <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+            </div>
+            <small className="text-muted">
+              • Use 8 or more characters
+              <br />• One uppercase, lowercase, special character, and number
+            </small>
+            {errors.password && <small className="text-danger">{errors.password}</small>}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">CNIC</label>
+            <input
+              type="text"
+              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              placeholder="Enter your CNIC"
+              name="cnic"
+              value={formData.cnic}
+              onChange={handleChange}
+            />
+            {errors.cnic && <small className="text-danger">{errors.cnic}</small>}
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Areas of Interest</label>
+            <textarea
+              className="form-control w-full px-3 py-2 border border-gray-300 rounded-lg"
+              rows="2"
+              placeholder="Enter your areas of interest"
+              name="areasOfInterest"
+              value={formData.areasOfInterest}
+              onChange={handleChange}
+            ></textarea>
+            {errors.areasOfInterest && <small className="text-danger">{errors.areasOfInterest}</small>}
+          </div>
+
+          <div className="form-check mb-4">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="email-updates"
+              name="agree"
+              checked={formData.agree}
+              onChange={handleChange}
+            />
+            <label className="form-check-label" htmlFor="email-updates">
+              I want to receive emails about the product, feature updates, and events.
+            </label>
+            {errors.agree && <small className="text-danger">{errors.agree}</small>}
+          </div>
+
+          <p className="small text-muted mb-4">
+            By creating an account, you agree to the{" "}
+            <a href="#" className="text-decoration-none text-green-600 hover:underline">
+              Terms of Use
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-decoration-none text-green-600 hover:underline">
+              Privacy Policy
+            </a>
+            .
+          </p>
+
+          <button type="submit" className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
+            Create an account
+          </button>
+        </form>
       </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Username</label>
-        <input
-          type="text"
-          name="username"
-          className={`form-control rounded-pill ${
-            errors.username ? "is-invalid" : ""
-          }`}
-          placeholder="Enter your username"
-          value={formData.username}
-          onChange={handleChange}
-        />
-        {errors.username && (
-          <div className="invalid-feedback">{errors.username}</div>
-        )}
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Password</label>
-        <input
-          type="password"
-          name="password"
-          className={`form-control rounded-pill ${
-            errors.password ? "is-invalid" : ""
-          }`}
-          placeholder="Enter your password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        <small className="text-muted">
-          • Use 8 or more characters
-          <br />• One Uppercase character, lowercase, special character, and
-          number
-        </small>
-        {errors.password && (
-          <div className="invalid-feedback">{errors.password}</div>
-        )}
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">CNIC</label>
-        <input
-          type="text"
-          name="cnic"
-          className={`form-control rounded-pill ${
-            errors.cnic ? "is-invalid" : ""
-          }`}
-          placeholder="Enter your CNIC"
-          value={formData.cnic}
-          onChange={handleChange}
-        />
-        {errors.cnic && <div className="invalid-feedback">{errors.cnic}</div>}
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Areas of Interest</label>
-        <textarea
-          name="areasOfInterest"
-          className={`form-control rounded-pill ${
-            errors.areasOfInterest ? "is-invalid" : ""
-          }`}
-          rows="2"
-          placeholder="Enter areas of interest"
-          value={formData.areasOfInterest}
-          onChange={handleChange}
-        ></textarea>
-        {errors.areasOfInterest && (
-          <div className="invalid-feedback">{errors.areasOfInterest}</div>
-        )}
-      </div>
-
-      <div className="form-check mb-3">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          name="agreed"
-          id="email-updates-investor"
-          checked={formData.agreed}
-          onChange={handleChange}
-        />
-        <label className="form-check-label" htmlFor="email-updates-investor">
-          I want to receive emails about the product, feature updates, and
-          events.
-        </label>
-        {errors.agreed && <div className="text-danger">{errors.agreed}</div>}
-      </div>
-
-      <p className="small text-muted">
-        By creating an account, you agree to the{" "}
-        <a href="#" className="text-decoration-none">
-          Terms of Use
-        </a>{" "}
-        and{" "}
-        <a href="#" className="text-decoration-none">
-          Privacy Policy
-        </a>
-        .
-      </p>
-
-      <button type="submit" className="btn btn-secondary w-100 rounded-pill">
-        Create an account
-      </button>
-    </form>
+    </div>
   );
 }
 

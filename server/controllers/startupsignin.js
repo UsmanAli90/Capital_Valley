@@ -25,16 +25,17 @@ const StartupsignIn = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Create a session
+
     req.session.user = {
       id: startupuser1._id,
       email: startupuser1.email,
       username: startupuser1.username,
+      type: startupuser1.type,
     };
 
     console.log("Session set with user data:", req.session.user);
 
-    // Send JSON response with session information
+
     return res.status(200).json({ message: "Sign-in successful", user: req.session.user });
   } catch (err) {
     console.error(err);

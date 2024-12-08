@@ -9,13 +9,13 @@ const { createInvestor } = require('./controllers/investorsignup.js')
 const { StartupsignIn } = require('./controllers/startupsignin.js')
 const { InvestorsignIn } = require('./controllers/investorsignin.js')
 const { forgotPassword, verifyOTP } = require("./controllers/forgotPassword");
+const { forgotPassword1, verifyOTP1 } = require("./controllers/forgotPasswordInvestor.js");
 const { resetPassword } = require('./controllers/resetPassword.js');
+const { resetPassword1 } = require('./controllers/resetPasswordIvestor.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const Post = require('./models/Post.js')
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
-const { forgotPassword1, verifyOTP1 } = require("./controllers/forgotPasswordInvestor.js");
-
 
 
 dotenv.config();
@@ -24,7 +24,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: "http://localhost:5173", // Frontend origin
+    origin: "http://localhost:5173", 
     credentials: true,
 }));
 connectDB(process.env.MONGO_URI);
@@ -53,7 +53,7 @@ app.post("/logout", (req, res) => {
         res.status(200).json({ message: "Logged out successfully" });
     });
 });
-// Endpoint for getting profile data
+
 app.get("/profile", (req, res) => {
     if (req.session && req.session.user) {
         res.status(200).json({
@@ -77,14 +77,12 @@ app.post("/updateProfile", async (req, res) => {
     }
 
     try {
-        // Find the user entry by email and update their name
         const updatedUser = await Startup.findOneAndUpdate(
-            { email }, // Match by email
+            { email },
             { username: name },
-            { new: true, upsert: true, setDefaultsOnInsert: true } // Update or create user
+            { new: true, upsert: true, setDefaultsOnInsert: true } 
         );
 
-        // Update session with the new user data
         req.session.user = { username: updatedUser.username, email: updatedUser.email };
 
         res.status(200).json(req.session.user);
@@ -143,10 +141,6 @@ app.patch('/posts/:id/upvote', async (req, res) => {
 });
 
 
-app.get('/search', searchProfiles)
-app.post("/posts", createPost);
-app.get('/search', searchProfiles)
-app.post("/posts", filterAndValidatePost, createPost);
 
 
 
@@ -158,6 +152,10 @@ app.post("/forgot-password", forgotPassword);
 app.post("/forgot-password1", forgotPassword1);
 app.post("/verify-otp", verifyOTP);
 app.use('/reset-password', resetPassword);
+app.use('/reset-password1', resetPassword1);
+app.post("/verify-otp1", verifyOTP1);
+app.get('/search', searchProfiles)
+app.post("/posts", filterAndValidatePost, createPost);
 
 
 const PORT = process.env.PORT || 3000;

@@ -1,16 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './ForgotPassword';
 
 function Signin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [usertype, setUsertype] = useState("startup");
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleUsertypeChange = (type) => {
@@ -70,90 +76,82 @@ function Signin() {
   };
 
   return (
-    <div className="bg-green-200 d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4 shadow" style={{ width: "350px" }}>
-        <h1 className="text-center mb-4">Sign in</h1>
-
-        <div>
-          <input
-            type="checkbox"
-            id="startup-checkbox"
-            checked={usertype === "startup"}
-            onChange={() => handleUsertypeChange("startup")}
-          />
-          <label className="ms-2" htmlFor="startup-checkbox">
-            Startup Founder
-          </label>
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            id="investor-checkbox"
-            checked={usertype === "investor"}
-            onChange={() => handleUsertypeChange("investor")}
-          />
-          <label className="ms-2" htmlFor="investor-checkbox">
-            Investor
-          </label>
-        </div>
-
-        <br />
-        <br />
-
+    <div className="min-h-screen flex items-center justify-center bg-green-200">
+      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-center text-green-600 mb-4">Welcome to Capital Valley</h1>
+        <p className="text-center text-gray-600 mb-8">Please sign in to continue</p>
         <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">
-              Email address
-            </label>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
-              className={`form-control rounded-pill ${
-                errors.email ? "is-invalid" : ""
-              }`}
-              id="email"
+              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              placeholder="Enter your email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email"
             />
-            {errors.email && (
-              <div className="invalid-feedback">{errors.email}</div>
-            )}
+            {errors.email && <small className="text-danger">{errors.email}</small>}
           </div>
-          <div className="mb-2 position-relative">
-            <label htmlFor="password" className="form-label">
-              Your password
-            </label>
-            <input
-              type="password"
-              className={`form-control rounded-pill ${
-                errors.password ? "is-invalid" : ""
-              }`}
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-            />
-            {errors.password && (
-              <div className="invalid-feedback">{errors.password}</div>
-            )}
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="input-group">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+                placeholder="Enter your password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <div className="input-group-append">
+                <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+            </div>
+            {errors.password && <small className="text-danger">{errors.password}</small>}
           </div>
-          <div className="mb-3 text-end">
-            <Link to={usertype === "investor" ? "/forgot-password-investor" : "/forgot-password"} className="text-decoration-none">
-              Forgot your password?
-            </Link>
+
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  className="form-radio"
+                  name="usertype"
+                  value="startup"
+                  checked={usertype === "startup"}
+                  onChange={() => handleUsertypeChange("startup")}
+                />
+                <span className="ml-2">Startup</span>
+              </label>
+              <label className="inline-flex items-center ml-6">
+                <input
+                  type="radio"
+                  className="form-radio"
+                  name="usertype"
+                  value="investor"
+                  checked={usertype === "investor"}
+                  onChange={() => handleUsertypeChange("investor")}
+                />
+                <span className="ml-2">Investor</span>
+              </label>
+            </div>
+            <Link to="/forgot-password" className="text-sm text-green-600 hover:underline">Forgot password?</Link>
           </div>
-          <button type="submit" className="btn btn-secondary w-100">
-            Sign in
+
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200"
+          >
+            Sign In
           </button>
         </form>
-        <div className="mt-3 text-center">
-          <span className="text-muted">Don’t have an account? </span>
-          <Link to="/signup" className="text-decoration-none">
-            Sign up
-          </Link>
-        </div>
+        <p className="text-center text-gray-600 mt-4">
+          Don't have an account? <Link to="/signup" className="text-green-600 hover:underline">Signup</Link>
+        </p>
       </div>
     </div>
   );

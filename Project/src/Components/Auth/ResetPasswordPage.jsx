@@ -27,6 +27,10 @@ const ResetPasswordPage = () => {
   
       if (response.ok) {
         setMessage("Password reset successfully!");
+        setTimeout(() => {
+          navigate(`/signin/${userId}`);
+        }, 2000);
+
       } else {
         setMessage(data.message); // Show error message
       }
@@ -37,7 +41,7 @@ const ResetPasswordPage = () => {
   
 
   return (
-    <div className="bg-image d-flex justify-content-center align-items-center vh-100">
+    <div className="bg-image d-flex justify-content-center align-items-center vh-100 bg-green-200">
       <div className="card p-4 shadow" style={{ width: "350px" }}>
         <h1 className="text-center mb-4">Reset Password</h1>
 

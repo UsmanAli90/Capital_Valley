@@ -13,13 +13,11 @@ const Profile = () => {
 
   const [user, setUser] = useState(null);
 
-  // Handle logout functionality
   const handleLogout = async () => {
     try {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
 
-      // Call server-side logout endpoint (ensure session is cleared server-side)
       const response = await fetch("http://localhost:3000/logout", {
         method: "POST",
         credentials: "include",
@@ -36,7 +34,6 @@ const Profile = () => {
     }
   };
 
-  // Fetch server-side profile to ensure session validity
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -77,11 +74,11 @@ const Profile = () => {
         />
       </Helmet>
       <Header />
-      <div className="flex justify-center items-center min-h-screen bg-green-200">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
-          <div className="flex w-full flex-col items-center gap-3.5 bg-green-200 px-3.5 py-5 shadow-xs sm:gap-3.5">
-            <div className="container-xs flex flex-col items-start gap-4 self-stretch sm:gap-4 bg-green-200 p-4 rounded-t-lg">
-              <div className="flex items-center gap-4 self-stretch">
+      <div className="flex justify-center items-center min-h-screen ">
+        <div className="w-full max-w-md bg-white shadow-md p-6 transform transition duration-700 hover:scale-105 border-2 border-green-800 rounded-lg">
+          <div className="flex w-full flex-col items-center gap-3.5 bg-white-a700 px-3.5 py-5 shadow-xs sm:gap-3.5  ">
+            <div className="container-xs flex flex-col items-start gap-4 self-stretch sm:gap-4 ">
+              <div className="flex items-center gap-4 self-stretch ">
                 <Img
                   src="profileAssets/images/user.png"
                   alt="Profile Image"
@@ -103,87 +100,61 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-            <div className="h-px w-full bg-gray-400 my-4" />
-            <div className="container-xs flex flex-col items-start gap-3 self-stretch sm:gap-3 bg-gray-100 p-4 rounded-b-lg">
-              <div className="flex w-full justify-between bg-gray-50 py-2 px-2 hover:bg-gray-100">
-                <div className="flex items-center gap-2.5">
-                  <Img
-                    src="profileAssets/images/profile.png"
-                    alt="User Image"
-                    className="h-[24px]"
-                  />
-                  <Text
-                    as="p"
-                    className="text-[14px] font-normal text-black-900"
-                  >
-                    My Profile
-                  </Text>
-                </div>
-                <Button
-                  onClick={() => navigate("/ProfileSetting")}
-                  className="hover:scale-110"
-                >
-                  <Img
-                    src="profileAssets/images/next.png"
-                    alt="Right Arrow"
-                    className="h-[24px]"
-                  />
-                </Button>
-              </div>
+          </div>
 
-              <div className="flex w-full justify-between bg-gray-50 py-2 px-2 hover:bg-gray-100">
-                <div className="flex items-center gap-2.5">
-                  <Img
-                    src="profileAssets/images/settings.png"
-                    alt="Settings Image"
-                    className="h-[24px]"
-                  />
-                  <Text
-                    as="p"
-                    className="text-[14px] font-normal text-blue_gray-900"
-                  >
-                    Change Password
-                  </Text>
-                </div>
-                <Link to="/changePassword">
-                  <Button className="hover:scale-110">
-                    <Img
-                      src="profileAssets/images/next.png"
-                      alt="Arrow Right"
-                      className="h-[24px]"
-                    />
-                  </Button>
-                </Link>
+          <div className="container-xs flex flex-col items-start gap-3 self-stretch sm:gap-3">
+            <div className="flex w-full justify-between bg-gray-50 py-2 px-2 transform transition duration-200 hover:bg-green-200 rounded-lg">
+              <div className="flex items-center gap-2.5">
+                <Img
+                  src="profileAssets/images/profile.png"
+                  alt="User Image"
+                  className="h-[24px]"
+                />
+                <Text as="p" className="text-[14px] font-normal text-black-900">
+                  My Profile
+                </Text>
               </div>
+              <Button
+                onClick={() => navigate("/ProfileSetting")}
+                className="transform transition duration-700 hover:scale-110"
+              >
+                <Img
+                  src="profileAssets/images/next.png"
+                  alt="Right Arrow"
+                  className="h-[24px]"
+                />
+              </Button>
+            </div>
 
-              <div className="flex w-full justify-between bg-gray-50 py-2 px-2 hover:bg-gray-100">
-                <div className="flex items-center gap-2.5">
-                  <Img
-                    src="profileAssets/images/bell.png"
-                    alt="Bell Image"
-                    className="h-[24px]"
-                  />
-                  <Text
-                    as="p"
-                    className="text-[14px] font-normal text-blue_gray-900"
-                  >
-                    Notification
-                  </Text>
-                </div>
-                <Button
-                  onClick={() => setNotificationsAllowed(!notificationsAllowed)}
-                  className="hover:scale-110"
+
+            <div className="flex w-full justify-between bg-gray-50 py-2 px-2 transform transition duration-200 hover:bg-green-200 rounded-lg">
+              <div className="flex items-center gap-2.5">
+                <Img
+                  src="profileAssets/images/bell.png"
+                  alt="Bell Image"
+                  className="h-[24px]"
+                />
+                <Text
+                  as="p"
+                  className="text-[14px] font-normal text-blue_gray-900"
                 >
-                  <Text
-                    as="p"
-                    className={`text-[12px] font-normal ${
-                      notificationsAllowed ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {notificationsAllowed ? "Allowed" : "Disallowed"}
-                  </Text>
-                </Button>
+                  Notification
+                </Text>
               </div>
+              <Button
+                onClick={() => setNotificationsAllowed(!notificationsAllowed)}
+                className="transform transition duration-700 hover:scale-110"
+              >
+                <Text
+                  as="p"
+                  className={`text-[12px] font-normal ${
+                    notificationsAllowed ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {notificationsAllowed ? "Allowed" : "Disallowed"}
+                </Text>
+              </Button>
+            </div>
 
               <div className="flex w-full justify-center bg-gray-50 py-2 px-2 hover:bg-gray-100">
                 <div className="flex items-center gap-2.5">

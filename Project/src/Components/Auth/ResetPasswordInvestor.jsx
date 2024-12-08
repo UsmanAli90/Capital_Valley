@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ResetPasswordPage1 = () => {
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Extract userId from query parameters
   const queryParams = new URLSearchParams(location.search);
@@ -13,7 +15,7 @@ const ResetPasswordPage1 = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch("http://localhost:3000/reset-password1", {
         method: "POST",
@@ -22,11 +24,16 @@ const ResetPasswordPage1 = () => {
         },
         body: JSON.stringify({ userId, newPassword }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         setMessage("Password reset successfully!");
+
+        setTimeout(() => {
+          navigate(`/signin/${userId}`);
+        }, 2000);
+
       } else {
         setMessage(data.message); // Show error message
       }
@@ -34,10 +41,10 @@ const ResetPasswordPage1 = () => {
       setMessage("An error occurred. Please try again.");
     }
   };
-  
+
 
   return (
-    <div className="bg-image d-flex justify-content-center align-items-center vh-100">
+    <div className="bg-image d-flex justify-content-center align-items-center vh-100 bg-green-200">
       <div className="card p-4 shadow" style={{ width: "350px" }}>
         <h1 className="text-center mb-4">Reset Password</h1>
 

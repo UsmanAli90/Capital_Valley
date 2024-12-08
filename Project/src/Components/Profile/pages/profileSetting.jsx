@@ -11,7 +11,6 @@ export default function ProfilesettingPage() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  // Fetch user data from the server's profile endpoint
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -59,7 +58,6 @@ export default function ProfilesettingPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
@@ -109,14 +107,14 @@ export default function ProfilesettingPage() {
         />
       </Helmet>
       <Header />
-      <div className="flex justify-center items-center min-h-screen bg-green-200">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="border-2 border-green-800 rounded-lg w-full max-w-md bg-white shadow-md p-6 transform transition duration-700 hover:scale-105">
           <form
-            className="flex flex-col items-start gap-4 sm:gap-6 bg-white-a700 p-4 sm:p-6"
+            className="flex flex-col items-start gap-6 bg-white-a700 p-6 sm:p-8 "
             onSubmit={handleSubmit}
           >
-            <div className="self-stretch">
-              <div className="flex flex-col gap-4">
+            <div className="self-stretch ">
+              <div className="flex flex-col gap-4 ">
                 <div className="flex flex-1 flex-col items-start">
                   <Text
                     size="texts"
@@ -189,7 +187,7 @@ export default function ProfilesettingPage() {
             <Button
               type="submit"
               shape="round"
-              className="min-w-[120px] sm:min-w-[144px] rounded-full px-4 sm:px-6 py-2 font-semibold text-white bg-green-700 hover:bg-green-600 active:bg-green-500 transition duration-300"
+              className="min-w-[144px] bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg hover:bg-green-900 sm:px-5 transition duration-300 hover:scale-105"
             >
               Save
             </Button>
