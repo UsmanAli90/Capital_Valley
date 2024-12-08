@@ -17,27 +17,94 @@ function StartupForm() {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.email.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/)) {
+    if (
+      !formData.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    ) {
       newErrors.email = "Please enter a valid email address.";
+    } else if (/\s/.test(formData.email)) {
+      newErrors.email = "Email should not contain spaces.";
+    } else if (/[^a-zA-Z0-9._%+-@]/.test(formData.email)) {
+      newErrors.email = "Email contains invalid characters.";
+    } else if (/[+-]/.test(formData.email)) {
+      newErrors.email =
+        "Email should not contain negative signs or plus signs.";
+    } else {
+      // Additional check to ensure the email domain is valid
+      const domain = formData.email.split("@")[1];
+      const validDomains = [
+        "gmail.com",
+        "yahoo.com",
+        "hotmail.com",
+        "outlook.com",
+        "aol.com",
+        "icloud.com",
+        "mail.com",
+        "zoho.com",
+        // Add more valid domains as needed
+      ];
+      if (!validDomains.includes(domain)) {
+        newErrors.email =
+          "Please enter a valid email address with a commonly used domain.";
+      }
     }
 
     if (!formData.username) {
       newErrors.username = "Username is required.";
+    } else if (/^\d+$/.test(formData.username)) {
+      newErrors.username = "Username cannot be all numbers.";
+    } else if (/\s/.test(formData.username)) {
+      newErrors.username = "Username should not contain spaces.";
+    } else if (/[^a-zA-Z0-9._-]/.test(formData.username)) {
+      newErrors.username = "Username contains invalid characters.";
+    } else if (/[+-]/.test(formData.username)) {
+      newErrors.username =
+        "Username should not contain negative signs or plus signs.";
+    } else if (formData.username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters long.";
+    } else if (formData.username.length > 50) {
+      newErrors.username = "Username cannot exceed 50 characters.";
+    } else if (/^\d/.test(formData.username)) {
+      newErrors.username = "Username should not start with a number.";
     }
 
     if (
       !formData.password.match(
-        /(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
       )
     ) {
       newErrors.password =
         "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.";
+    } else if (/\s/.test(formData.password)) {
+      newErrors.password = "Password should not contain spaces.";
     }
 
     if (!formData.cnic) {
       newErrors.cnic = "CNIC is required.";
-    } else if (!/^\d{5}-\d{7}-\d{1}$/.test(formData.cnic)) {
-      newErrors.cnic = "CNIC must be in the format: 12345-1234567-1";
+    } else if (
+      !/^\d{5}-\d{7}-\d$/.test(formData.cnic) &&
+      !/^\d{13}$/.test(formData.cnic)
+    ) {
+      newErrors.cnic =
+        "CNIC must be exactly 13 digits or follow the format 12345-1234567-1.";
+    } else if (/^0+$/.test(formData.cnic.replace(/-/g, ""))) {
+      newErrors.cnic = "CNIC cannot be all zeros.";
+    } else if (/[+-]/.test(formData.cnic)) {
+      newErrors.cnic = "CNIC should not contain negative signs or plus signs.";
+    } else if (/[a-zA-Z]/.test(formData.cnic)) {
+      newErrors.cnic =
+        "CNIC should not contain alphabets, only numbers are allowed.";
+    } else {
+      const parts = formData.cnic.split("-");
+      if (parts.length === 3) {
+        if (
+          parts[0] === "00000" ||
+          parts[1] === "0000000" ||
+          parts[2] === "0"
+        ) {
+          newErrors.cnic = "CNIC cannot be dominated by zeros.";
+        }
+      }
+
     }
     
 
@@ -135,8 +202,8 @@ function StartupForm() {
           onChange={handleChange}
         />
         <small className="text-muted">
-          • Use 8 or more characters<br />
-          • One uppercase, lowercase, special character, and number
+          • Use 8 or more characters
+          <br />• One uppercase, lowercase, special character, and number
         </small>
         {errors.password && (
           <small className="text-danger">{errors.password}</small>

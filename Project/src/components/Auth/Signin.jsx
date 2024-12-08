@@ -3,52 +3,28 @@ import { useState } from "react";
 import './ForgotPassword';
 
 function Signin() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [usertype, setUsertype] = useState("startup");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const [usertype, steusertype] = useState('startup');
-  const handleuser = (type) => {
-    steusertype(type)
-  }
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [errors, setErrors] = useState({});
-
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email) {
-      newErrors.email = "Email is required.";
-    } else if (
-      !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(formData.email)
-    ) {
-      newErrors.email = "Please enter a valid email address.";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleUsertypeChange = (type) => {
+    setUsertype(type);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      alert("Please fill in both email and password.");
+      setErrors({
+        email: !formData.email ? "Email is required" : "",
+        password: !formData.password ? "Password is required" : "",
+      });
       return;
     }
 
@@ -68,22 +44,24 @@ function Signin() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+        credentials: "include", // Include cookies for session handling
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
+        // Store user details in local storage
+        localStorage.setItem("user", JSON.stringify(data.user));
         alert("Login successful!");
         console.log("Logged-in User Data:", data);
 
-        if (usertype === "startup") {
-          navigate("/"); // Redirect to the startup dashboard or home
-        } else {
-          navigate("/"); // Redirect to the investor dashboard or home
-        }
+        navigate("/"); // Redirect to home page
       } else {
-        const errorData = await response.json();
-        alert(`Error: ${errorData.message || "Invalid credentials"}`);
+        alert(`Error: ${data.message || "Invalid credentials"}`);
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -100,22 +78,27 @@ function Signin() {
           <input
             type="checkbox"
             id="startup-checkbox"
-            checked={usertype === 'startup'}
-            onChange={() => handleuser('startup')}
+            checked={usertype === "startup"}
+            onChange={() => handleUsertypeChange("startup")}
           />
-          <label className="ms-2" htmlFor="startup-checkbox">Startup Founder</label>
+          <label className="ms-2" htmlFor="startup-checkbox">
+            Startup Founder
+          </label>
         </div>
         <div>
           <input
             type="checkbox"
             id="investor-checkbox"
-            checked={usertype === 'investor'}
-            onChange={() => handleuser('investor')}
+            checked={usertype === "investor"}
+            onChange={() => handleUsertypeChange("investor")}
           />
-          <label className="ms-2" htmlFor="investor-checkbox">Investor</label>
+          <label className="ms-2" htmlFor="investor-checkbox">
+            Investor
+          </label>
         </div>
 
-        <br /><br />
+        <br />
+        <br />
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -124,14 +107,18 @@ function Signin() {
             </label>
             <input
               type="email"
-              className={`form-control rounded-pill ${errors.email ? "is-invalid" : ""}`}
+              className={`form-control rounded-pill ${
+                errors.email ? "is-invalid" : ""
+              }`}
               id="email"
               name="email"
               value={formData.email}
-              onChange={handleInputChange}
+              onChange={handleChange}
               placeholder="Enter your email"
             />
-            {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+            {errors.email && (
+              <div className="invalid-feedback">{errors.email}</div>
+            )}
           </div>
           <div className="mb-2 position-relative">
             <label htmlFor="password" className="form-label">
@@ -139,14 +126,18 @@ function Signin() {
             </label>
             <input
               type="password"
-              className={`form-control rounded-pill ${errors.password ? "is-invalid" : ""}`}
+              className={`form-control rounded-pill ${
+                errors.password ? "is-invalid" : ""
+              }`}
               id="password"
               name="password"
               value={formData.password}
-              onChange={handleInputChange}
+              onChange={handleChange}
               placeholder="Enter your password"
             />
-            {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+            {errors.password && (
+              <div className="invalid-feedback">{errors.password}</div>
+            )}
           </div>
           <div className="mb-3 text-end">
             <Link to={usertype === "investor" ? "/forgot-password-investor" : "/forgot-password"} className="text-decoration-none">

@@ -3,28 +3,45 @@ const bcrypt = require('bcrypt');
 
 const InvestorsignIn = async (req, res) => {
   try {
+    console.log("Received request body:", req.body);
+
     const { email, password } = req.body;
 
     if (!email || !password) {
+      console.log("Missing email or password");
       return res.status(400).json({ message: "Email and password are required" });
     }
 
     const investoruser1 = await investoruser.findOne({ email });
+    console.log("User found in database:", investoruser1);
 
     if (!investoruser1) {
+      console.log("No user found with provided email");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Compare the hashed password using bcrypt
-    const isPasswordValid = await bcrypt.compare(password, investoruser1.password);
-    if (!isPasswordValid) {
+    const isMatch = await bcrypt.compare(password, investoruser1.password);
+    console.log("Password comparison result:", isMatch);
+
+    if (!isMatch) {
+      console.log("Passwords do not match");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    res.status(200).json({ message: "Sign-in successful", user: investoruser1.email });
+    // Create a session
+    req.session.user = {
+      id: investoruser1._id,
+      email: investoruser1.email,
+      username: investoruser1.username,
+    };
+
+    console.log("Session set with user data:", req.session.user);
+
+    // Send JSON response with session information
+    return res.status(200).json({ message: "Sign-in successful", user: req.session.user });
   } catch (err) {
-    console.error("Error in InvestorsignIn:", err);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error during login:", err);
+    return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 };
 
