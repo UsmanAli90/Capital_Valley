@@ -147,37 +147,35 @@ const Profile = () => {
               >
                 <Text
                   as="p"
-                  className={`text-[12px] font-normal ${
-                    notificationsAllowed ? "text-green-500" : "text-red-500"
-                  }`}
+                  className={`text-[12px] font-normal ${notificationsAllowed ? "text-green-500" : "text-red-500"
+                    }`}
                 >
                   {notificationsAllowed ? "Allowed" : "Disallowed"}
                 </Text>
               </Button>
             </div>
 
-              <div className="flex w-full justify-center bg-gray-50 py-2 px-2 hover:bg-gray-100">
-                <div className="flex items-center gap-2.5">
-                  <Button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2.5 bg-red-500 hover:bg-red-400 active:bg-red-300 text-white py-2 px-4 rounded transition duration-300"
-                  >
-                    <Img
-                      src="profileAssets/images/power-off.png"
-                      alt="Arrow Right Blue"
-                      className="h-[24px]"
-                    />
-                    <Text as="p" className="text-[14px] font-normal">
-                      Log Out
-                    </Text>
-                  </Button>
-                </div>
+            <div className="flex w-full justify-center bg-gray-50 py-2 px-2 hover:bg-gray-100">
+              <div className="flex items-center gap-2.5">
+                <Button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2.5 bg-red-500 hover:bg-red-400 active:bg-red-300 text-white py-2 px-4 rounded transition duration-300"
+                >
+                  <Img
+                    src="profileAssets/images/power-off.png"
+                    alt="Arrow Right Blue"
+                    className="h-[24px]"
+                  />
+                  <Text as="p" className="text-[14px] font-normal">
+                    Log Out
+                  </Text>
+                </Button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+      </>
   );
 };
 

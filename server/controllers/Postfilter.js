@@ -1,36 +1,40 @@
 const Filter = require("bad-words");
 const validator = require("validator");
-require("dotenv").config();
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const filter = new Filter();
 const badWords = process.env.BAD_WORDS.split(",");
 filter.addWords(...badWords);
 
 const containsProhibitedContent = (text) => {
-
-  if (filter.isProfane(text)) return true;
-
-  const phoneRegex = /\b\d{10,11,12}\b/g; 
-  const partialEmailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\b/g; 
-  const urlRegex = /(https?:\/\/[^\s]+)/g; 
-
-  if (
-    phoneRegex.test(text) || 
-    partialEmailRegex.test(text) || 
-    urlRegex.test(text)
-  ) {
-    return true;
-  }
-
-  const words = text.split(/\s+/); 
-  for (const word of words) {
-    if (validator.isEmail(word)) {
-      return true; 
+    console.log("Checking text:", text);
+  
+    const isProfane = filter.isProfane(text);
+    console.log(`Profanity check result for "${text}":`, isProfane);
+  
+    if (isProfane) {
+      console.log("Text contains prohibited words.");
+      return true;
     }
-  }
-
-  return false;
-};
+  
+    // Check for phone numbers, email, and URLs
+    const phoneRegex = /\b\d{10,11,12}\b/g;
+    const partialEmailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\b/g;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+  
+    const matchesPhone = phoneRegex.test(text);
+    const matchesEmail = partialEmailRegex.test(text);
+    const matchesURL = urlRegex.test(text);
+  
+    console.log("Phone match:", matchesPhone);
+    console.log("Email match:", matchesEmail);
+    console.log("URL match:", matchesURL);
+  
+    return matchesPhone || matchesEmail || matchesURL;
+  };
+  
 
 const filterAndValidatePost = (req, res, next) => {
   try {
@@ -38,7 +42,7 @@ const filterAndValidatePost = (req, res, next) => {
 
     if (containsProhibitedContent(problem) || containsProhibitedContent(solution)) {
       return res.status(400).json({
-        error: "Your post contains prohibited content. Please revise and try again.",
+        error: "Your post contains prohibited content. Please revise this mannnnnnnnnn and try again.",
       });
     }
 

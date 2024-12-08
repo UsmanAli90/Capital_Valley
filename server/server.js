@@ -14,8 +14,8 @@ const { resetPassword } = require('./controllers/resetPassword.js');
 const { resetPassword1 } = require('./controllers/resetPasswordIvestor.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
-const Post = require('./models/Post.js')
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
+const Post = require('./models/Post.js');
 
 
 dotenv.config();
@@ -155,7 +155,7 @@ app.use('/reset-password', resetPassword);
 app.use('/reset-password1', resetPassword1);
 app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles)
-app.post("/posts", filterAndValidatePost, createPost);
+app.post("/filterposts", filterAndValidatePost, createPost);
 
 
 const PORT = process.env.PORT || 3000;
