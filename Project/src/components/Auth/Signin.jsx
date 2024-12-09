@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './ForgotPassword';
+import Modal from './Modal'
 
 function Signin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -9,6 +10,9 @@ function Signin() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [modal, setModal] = useState({ show: false, title: '', message: '' });
+
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,17 +66,21 @@ function Signin() {
       if (response.ok) {
         // Store user details in local storage
         localStorage.setItem("user", JSON.stringify(data.user));
-        alert("Login successful!");
-        console.log("Logged-in User Data:", data);
-
-        navigate("/"); // Redirect to home page
+        setModal({ show: true, title: 'Success', message: 'Login successful!' });
+        setTimeout(() => {
+          navigate('/'); // Redirect to homepage or another page after login
+        }, 2000);
+        // navigate("/"); // Redirect to home page
       } else {
-        alert(`Error: ${data.message || "Invalid credentials"}`);
+        setModal({ show: true, title: 'Error', message: 'Invalid Credentials.' });
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      alert("An error occurred. Please try again.");
+      setModal({ show: true, title: 'Error', message: 'An error occurred during login.' });
     }
+  };
+
+  const closeModal = () => {
+    setModal({ show: false, title: '', message: '' });
   };
 
   return (
@@ -153,6 +161,7 @@ function Signin() {
           Don't have an account? <Link to="/signup" className="text-green-600 hover:underline">Signup</Link>
         </p>
       </div>
+      <Modal show={modal.show} onClose={closeModal} title={modal.title} message={modal.message} />
     </div>
   );
 }

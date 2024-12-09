@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Modal from './Modal'
 
 function InvestorForm() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+
+  const [modal, setModal] = useState({ show: false, title: '', message: '' });
 
   const [formData, setFormData] = useState({
     email: "",
@@ -148,18 +151,23 @@ function InvestorForm() {
 
         if (response.ok) {
           const data = await response.json();
-          alert("Investor account created successfully!");
-          console.log("Response Data:", data);
-          navigate("/signin");
+          setModal({ show: true, title: 'Success', message: 'Login successful!' });
+          setTimeout(() => {
+            navigate('/signin'); 
+          }, 2000);
         } else {
           const errorData = await response.json();
-          alert(`Error: ${errorData.message || "Something went wrong!"}`);
+          setModal({ show: true, title: 'Error', message: 'An error occurred during Signup.' });
         }
       } catch (error) {
         console.error("Error creating investor account:", error);
-        alert("An error occurred. Please try again.");
+        setModal({ show: true, title: 'Error', error });
       }
     }
+  };
+
+  const closeModal = () => {
+    setModal({ show: false, title: '', message: '' });
   };
 
   return (
@@ -276,6 +284,7 @@ function InvestorForm() {
           </button>
         </form>
       </div>
+      <Modal show={modal.show} onClose={closeModal} title={modal.title} message={modal.message} />
     </div>
   );
 }
