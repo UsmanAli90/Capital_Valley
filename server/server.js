@@ -16,6 +16,7 @@ const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
 const Post = require('./models/Post.js');
+const {getUsers} = require('./controllers/userControlller.js')
 
 
 dotenv.config();
@@ -157,6 +158,7 @@ app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles)
 app.post("/filterposts", filterAndValidatePost, createPost);
 
+app.get("/chat", getUsers)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
