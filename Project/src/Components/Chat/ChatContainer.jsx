@@ -1,39 +1,78 @@
-import { FaPaperclip, FaPaperPlane } from "react-icons/fa"; // Icons for attach & send
+const React = require('react');
+const { useEffect, useRef } = React;
+const { ChatStore } = require('../../store/ChatStore');
+const ChatHeader = require('./ChatHeader');
+const MessageInput = require('./MessageInput');
+// const MessageSkeleton = require('./skeletons/MessageSkeleton');
+const { useAuthStore } = require('../../store/useAuthStore');
+const formatMessageTime = require('../lib/utils');
 
-const ChatContainer = ({ user }) => {
+const ChatContainer = () => {
+    const { messages, isMessageLoading, getMessages, selectedUser, subscribeToNewMessages, unsubscribeFromMessages } = ChatStore();
+    const { authUser } = useAuthStore();
+    const messageEndRef = useRef(null);
+
+    useEffect(() => {
+        getMessages(selectedUser._id);
+
+        subscribeToNewMessages();
+
+        return () => unsubscribeFromMessages();
+    }, [selectedUser._id, getMessages, subscribeToNewMessages, unsubscribeFromMessages]);
+
+    useEffect(() => {
+        if (messageEndRef.current && messages) {
+            messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
+
+    if (isMessageLoading) {
+        return (
+            <div className="flex-1 flex flex-col overflow-auto">
+                <ChatHeader />
+                {/* <MessageSkeleton /> */}
+                <MessageInput />
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col h-screen bg-gray-800 text-white">
-            {/* Top Bar */}
-            <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-700">
-                <div>
-                    <h2 className="text-lg font-semibold">{user.username}</h2>
-                    <p className="text-sm text-gray-400">
-                        {user.online ? "Online" : "Offline"}
-                    </p>
-                </div>
-            </div>
+        <div className='flex-1 flex flex-col overflow-auto'>
+            <ChatHeader />
+            <div className='flex-1 overflow-y-auto p-4 space-y-4'>
+                {messages.map((message) => (
+                    <div
+                        key={message._id}
+                        className={`chat ${message.senderId === authUser._id ? 'chat-end' : 'chat-start'}`}
+                        ref={messageEndRef}
+                    >
+                        <div className='chat-image avatar'>
+                            <div className='size-10 rounded-full border'>
+                                <img
+                                    src={message.senderId === authUser._id ? authUser.profilepic || '/avatar.png' : selectedUser.profilepic || '/avatar.png'}
+                                    alt=""
+                                />
+                            </div>
+                        </div>
 
-            {/* Chat Messages (We'll add dynamic messages later) */}
-            <div className="flex-1 p-4 overflow-y-auto "style={{ minHeight: "0px" }}>
-                {/* Messages will go here */}
-            </div>
+                        <div className='chat-header mb-1'>
+                            <time className='text-xs opacity-50 ml-1'>
+                                {formatMessageTime(message.createdAt)}
+                            </time>
+                        </div>
 
-            {/* Input Field */}
-            <div className="flex items-center p-4 border-t border-gray-700 bg-gray-900">
-                <button className="p-2 text-gray-400 hover:text-white">
-                    <FaPaperclip size={20} />
-                </button>
-                <input
-                    type="text"
-                    placeholder="Type a message..."
-                    className="flex-1 mx-2 p-2 bg-gray-800 rounded-md text-white focus:outline-none"
-                />
-                <button className="p-2 text-blue-400 hover:text-blue-500">
-                    <FaPaperPlane size={20} />
-                </button>
+                        <div className='chat-bubble flex flex-col'>
+                            {message.image && (
+                                <img src={message.image} alt='Attachement' className='sm:max-w-[200px] rounded-md mb-2' />
+                            )}
+                            {message.text && <p>{message.text}</p>}
+                        </div>
+                    </div>
+                ))}
             </div>
+            <MessageInput />
         </div>
     );
 };
 
-export default ChatContainer;
+module.exports = ChatContainer;
