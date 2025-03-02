@@ -4,6 +4,7 @@ import logo from '../../assets/Home/CapitalValleyLogo.png';
 import { FiAlignJustify } from "react-icons/fi";
 import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes, FaSearch } from "react-icons/fa";
 import { Link } from 'react-router-dom';
+import ChatButton from "../Subscription/ChatButton";
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -84,10 +85,11 @@ const Header = () => {
             <button className="text-grey hover:text-white flex items-center transition duration-300">
               <FaHome size={20} />
             </button>
-          </Link>
+          </Link >
           <button className="text-grey hover:text-white flex items-center transition duration-300">
             <FaCommentAlt size={20} />
           </button>
+          <ChatButton/>
           <button className="text-grey hover:text-white flex items-center transition duration-300">
             <FaBell size={20} />
           </button>

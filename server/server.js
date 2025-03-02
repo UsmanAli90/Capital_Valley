@@ -16,7 +16,7 @@ const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
 const Post = require('./models/Post.js');
-
+const subscriptionRoute = require("./controllers/subscription.js");
 
 dotenv.config();
 const app = express();
@@ -156,6 +156,8 @@ app.use('/reset-password1', resetPassword1);
 app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles)
 app.post("/filterposts", filterAndValidatePost, createPost);
+app.use("/api", subscriptionRoute);
+
 
 
 const PORT = process.env.PORT || 3000;
