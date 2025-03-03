@@ -109,36 +109,91 @@ app.get("/posts", async (req, res) => {
     }
 });
 
+
+app.get("/posts/liked/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const likedPosts = await Post.find({ upvotedBy: userId });
+
+        if (!likedPosts.length) {
+            return res.status(404).json({ message: "No liked posts found" });
+        }
+
+        res.status(200).json(likedPosts);
+    } catch (error) {
+        console.error("Error fetching liked posts:", error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
+
+
+app.get("/posts/owned/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const posts = await Post.find({ owner: userId }); // ✅ Fetch posts owned by user
+
+        if (!posts) {
+            return res.status(404).json({ message: "No posts found" });
+        }
+
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error("Error fetching owned posts:", error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
+
+
 app.patch('/posts/:id/upvote', async (req, res) => {
-    const { id } = req.params; // Extract the ID from the URL
-    const { upvoteChange } = req.body; // Extract the change (+1 or -1) from the request body
+    const { id } = req.params;
+    const { userId, upvoteChange } = req.body; // ✅ Include userId
 
-    console.log('Received ID:', id);
-    console.log('Received upvoteChange:', upvoteChange);
+    console.log("Received upvote request:");
+    console.log("Post ID:", id);
+    console.log("User ID:", userId);
+    console.log("Upvote Change:", upvoteChange);
 
-    // Validate upvoteChange value
-    if (typeof upvoteChange !== 'number') {
-        return res.status(400).json({ message: 'Invalid upvoteChange value' });
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
     }
 
     try {
-        const updatedPost = await Post.findByIdAndUpdate(
-            id,
-            { $inc: { upvotes: upvoteChange } }, // Adjust the upvotes field by +1 or -1
-            { new: true }
-        );
+        let update = {};
 
-        if (!updatedPost) {
-            return res.status(404).json({ message: 'Post not found' });
+        if (upvoteChange === 1) {
+            update = { 
+                $inc: { upvotes: 1 }, 
+                $addToSet: { upvotedBy: userId } // ✅ Add user to upvotedBy list
+            };
+        } else if (upvoteChange === -1) {
+            update = { 
+                $inc: { upvotes: -1 }, 
+                $pull: { upvotedBy: userId } // ✅ Remove user from upvotedBy list
+            };
+        } else {
+            return res.status(400).json({ message: "Invalid upvoteChange value" });
         }
 
-        console.log('Updated Post:', updatedPost);
+        const updatedPost = await Post.findByIdAndUpdate(id, update, { new: true });
+
+        if (!updatedPost) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
         res.status(200).json(updatedPost);
     } catch (error) {
-        console.error('Error:', error.stack);
-        res.status(500).json({ message: 'Server error', error });
+        console.error("Error updating upvote:", error);
+        res.status(500).json({ message: "Server error", error });
     }
 });
+
+
 
 
 
