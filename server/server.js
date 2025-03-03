@@ -16,7 +16,8 @@ const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
 const Post = require('./models/Post.js');
-const subscriptionRoute = require("./controllers/subscription.js");
+const paymentRoutes = require("./routes/paymentRoutes");
+
 
 dotenv.config();
 const app = express();
@@ -140,10 +141,6 @@ app.patch('/posts/:id/upvote', async (req, res) => {
     }
 });
 
-
-
-
-
 app.post("/startupsignup", createStartup);
 app.post("/investorsignup", createInvestor);
 app.post("/startupsignin", StartupsignIn);
@@ -156,9 +153,8 @@ app.use('/reset-password1', resetPassword1);
 app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles)
 app.post("/filterposts", filterAndValidatePost, createPost);
-app.use("/api", subscriptionRoute);
 
-
+app.use("/api/payment", paymentRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
