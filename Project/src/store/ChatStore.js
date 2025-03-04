@@ -1,17 +1,17 @@
-const { create } = require('zustand');
-const toast = require('react-hot-toast');
-const { io } = require('socket.io-client');
+import { create } from 'zustand';
+import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 
 const BASE_URL = "http://localhost:3000"; // Backend URL
 
-const ChatStore = create((set, get) => ({
+export const ChatStore = create((set, get) => ({
     messages: [],
     users: [],
-    selectedUser: null,
+    selectedUser: null, // Initialize as null
     isUserLoading: false,
     isMessageLoading: false,
-    socket: null, // Add socket to the store
-    onlineUsers: [], // Add onlineUsers state
+    socket: null,
+    onlineUsers: [],
 
     // Initialize socket connection
     connectSocket: () => {
@@ -42,7 +42,7 @@ const ChatStore = create((set, get) => ({
     getUsers: async () => {
         set({ isUserLoading: true });
         try {
-            const response = await fetch(`${BASE_URL}/message/users`, {
+            const response = await fetch(`${BASE_URL}/chat`, {
                 credentials: 'include', // Send cookies for authentication
             });
             if (!response.ok) {
@@ -79,8 +79,13 @@ const ChatStore = create((set, get) => ({
     // Send a message
     sendMessage: async (messageData) => {
         const { selectedUser, messages } = get();
+        if (!selectedUser) {
+            console.log("selectedUser", selectedUser);  
+            toast.error('No user selected');
+            return;
+        }
         try {
-            const response = await fetch(`${BASE_URL}/message/send/${selectedUser._id}`, {
+            const response = await fetch(`${BASE_URL}/send/${selectedUser._id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,6 +93,7 @@ const ChatStore = create((set, get) => ({
                 credentials: 'include', // Send cookies for authentication
                 body: JSON.stringify(messageData),
             });
+            console.log("messageData", messageData);
             if (!response.ok) {
                 throw new Error('Failed to send message');
             }
@@ -120,5 +126,3 @@ const ChatStore = create((set, get) => ({
     // Set the selected user
     setSelectedUser: (selectedUser) => set({ selectedUser }),
 }));
-
-module.exports = ChatStore;

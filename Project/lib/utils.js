@@ -6,4 +6,4 @@ function formatMessageTime(date) {
     });
 }
 
-module.exports = formatMessageTime;
+export default formatMessageTime;

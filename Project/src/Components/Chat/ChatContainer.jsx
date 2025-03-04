@@ -1,35 +1,43 @@
-const React = require('react');
-const { useEffect, useRef } = React;
-const { ChatStore } = require('../../store/ChatStore');
-const ChatHeader = require('./ChatHeader');
-const MessageInput = require('./MessageInput');
-// const MessageSkeleton = require('./skeletons/MessageSkeleton');
-const { useAuthStore } = require('../../store/useAuthStore');
-const formatMessageTime = require('../lib/utils');
+import React, { useEffect, useRef } from 'react';
+import { ChatStore } from '../../store/ChatStore.js';
+import MessageInput from './MessageInput.jsx';
+import formatMessageTime from '../../../lib/utils.js';
 
-const ChatContainer = () => {
-    const { messages, isMessageLoading, getMessages, selectedUser, subscribeToNewMessages, unsubscribeFromMessages } = ChatStore();
-    const { authUser } = useAuthStore();
+const ChatContainer = ({ user, currentUser }) => {
+    const {
+        messages,
+        isMessageLoading,
+        getMessages,
+        subscribeToNewMessages,
+        unsubscribeFromMessages,
+    } = ChatStore();
     const messageEndRef = useRef(null);
 
+    // Fetch messages and subscribe to new messages when the selected user changes
     useEffect(() => {
-        getMessages(selectedUser._id);
+        if (user && user._id) {
+            getMessages(user._id); // Fetch messages for the selected user
+            subscribeToNewMessages(); // Subscribe to new messages
+        }
 
-        subscribeToNewMessages();
+        return () => {
+            if (user && user._id) {
+                unsubscribeFromMessages(); // Unsubscribe when the component unmounts
+            }
+        };
+    }, [user, getMessages, subscribeToNewMessages, unsubscribeFromMessages]);
 
-        return () => unsubscribeFromMessages();
-    }, [selectedUser._id, getMessages, subscribeToNewMessages, unsubscribeFromMessages]);
-
+    // Scroll to the bottom of the chat when messages change
     useEffect(() => {
         if (messageEndRef.current && messages) {
             messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
 
+    // Show loading skeleton if messages are being fetched
     if (isMessageLoading) {
         return (
             <div className="flex-1 flex flex-col overflow-auto">
-                <ChatHeader />
                 {/* <MessageSkeleton /> */}
                 <MessageInput />
             </div>
@@ -37,19 +45,19 @@ const ChatContainer = () => {
     }
 
     return (
-        <div className='flex-1 flex flex-col overflow-auto'>
-            <ChatHeader />
+        <div className='flex flex-col h-screen'>
+            {/* Chat Messages */}
             <div className='flex-1 overflow-y-auto p-4 space-y-4'>
                 {messages.map((message) => (
                     <div
                         key={message._id}
-                        className={`chat ${message.senderId === authUser._id ? 'chat-end' : 'chat-start'}`}
+                        className={`chat ${message.senderId === currentUser._id ? 'chat-end' : 'chat-start'}`}
                         ref={messageEndRef}
                     >
                         <div className='chat-image avatar'>
                             <div className='size-10 rounded-full border'>
                                 <img
-                                    src={message.senderId === authUser._id ? authUser.profilepic || '/avatar.png' : selectedUser.profilepic || '/avatar.png'}
+                                    src={message.senderId === currentUser._id ? currentUser.profilepic || '/avatar.png' : user.profilepic || '/avatar.png'}
                                     alt=""
                                 />
                             </div>
@@ -70,9 +78,11 @@ const ChatContainer = () => {
                     </div>
                 ))}
             </div>
-            <MessageInput />
+
+            {/* Message Input */}
+            {user && <MessageInput />}
         </div>
     );
 };
 
-module.exports = ChatContainer;
+export default ChatContainer;
