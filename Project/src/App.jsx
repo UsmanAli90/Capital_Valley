@@ -9,29 +9,43 @@ import ForgotPassword from './Components/Auth/ForgotPassword.jsx';
 import OTPPage from './Components/Auth/OTPPage.jsx';
 import ResetPasswordPage from './Components/Auth/ResetPasswordPage.jsx'
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import Chat from "../src/Components/Chat/Chat.jsx"
+import { ThemeStore } from "../src/store/ThemeStore.js"
+import Settings from '../src/Components/Pages/Settings.jsx'
+
+
 
 function App() {
+  const { theme } = ThemeStore();
   return (
     <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<ProtectedRoute element={HomePage} />} />
-          <Route path="/signin" element={<Signin />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/profile"
-            element={<ProtectedRoute element={Profile} />}
-          />
-          <Route
-            path="/profileSetting"
-            element={<ProtectedRoute element={ProfileSetting} />}
-          />
-          <Route path="*" element={<Notfound />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-otp/:userId" element={<OTPPage />} />
-          <Route path="/reset-password/:userId" element={< ResetPasswordPage />} />
-        </Routes>
-      </Router>
+      <div>
+        <Router>
+          <Routes>
+            <Route path="/" element={<ProtectedRoute element={HomePage} />} />
+            <Route path="/signin" element={<Signin />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/profile"
+              element={<ProtectedRoute element={Profile} />}
+            />
+            <Route
+              path="/profileSetting"
+              element={<ProtectedRoute element={ProfileSetting} />}
+            />
+            <Route path="*" element={<Notfound />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-otp/:userId" element={<OTPPage />} />
+            <Route path="/reset-password/:userId" element={< ResetPasswordPage />} />
+            <Route
+              path="/chat"
+              element={<ProtectedRoute element={Chat} />}
+            />
+            <Route path="/settings" element={<Settings />} />
+
+          </Routes>
+        </Router>
+      </div>
     </>
   );
 }

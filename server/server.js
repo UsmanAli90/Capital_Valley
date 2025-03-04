@@ -16,15 +16,20 @@ const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
 const Post = require('./models/Post.js');
+const { getUsers } = require('./controllers/userControlller.js')
+const { sendMessage } = require('./controllers/Messages.js')
+const { getMessages } = require('./controllers/Messages.js')
+const {app,server} =require('./utils/socket.cjs')
 
 
 dotenv.config();
-const app = express();
+
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: "http://localhost:5173", 
+    origin: "http://localhost:5173",
     credentials: true,
 }));
 connectDB(process.env.MONGO_URI);
@@ -41,6 +46,8 @@ app.use(
         },
     })
 );
+
+
 
 
 app.post("/logout", (req, res) => {
@@ -80,7 +87,7 @@ app.post("/updateProfile", async (req, res) => {
         const updatedUser = await Startup.findOneAndUpdate(
             { email },
             { username: name },
-            { new: true, upsert: true, setDefaultsOnInsert: true } 
+            { new: true, upsert: true, setDefaultsOnInsert: true }
         );
 
         req.session.user = { username: updatedUser.username, email: updatedUser.email };
@@ -212,8 +219,11 @@ app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles)
 app.post("/filterposts", filterAndValidatePost, createPost);
 
+app.get("/chat", getUsers)
+app.post("/send/:id", sendMessage);
+app.get('/:id', getMessages);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
