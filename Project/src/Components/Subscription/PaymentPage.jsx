@@ -11,7 +11,7 @@ const PaymentForm = ({ userId }) => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
-  
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
@@ -21,45 +21,51 @@ const PaymentForm = ({ userId }) => {
   const handlePayment = async (e) => {
     e.preventDefault();
 
+    // Check if Stripe is loaded
     if (!stripe || !elements) {
       setMessage("⚠️ Stripe is not loaded yet!");
       return;
     }
 
+    // Get CardElement reference
     const cardElement = elements.getElement(CardElement);
-
-    const { paymentMethod, error } = await stripe.createPaymentMethod({
-      type: "card",
-      card: cardElement,
-      billing_details: {
-        name,
-        email,
-        address: { line1: billingAddress },
-      },
-    });
-
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
-
-    // Ensure amount is either 20 or 200 (preventing manipulation)
-    const validAmounts = ["20", "200"];
-    if (!validAmounts.includes(paymentAmount)) {
-      setMessage("❌ Invalid payment amount selected.");
+    if (!cardElement) {
+      setMessage("❌ Card details are not entered properly.");
       return;
     }
 
     try {
+      // Create payment method
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+        billing_details: {
+          name,
+          email,
+          address: { line1: billingAddress },
+        },
+      });
+
+      if (error) {
+        setMessage(error.message);
+        console.error("Payment Method Error:", error);
+        return;
+      }
+
+      // Validate payment amount
+      const validAmounts = ["20", "200"];
+      if (!validAmounts.includes(paymentAmount)) {
+        setMessage("❌ Invalid payment amount selected.");
+        return;
+      }
+
+      // Send payment to backend
       const response = await axios.post("http://localhost:3000/api/payment", {
         userId,
         paymentMethodId: paymentMethod.id,
-        name,
-        email,
-        billingAddress,
-        amount: paymentAmount, // Sending amount to backend
+        amount: paymentAmount, 
       });
-
+      
       if (response.status === 200) {
         setMessage("✅ Payment successful!");
         setTimeout(() => navigate("/chat"), 2000);
@@ -68,6 +74,7 @@ const PaymentForm = ({ userId }) => {
       }
     } catch (err) {
       setMessage("❌ Error processing payment");
+      console.error("Server Error:", err);
     }
   };
 

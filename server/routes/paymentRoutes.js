@@ -15,12 +15,13 @@ router.post("/payment", async (req, res) => {
 
   try {
     const paymentIntent = await stripe.paymentIntents.create({
+      
       amount: amount * 100, // Convert to cents
       currency: "usd",
       payment_method: paymentMethodId,
       confirm: true,
     });
-
+    console.log("Amount in cents:", amount * 100);
     res.json({ success: true, paymentIntent });
   } catch (error) {
     res.status(500).json({ error: error.message });
