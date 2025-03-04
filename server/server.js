@@ -19,7 +19,7 @@ const Post = require('./models/Post.js');
 const { getUsers } = require('./controllers/userControlller.js')
 const { sendMessage } = require('./controllers/Messages.js')
 const { getMessages } = require('./controllers/Messages.js')
-const {app,server} =require('./utils/socket.cjs')
+const { app, server } = require('./utils/socket.cjs')
 
 
 dotenv.config();
@@ -48,7 +48,17 @@ app.use(
 );
 
 
-
+const attachUser = (req, res, next) => {
+    if (req.session.user) {
+        console.log("User in session:", req.session.user); // Debugging
+        req.user = req.session.user; // Attach user to req.user
+        req.user._id = req.session.user.id
+        next();
+    } else {
+        console.log("No user in session"); // Debugging
+        return res.status(401).json({ message: "Unauthorized: No user in session" });
+    }
+};
 
 app.post("/logout", (req, res) => {
     req.session.destroy((err) => {
@@ -164,9 +174,9 @@ app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles)
 app.post("/filterposts", filterAndValidatePost, createPost);
 
-app.get("/chat", getUsers)
-app.post("/send/:id", sendMessage);
-app.get('/:id', getMessages);
+app.get("/chat", attachUser, getUsers)
+app.post("/send/:id", attachUser, sendMessage);
+app.get('/:id', attachUser, getMessages);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

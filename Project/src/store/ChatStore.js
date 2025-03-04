@@ -58,18 +58,39 @@ export const ChatStore = create((set, get) => ({
     },
 
     // Fetch messages for a specific user
+    // getMessages: async (userID) => {
+    //     set({ isMessageLoading: true });
+    //     try {
+    //         const response = await fetch(`${BASE_URL}/${userID}`, {
+    //             credentials: 'include', // Send cookies for authentication
+    //         });
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch messages');
+    //         }
+    //         const data = await response.json();
+    //         set({ messages: data.messages });
+    //     } catch (error) {
+    //         toast.error('Failed to fetch messages');
+    //     } finally {
+    //         set({ isMessageLoading: false });
+    //     }
+    // },
     getMessages: async (userID) => {
         set({ isMessageLoading: true });
         try {
-            const response = await fetch(`${BASE_URL}/message/${userID}`, {
+            console.log("Fetching messages for userID:", userID); // Debugging
+            const response = await fetch(`${BASE_URL}/${userID}`, {
                 credentials: 'include', // Send cookies for authentication
             });
+            console.log("Response status:", response.status); // Debugging
             if (!response.ok) {
                 throw new Error('Failed to fetch messages');
             }
             const data = await response.json();
+            console.log("Fetched messages:", data.messages); // Debugging
             set({ messages: data.messages });
         } catch (error) {
+            console.log("Error in getMessages:", error.message); // Debugging
             toast.error('Failed to fetch messages');
         } finally {
             set({ isMessageLoading: false });
@@ -79,6 +100,7 @@ export const ChatStore = create((set, get) => ({
     // Send a message
     sendMessage: async (messageData) => {
         const { selectedUser, messages } = get();
+        console.log("selectedUser in chat store is", selectedUser);
         if (!selectedUser) {
             console.log("selectedUser", selectedUser);  
             toast.error('No user selected');

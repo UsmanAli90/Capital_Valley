@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import toast from "react-hot-toast";
 
 function StartupForm() {
   const [formData, setFormData] = useState({
@@ -139,15 +140,18 @@ function StartupForm() {
         });
 
         if (response.ok) {
-          alert("Account created successfully!");
+          toast.success('Account created successfully! Redirecting to login page...');
+          // alert("Account created successfully!");
           navigate("/signin");
         } else {
           const errorData = await response.json();
-          alert("Error: " + errorData.message || "Unable to sign up.");
+          toast.error("Unable to sign up.")
+          // alert("Error: " + errorData.message || "Unable to sign up.");
         }
       } catch (error) {
         console.error("Error creating account:", error);
-        alert("An error occurred. Please try again.");
+        toast.error("An error occurred. Please try again.")
+        // alert("An error occurred. Please try again.");
       }
     }
   };

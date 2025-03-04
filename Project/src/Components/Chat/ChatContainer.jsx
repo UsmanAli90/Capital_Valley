@@ -10,9 +10,16 @@ const ChatContainer = ({ user, currentUser }) => {
         getMessages,
         subscribeToNewMessages,
         unsubscribeFromMessages,
+        setSelectedUser, // Add this action from ChatStore
     } = ChatStore();
     const messageEndRef = useRef(null);
 
+    // Update selectedUser in ChatStore when user changes
+    useEffect(() => {
+        if (user) {
+            setSelectedUser(user); // Update selectedUser in ChatStore
+        }
+    }, [user, setSelectedUser]);
     // Fetch messages and subscribe to new messages when the selected user changes
     useEffect(() => {
         if (user && user._id) {
@@ -54,25 +61,35 @@ const ChatContainer = ({ user, currentUser }) => {
                         className={`chat ${message.senderId === currentUser._id ? 'chat-end' : 'chat-start'}`}
                         ref={messageEndRef}
                     >
+                        {/* Profile Picture */}
                         <div className='chat-image avatar'>
-                            <div className='size-10 rounded-full border'>
+                            <div className='w-10 rounded-full'>
                                 <img
                                     src={message.senderId === currentUser._id ? currentUser.profilepic || '/avatar.png' : user.profilepic || '/avatar.png'}
-                                    alt=""
+                                    alt="Profile"
                                 />
                             </div>
                         </div>
 
-                        <div className='chat-header mb-1'>
-                            <time className='text-xs opacity-50 ml-1'>
+                        {/* Message Header (Time) */}
+                        <div className='chat-header'>
+                            <time className='text-xs opacity-50'>
                                 {formatMessageTime(message.createdAt)}
                             </time>
                         </div>
 
-                        <div className='chat-bubble flex flex-col'>
+                        {/* Message Bubble */}
+                        <div className={`chat-bubble ${message.senderId === currentUser._id ? 'bg-blue-500 text-white' : 'bg-gray-900 text-white'}`}>
+                            {/* Display the sender's username */}
+                            <div className="text-sm font-semibold mb-1">
+                                {message.senderId === currentUser._id ? "You" : user.username}
+                            </div>
+
+                            {/* Display the message image (if any) */}
                             {message.image && (
-                                <img src={message.image} alt='Attachement' className='sm:max-w-[200px] rounded-md mb-2' />
+                                <img src={message.image} alt='Attachment' className='sm:max-w-[200px] rounded-md mb-2' />
                             )}
+                            {/* Display the message text (if any) */}
                             {message.text && <p>{message.text}</p>}
                         </div>
                     </div>

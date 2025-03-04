@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Modal from './Modal'
+import toast from "react-hot-toast";
 
 function InvestorForm() {
   const navigate = useNavigate();
@@ -151,17 +152,20 @@ function InvestorForm() {
 
         if (response.ok) {
           const data = await response.json();
-          setModal({ show: true, title: 'Success', message: 'Login successful!' });
+          toast.success('Account created successfully! Redirecting to login page...');
+          // setModal({ show: true, title: 'Success', message: 'Login successful!' });
           setTimeout(() => {
             navigate('/signin'); 
           }, 2000);
         } else {
           const errorData = await response.json();
-          setModal({ show: true, title: 'Error', message: 'An error occurred during Signup.' });
+          toast.error(errorData.message);
+          // setModal({ show: true, title: 'Error', message: 'An error occurred during Signup.' });
         }
       } catch (error) {
         console.error("Error creating investor account:", error);
-        setModal({ show: true, title: 'Error', error });
+        toast.error('An error occurred during Signup.');
+        // setModal({ show: true, title: 'Error', error });
       }
     }
   };

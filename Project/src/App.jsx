@@ -10,16 +10,19 @@ import OTPPage from './Components/Auth/OTPPage.jsx';
 import ResetPasswordPage from './Components/Auth/ResetPasswordPage.jsx'
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Chat from "../src/Components/Chat/Chat.jsx"
-import { ThemeStore } from "../src/store/ThemeStore.js"
-import Settings from '../src/Components/Pages/Settings.jsx'
+// import { ThemeStore } from "../src/store/ThemeStore.js"
+// import Settings from '../src/Components/Pages/Settings.jsx'
+import { Toaster } from 'react-hot-toast';
+
 
 
 
 function App() {
-  const { theme } = ThemeStore();
+  // const { theme } = ThemeStore();
   return (
     <>
       <div>
+      <Toaster position="top-center" reverseOrder={false} />
         <Router>
           <Routes>
             <Route path="/" element={<ProtectedRoute element={HomePage} />} />
@@ -41,7 +44,7 @@ function App() {
               path="/chat"
               element={<ProtectedRoute element={Chat} />}
             />
-            <Route path="/settings" element={<Settings />} />
+            {/* <Route path="/settings" element={<Settings />} /> */}
 
           </Routes>
         </Router>
