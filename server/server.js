@@ -15,8 +15,8 @@ const { resetPassword1 } = require('./controllers/resetPasswordIvestor.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js')
 const { createPost } = require('./controllers/PostUpload.js')
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
+const {processPayment} = require("./controllers/Payment.js")
 const Post = require('./models/Post.js');
-const paymentRoutes = require("./routes/paymentRoutes");
 
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -144,30 +144,32 @@ app.patch('/posts/:id/upvote', async (req, res) => {
 });
 
 
-app.post("/api/payment", async (req, res) => {
-    try {
-      const { userId, paymentMethodId, amount } = req.body;
+// app.post("/api/payment", async (req, res) => {
+//     try {
+//       const { paymentMethodId, amount } = req.body;
   
-      // Validate amount to prevent tampering
-      const validAmounts = [20, 200]; // Allowed amounts in dollars
-      if (!validAmounts.includes(Number(amount))) {
-        return res.status(400).json({ success: false, message: "Invalid payment amount" });
-      }
+//       // Validate amount to prevent tampering
+//       const validAmounts = [20, 200]; // Allowed amounts in dollars
+//       if (!validAmounts.includes(Number(amount))) {
+//         return res.status(400).json({ success: false, message: "Invalid payment amount" });
+//       }
   
-      // Create payment intent
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100, // Convert to cents
-        currency: "usd",
-        payment_method: paymentMethodId,
-        confirm: true,
-      });
+//       // Create payment intent
+//       const paymentIntent = await stripe.paymentIntents.create({
+//         amount: amount * 100, // Convert to cents
+//         currency: "usd",
+//         payment_method: paymentMethodId,
+//         confirm: true,
+//         return_url: "http://localhost:3000", // Change this to your actual frontend success page
+//       });
+      
   
-      res.json({ success: true, paymentIntent });
-    } catch (error) {
-      console.error("Stripe Payment Error:", error);
-      res.status(400).json({ success: false, message: error.message });
-    }
-  });
+//       res.json({ success: true, paymentIntent });
+//     } catch (error) {
+//       console.error("Stripe Payment Error:", error);
+//       res.status(400).json({ success: false, message: error.message });
+//     }
+//   });
 
 app.post("/startupsignup", createStartup);
 app.post("/investorsignup", createInvestor);
@@ -181,8 +183,7 @@ app.use('/reset-password1', resetPassword1);
 app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles)
 app.post("/filterposts", filterAndValidatePost, createPost);
-
-app.use("/api/payment", paymentRoutes);
+app.use("/api/payment", processPayment);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

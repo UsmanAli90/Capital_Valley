@@ -5,21 +5,31 @@ dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-exports.processPayment = async (req, res) => {
+processPayment = async (req, res) => {
     try {
-        const { amount, paymentMethodId } = req.body;
-
+        const { paymentMethodId, amount } = req.body;
+    
+        // Validate amount to prevent tampering
+        const validAmounts = [20, 200]; // Allowed amounts in dollars
+        if (!validAmounts.includes(Number(amount))) {
+          return res.status(400).json({ success: false, message: "Invalid payment amount" });
+        }
+    
+        // Create payment intent
         const paymentIntent = await stripe.paymentIntents.create({
-            amount, // Amount in cents (e.g., 1000 = $10)
-            currency: "usd",
-            payment_method: paymentMethodId,
-            confirm: true,
+          amount: amount * 100, // Convert to cents
+          currency: "usd",
+          payment_method: paymentMethodId,
+          confirm: true,
+          return_url: "http://localhost:3000", // Change this to your actual frontend success page
         });
-
-        console.log(`✅ Payment successful: ${paymentIntent.id}`);
-        res.status(200).json({ success: true, message: "Payment Successful", paymentIntent });
-    } catch (error) {
-        console.error("❌ Payment failed:", error.message);
-        res.status(500).json({ success: false, message: error.message });
-    }
+        
+        res.json({ success: true, paymentIntent });
+      } catch (error) {
+        console.error("Stripe Payment Error:", error);
+        res.status(400).json({ success: false, message: error.message });
+      }
 };
+module.exports = {
+    processPayment,
+  };
