@@ -151,7 +151,7 @@ const PaymentForm = ({ userId }) => {
         <button
           type="submit"
           disabled={!stripe}
-          className="bg-blue-500 text-white px-6 py-3 rounded-lg mt-4 w-full"
+          className="hover:bg-green-500 bg-green-400 text-white px-6 py-3 rounded-lg mt-4 w-full"
         >
           Pay Now
         </button>
