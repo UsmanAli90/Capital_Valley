@@ -10,26 +10,27 @@ const ChatContainer = ({ user, currentUser }) => {
         getMessages,
         subscribeToNewMessages,
         unsubscribeFromMessages,
-        setSelectedUser, // Add this action from ChatStore
+        setSelectedUser,
     } = ChatStore();
     const messageEndRef = useRef(null);
 
     // Update selectedUser in ChatStore when user changes
     useEffect(() => {
         if (user) {
-            setSelectedUser(user); // Update selectedUser in ChatStore
+            setSelectedUser(user);
         }
     }, [user, setSelectedUser]);
+
     // Fetch messages and subscribe to new messages when the selected user changes
     useEffect(() => {
         if (user && user._id) {
-            getMessages(user._id); // Fetch messages for the selected user
-            subscribeToNewMessages(); // Subscribe to new messages
+            getMessages(user._id);
+            subscribeToNewMessages();
         }
 
         return () => {
             if (user && user._id) {
-                unsubscribeFromMessages(); // Unsubscribe when the component unmounts
+                unsubscribeFromMessages();
             }
         };
     }, [user, getMessages, subscribeToNewMessages, unsubscribeFromMessages]);
@@ -45,7 +46,6 @@ const ChatContainer = ({ user, currentUser }) => {
     if (isMessageLoading) {
         return (
             <div className="flex-1 flex flex-col overflow-auto">
-                {/* <MessageSkeleton /> */}
                 <MessageInput />
             </div>
         );
@@ -58,40 +58,58 @@ const ChatContainer = ({ user, currentUser }) => {
                 {messages.map((message) => (
                     <div
                         key={message._id}
-                        className={`chat ${message.senderId === currentUser._id ? 'chat-end' : 'chat-start'}`}
+                        className={`flex ${message.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}
                         ref={messageEndRef}
                     >
-                        {/* Profile Picture */}
-                        <div className='chat-image avatar'>
-                            <div className='w-10 rounded-full'>
-                                <img
-                                    src={message.senderId === currentUser._id ? currentUser.profilepic || '/avatar.png' : user.profilepic || '/avatar.png'}
-                                    alt="Profile"
-                                />
+                        {/* Profile Picture for Other User */}
+                        {message.senderId !== currentUser.id && (
+                            <div className='flex-shrink-0'>
+                                <div className='size-10 rounded-full border'>
+                                    <img
+                                        src={user.profilepic || '/avatar.png'}
+                                        alt="Profile"
+                                        className='w-full h-full rounded-full'
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Message Header (Time) */}
-                        <div className='chat-header'>
-                            <time className='text-xs opacity-50'>
+                        {/* Message Content */}
+                        <div className='flex flex-col'>
+                            {/* Message Bubble */}
+                            <div className={`p-3 rounded-lg max-w-[100%] ${message.senderId === currentUser.id ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
+                                {/* Display the sender's username */}
+                                <div className="text-sm font-semibold mb-1">
+                                    {message.senderId === currentUser.id ? "You" : user.username}
+                                </div>
+
+                                {/* Display the message image (if any) */}
+                                {message.image && (
+                                    <img src={message.image} alt='Attachment' className='sm:max-w-[200px] rounded-md mb-2' />
+                                )}
+
+                                {/* Display the message text (if any) */}
+                                {message.text && <p>{message.text}</p>}
+                            </div>
+
+                            {/* Message Header (Time) */}
+                            <time className='text-xs opacity-50 mt-1'>
                                 {formatMessageTime(message.createdAt)}
                             </time>
                         </div>
 
-                        {/* Message Bubble */}
-                        <div className={`chat-bubble ${message.senderId === currentUser._id ? 'bg-blue-500 text-white' : 'bg-gray-900 text-white'}`}>
-                            {/* Display the sender's username */}
-                            <div className="text-sm font-semibold mb-1">
-                                {message.senderId === currentUser._id ? "You" : user.username}
+                        {/* Profile Picture for Current User */}
+                        {message.senderId === currentUser.id && (
+                            <div className='flex-shrink-0'>
+                                <div className='size-10 rounded-full border'>
+                                    <img
+                                        src={currentUser.profilepic || '/avatar.png'}
+                                        alt="Profile"
+                                        className='w-full h-full rounded-full'
+                                    />
+                                </div>
                             </div>
-
-                            {/* Display the message image (if any) */}
-                            {message.image && (
-                                <img src={message.image} alt='Attachment' className='sm:max-w-[200px] rounded-md mb-2' />
-                            )}
-                            {/* Display the message text (if any) */}
-                            {message.text && <p>{message.text}</p>}
-                        </div>
+                        )}
                     </div>
                 ))}
             </div>
