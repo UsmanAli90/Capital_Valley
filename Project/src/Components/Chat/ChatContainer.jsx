@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { ChatStore } from '../../store/ChatStore.js';
 import MessageInput from './MessageInput.jsx';
 import formatMessageTime from '../../../lib/utils.js';
+import socket from './Socket.js'; // Import the Socket.IO client
 
 const ChatContainer = ({ user, currentUser }) => {
     const {
@@ -41,6 +42,61 @@ const ChatContainer = ({ user, currentUser }) => {
             messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
+
+    // Connect to Socket.IO and handle messages
+    useEffect(() => {
+        // Connect to the Socket.IO server
+        socket.connect();
+
+        // Join the current user's room
+        if (currentUser?.id) {
+            socket.emit('joinRoom', currentUser.id);
+        }
+
+        // Listen for incoming messages
+        const handleReceiveMessage = (newMessage) => {
+            // Check if the message already exists in the messages list
+            const messageExists = messages.some((msg) => msg._id === newMessage._id);
+
+            if (!messageExists) {
+                // Add the new message to the messages list
+                ChatStore.setState((state) => ({
+                    messages: [...state.messages, newMessage],
+                }));
+            }
+        };
+
+        // Add the event listener
+        socket.on('receiveMessage', handleReceiveMessage);
+
+        // Cleanup on component unmount
+        return () => {
+            // Remove the event listener
+            socket.off('receiveMessage', handleReceiveMessage);
+
+            // Disconnect from the Socket.IO server
+            socket.disconnect();
+        };
+    }, [currentUser, messages]);
+
+    // Function to send a message
+    const sendMessage = async (messageData) => {
+        const newMessage = {
+            ...messageData,
+            senderId: currentUser.id,
+            receiverId: user._id,
+            createdAt: new Date(),
+            _id: Date.now(), // Temporary ID for optimistic update
+        };
+
+        // Optimistically update the messages list
+        ChatStore.setState((state) => ({
+            messages: [...state.messages, newMessage],
+        }));
+
+        // Emit the message to the server
+        socket.emit('sendMessage', newMessage);
+    };
 
     // Show loading skeleton if messages are being fetched
     if (isMessageLoading) {
@@ -115,7 +171,7 @@ const ChatContainer = ({ user, currentUser }) => {
             </div>
 
             {/* Message Input */}
-            {user && <MessageInput />}
+            {user && <MessageInput sendMessage={sendMessage} />}
         </div>
     );
 };
