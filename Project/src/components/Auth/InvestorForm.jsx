@@ -261,7 +261,7 @@ function InvestorForm() {
               className="form-check-input"
               type="checkbox"
               id="email-updates"
-              name="agree"
+              name="agreed"
               checked={formData.agree}
               onChange={handleChange}
             />
