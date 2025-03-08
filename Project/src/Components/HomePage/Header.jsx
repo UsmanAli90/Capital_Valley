@@ -6,6 +6,8 @@ import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes, FaSearch } from "r
 import { IoIosSettings } from "react-icons/io";
 import { Settings, House, MessageCircle, Bell, CircleUser } from "lucide-react";
 import { Link } from 'react-router-dom';
+import SubscriptionForm from "/src/Components/Subscription/SubscriptionForm.jsx";
+
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -91,8 +93,14 @@ const Header = () => {
             <button className="text-grey hover:text-white flex items-center transition duration-300">
               <MessageCircle />
             </button>
-          </Link>
+          </Link >
           <button className="text-grey hover:text-white flex items-center transition duration-300">
+            <FaCommentAlt size={20} />
+          </button>
+          <SubscriptionForm/>
+          <button className="text-grey hover:text-white flex items-center transition duration-300">
+            <FaBell size={20} />
+
             <Bell />
           </button>
           <button className="text-grey hover:text-white flex items-center transition duration-300">

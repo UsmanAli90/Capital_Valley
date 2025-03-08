@@ -17,7 +17,11 @@ const { resetPassword1 } = require('./controllers/resetPasswordIvestor.js');
 const { searchProfiles } = require('./controllers/searchcontroller.js');
 const { createPost } = require('./controllers/PostUpload.js');
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
+const {processPayment} = require("./controllers/Payment.js")
 const Post = require('./models/Post.js');
+
+require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { getUsers } = require('./controllers/userControlller.js');
 const { sendMessage } = require('./controllers/Messages.js');
 const { getMessages } = require('./controllers/Messages.js');
@@ -223,6 +227,7 @@ app.patch("/posts/:id/upvote", async (req, res) => {
   console.log("User ID:", userId);
   console.log("Upvote Change:", upvoteChange);
 
+
   if (!userId) {
     return res.status(400).json({ message: "User ID is required" });
   }
@@ -270,6 +275,7 @@ app.use("/reset-password1", resetPassword1);
 app.post("/verify-otp1", verifyOTP1);
 app.get('/search', searchProfiles);
 app.post("/filterposts", filterAndValidatePost, createPost);
+app.use("/api/payment", processPayment);
 
 app.get("/chat", attachUser, getUsers);
 app.post("/send/:id", attachUser, sendMessage);
@@ -333,5 +339,5 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-
 });
+

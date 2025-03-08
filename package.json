@@ -1,0 +1,12 @@
+{
+  "name": "capital_valley",
+  "version": "1.0.0",
+  "description": "Capital Valley is a platform connecting startups with investors, helping new businesses secure funding and grow. It ensures idea protection, enables communication, and offers premium features like priority messaging. By bridging this gap, it fosters innovation, boosts economic growth, and supports the IT sector.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

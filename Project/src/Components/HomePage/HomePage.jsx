@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Header from './Header'
 import { UserCircleIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-
+import ChatButton from "../Subscription/SubscriptionForm.jsx";
 
 const HomePage = () => {
   const navigate = useNavigate();
