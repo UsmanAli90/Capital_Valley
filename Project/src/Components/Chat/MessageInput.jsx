@@ -117,50 +117,36 @@
 
 
 import React, { useState } from 'react';
-import { ChatStore } from '../../store/ChatStore.js';
 import { Send } from "lucide-react";
 
-const MessageInput = () => {
+const MessageInput = ({ sendMessage }) => {
     const [text, setText] = useState('');
-    const { sendMessage, selectedUser } = ChatStore();
 
-    const handleSendMessage = async (e) => {
+    const handleSend = (e) => {
         e.preventDefault();
-        const trimmedText = (text || '').trim();
-        if (!trimmedText.trim()) {
-            return;
-        }
-        try {
-            await sendMessage({
-                text: text.trim(),
-            });
+        if (text.trim()) {
+            sendMessage({ text });
             setText('');
-        } catch (error) {
-            console.log("Failed to send Message: ", error);
         }
     };
 
     return (
-        <div className="p-4 w-full">
-            <form onSubmit={handleSendMessage} className='flex items-center gap-2'>
-                <div className='flex-1 flex gap-2'>
-                    <input
-                        type="text"
-                        className="w-full input input-bordered rounded-lg input-sm sm:input-md"
-                        placeholder="Type a message..."
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                    />
-                </div>
-                <button
+        <form onSubmit={handleSend} className='p-4 border-t border-gray-300 flex gap-2'>
+            <input
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Type a message..."
+                className='flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+            <button
                     type="submit"
                     className="btn btn-sm btn-circle"
                     disabled={!text?.trim()}
                 >
                     <Send size={22} />
                 </button>
-            </form>
-        </div>
+        </form>
     );
 };
 

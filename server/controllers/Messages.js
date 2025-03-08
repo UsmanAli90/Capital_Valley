@@ -51,16 +51,43 @@ const getUsersForSidebar = async (req, res) => {
     }
 };
 
+// const getMessages = async (req, res) => {
+//     try {
+//         const { id: userToChatId } = req.params;
+//         const myId = req.user._id;
+//         const messages = await Message.find({
+//             $or: [
+//                 { senderId: myId, receiverId: userToChatId },
+//                 { senderId: userToChatId, receiverId: myId }
+//             ]
+//         });
+//         console.log("Messages in Backend are:",messages);
+//         res.status(200).json({ messages });
+//     } catch (error) {
+//         console.log("error in getMessages", error.message);
+//         res.status(500).json({ message: "Internal Server Error" });
+//     }
+// };
+
 const getMessages = async (req, res) => {
     try {
         const { id: userToChatId } = req.params;
         const myId = req.user._id;
+
+        console.log("myId:", myId); // Debugging
+        console.log("userToChatId:", userToChatId); // Debugging
+
+        if (!myId) {
+            return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+        }
+
         const messages = await Message.find({
             $or: [
                 { senderId: myId, receiverId: userToChatId },
                 { senderId: userToChatId, receiverId: myId }
             ]
         });
+
         res.status(200).json({ messages });
     } catch (error) {
         console.log("error in getMessages", error.message);
@@ -69,30 +96,25 @@ const getMessages = async (req, res) => {
 };
 
 const sendMessage = async (req, res) => {
-    try {
-        const { text } = req.body;
-        console.log("req.body", req.body);
-        const { id: receiverId } = req.params;
-        const senderId = req.user._id;
+    const { id: receiverId } = req.params;
+    const { text, senderId } = req.body;
 
+    try {
+        // Save the message to the database
         const newMessage = new Message({
             senderId,
             receiverId,
             text,
         });
-
         await newMessage.save();
 
-        const receiverSocketId = getReceiverSocketId(receiverId);
+        // Emit the message to the receiver using Socket.IO
+        io.to(receiverId).emit('receiveMessage', newMessage);
 
-        // If receiverSocketId exists, it means the user is online, and we will send the message to them
-        if (receiverSocketId) {
-            io.to(receiverSocketId).emit("newMessage", newMessage); // Sending message to receiver
-        }
-
+        // Respond with the saved message
         res.status(200).json(newMessage);
     } catch (error) {
-        console.log("error in sendMessage", error.message);
+        console.error("Error sending message:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };

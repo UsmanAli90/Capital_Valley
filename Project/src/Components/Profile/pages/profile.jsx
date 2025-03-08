@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import Button from "../component/button";
 import Text from "../component/text";
 import Img from "../component/img";
+import toast from "react-hot-toast";
 import Header from "../../HomePage/Header";
 
 const Profile = () => {
@@ -139,6 +140,7 @@ const Profile = () => {
       });
 
       if (response.ok) {
+        toast.success('Logged out!')
         navigate("/signin");
       } else {
         alert("Logout failed. Try again.");

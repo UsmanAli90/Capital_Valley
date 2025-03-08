@@ -28,10 +28,17 @@ const ChatHeader = ({ user, onClose }) => {
                 <div className="flex items-center gap-3">
                     {/* User info */}
                     <div>
-                        <h3 className="font-medium">{user.username}</h3>
+                        <div className="flex items-center gap-3">
+                            <img
+                                src={user.profilepic || "/avatar.png"}
+                                alt={user.username}
+                                className="size-12 object-cover rounded-full"
+                            />
+                            <h3 className="font-medium">{user.username}</h3>
+                        </div>
                         <p className="text-sm text-base-content/70">
                             {/* Online status */}
-                            {user.online ? "Online" : "Offline"}
+                            {/* {user.online ? "Online" : "Offline"} */}
                         </p>
                     </div>
                 </div>

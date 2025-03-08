@@ -9,15 +9,17 @@ import ForgotPassword from "./Components/Auth/ForgotPassword.jsx";
 import OTPPage from "./Components/Auth/OTPPage.jsx";
 import ResetPasswordPage from "./Components/Auth/ResetPasswordPage.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
-import Chat from "../src/Components/Chat/Chat.jsx";
-import { ThemeStore } from "../src/store/ThemeStore.js";
-import Settings from "../src/Components/Pages/Settings.jsx";
+import Chat from "../src/Components/Chat/Chat.jsx"
+// import { ThemeStore } from "../src/store/ThemeStore.js"
+// import Settings from '../src/Components/Pages/Settings.jsx'
+import { Toaster } from 'react-hot-toast';
 
 function App() {
-  const { theme } = ThemeStore();
+  // const { theme } = ThemeStore();
   return (
     <>
       <div>
+      <Toaster position="top-center" reverseOrder={false} />
         <Router>
           <Routes>
             {/* Root path (requires authentication) */}
@@ -28,7 +30,13 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp/:userId" element={<OTPPage />} />
-            <Route path="/reset-password/:userId" element={<ResetPasswordPage />} />
+            <Route path="/reset-password/:userId" element={< ResetPasswordPage />} />
+            <Route
+              path="/chat"
+              element={<ProtectedRoute element={Chat} />}
+            />
+            {/* <Route path="/settings" element={<Settings />} /> */}
+
 
             {/* Profile routes (requires authentication) */}
             <Route path="/profile" element={<ProtectedRoute element={Profile} />} />

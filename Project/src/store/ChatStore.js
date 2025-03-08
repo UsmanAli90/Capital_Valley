@@ -58,18 +58,39 @@ export const ChatStore = create((set, get) => ({
     },
 
     // Fetch messages for a specific user
+    // getMessages: async (userID) => {
+    //     set({ isMessageLoading: true });
+    //     try {
+    //         const response = await fetch(`${BASE_URL}/${userID}`, {
+    //             credentials: 'include', // Send cookies for authentication
+    //         });
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch messages');
+    //         }
+    //         const data = await response.json();
+    //         set({ messages: data.messages });
+    //     } catch (error) {
+    //         toast.error('Failed to fetch messages');
+    //     } finally {
+    //         set({ isMessageLoading: false });
+    //     }
+    // },
     getMessages: async (userID) => {
         set({ isMessageLoading: true });
         try {
-            const response = await fetch(`${BASE_URL}/message/${userID}`, {
+            // console.log("Fetching messages for userID:", userID); // Debugging
+            const response = await fetch(`${BASE_URL}/${userID}`, {
                 credentials: 'include', // Send cookies for authentication
             });
+            // console.log("Response status:", response.status); // Debugging
             if (!response.ok) {
                 throw new Error('Failed to fetch messages');
             }
             const data = await response.json();
+            // console.log("Fetched messages:", data.messages); // Debugging
             set({ messages: data.messages });
         } catch (error) {
+            console.log("Error in getMessages:", error.message); // Debugging
             toast.error('Failed to fetch messages');
         } finally {
             set({ isMessageLoading: false });
@@ -80,10 +101,10 @@ export const ChatStore = create((set, get) => ({
     sendMessage: async (messageData) => {
         const { selectedUser, messages } = get();
         if (!selectedUser) {
-            console.log("selectedUser", selectedUser);  
             toast.error('No user selected');
             return;
         }
+
         try {
             const response = await fetch(`${BASE_URL}/send/${selectedUser._id}`, {
                 method: 'POST',
@@ -93,14 +114,17 @@ export const ChatStore = create((set, get) => ({
                 credentials: 'include', // Send cookies for authentication
                 body: JSON.stringify(messageData),
             });
-            console.log("messageData", messageData);
+            // console.log("messageData:", messageData); // Debugging
             if (!response.ok) {
                 throw new Error('Failed to send message');
             }
+
             const data = await response.json();
-            set({ messages: [...messages, data] });
+            set({ messages: [...messages, data] }); // Update the messages list with the saved message
+            return data; // Return the saved message
         } catch (error) {
             toast.error(error.message);
+            throw error; // Re-throw the error to handle it in the component
         }
     },
 

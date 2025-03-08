@@ -113,7 +113,7 @@ const HomePage = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data from server:", data); // <-- This logs the response
+          // console.log("Fetched data from server:", data); // <-- This logs the response
           const initializedPosts = data.map((post) => ({
             ...post,
             upvotes: post.upvotes || 0, // Ensure all posts have upvote initialized

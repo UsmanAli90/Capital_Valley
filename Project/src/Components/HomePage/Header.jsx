@@ -54,9 +54,9 @@ const Header = () => {
             placeholder="Search..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-            className="w-full max-w-sm pl-10 pr-4 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
-            disabled={isSearching}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            className="w-full max-w-sm pl-10 pr-4 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-400 transition duration-300 bg-white text-gray-900"
+
           />
           <FaSearch
             className="absolute left-3 text-white cursor-pointer"
