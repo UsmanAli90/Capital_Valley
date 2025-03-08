@@ -17,12 +17,15 @@ const { searchProfiles } = require("./controllers/searchcontroller.js");
 const { createPost } = require("./controllers/PostUpload.js");
 const { filterAndValidatePost } = require("./controllers/Postfilter.js");
 const Post = require("./models/Post.js");
+const { getUsers } = require("./controllers/userControlller.js");
+const { sendMessage } = require("./controllers/Messages.js");
+const { getMessages } = require("./controllers/Messages.js");
+const { app, server } = require("./utils/socket.cjs");
 
 dotenv.config();
-const app = express();
 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true })); // Added from main
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -43,6 +46,18 @@ app.use(
     },
   })
 );
+
+// Logout Route
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Logout failed" });
+    }
+
+    res.clearCookie("connect.sid");
+    res.status(200).json({ message: "Logged out successfully" });
+  });
+});
 
 // Profile Route (Logged-in User)
 app.get("/profile", (req, res) => {
@@ -94,18 +109,6 @@ app.get("/profile/:id", async (req, res) => {
       message: "Server error",
     });
   }
-});
-
-// Logout Route
-app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ message: "Logout failed" });
-    }
-
-    res.clearCookie("connect.sid");
-    res.status(200).json({ message: "Logged out successfully" });
-  });
 });
 
 // Update Profile Route
@@ -242,8 +245,13 @@ app.post("/verify-otp1", verifyOTP1);
 app.get("/search", searchProfiles);
 app.post("/filterposts", filterAndValidatePost, createPost);
 
-// Start Server
+// New Chat Routes from main
+app.get("/chat", getUsers);
+app.post("/send/:id", sendMessage);
+app.get("/:id", getMessages);
+
+// Start Server with WebSocket
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

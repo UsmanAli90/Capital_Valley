@@ -3,6 +3,8 @@ import axios from "axios";
 import logo from "../../assets/Home/CapitalValleyLogo.png";
 import { FiAlignJustify } from "react-icons/fi";
 import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes, FaSearch } from "react-icons/fa";
+import { IoIosSettings } from "react-icons/io";
+import { Settings, House, MessageCircle, Bell, CircleUser } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Header = () => {
@@ -104,12 +106,19 @@ const Header = () => {
               <FaCommentAlt size={20} />
             </button>
           </Link>
-          <button className="text-grey hover:text-white flex items-center transition duration-300">
-            <FaBell size={20} />
-          </button>
+          <Link to="/notifications">
+            <button className="text-grey hover:text-white flex items-center transition duration-300">
+              <FaBell size={20} />
+            </button>
+          </Link>
           <Link to="/profile">
             <button className="text-grey hover:text-white flex items-center transition duration-300">
               <FaUserCircle size={20} />
+            </button>
+          </Link>
+          <Link to="/settings">
+            <button className="text-grey hover:text-white flex items-center transition duration-300">
+              <IoIosSettings size={20} />
             </button>
           </Link>
         </div>
@@ -152,14 +161,23 @@ const Header = () => {
                 </Link>
               </li>
               <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
-                <button className="text-grey hover:text-white flex items-center transition duration-300">
-                  <FaBell size={20} className="mr-2" /> Notifications
-                </button>
+                <Link to="/notifications">
+                  <button className="text-grey hover:text-white flex items-center transition duration-300">
+                    <FaBell size={20} className="mr-2" /> Notifications
+                  </button>
+                </Link>
               </li>
               <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
                 <Link to="/profile">
                   <button className="text-grey hover:text-white flex items-center transition duration-300">
                     <FaUserCircle size={20} className="mr-2" /> Profile
+                  </button>
+                </Link>
+              </li>
+              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
+                <Link to="/settings">
+                  <button className="text-grey hover:text-white flex items-center transition duration-300">
+                    <IoIosSettings size={20} className="mr-2" /> Settings
                   </button>
                 </Link>
               </li>
