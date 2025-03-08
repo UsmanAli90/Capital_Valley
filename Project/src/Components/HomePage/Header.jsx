@@ -94,12 +94,8 @@ const Header = () => {
               <MessageCircle />
             </button>
           </Link >
-          <button className="text-grey hover:text-white flex items-center transition duration-300">
-            <FaCommentAlt size={20} />
-          </button>
           <SubscriptionForm/>
           <button className="text-grey hover:text-white flex items-center transition duration-300">
-            <FaBell size={20} />
 
             <Bell />
           </button>
