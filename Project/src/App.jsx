@@ -47,7 +47,7 @@ function App() {
             <Route path="/chat" element={<ProtectedRoute element={Chat} />} />
 
             {/* Settings route (requires authentication) */}
-            <Route path="/settings" element={<ProtectedRoute element={Settings} />} />
+            {/* <Route path="/settings" element={<ProtectedRoute element={Settings} />} /> */}
 
             {/* Fallback route for 404 */}
             <Route path="*" element={<Notfound />} />
