@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import { ChatStore } from '../../store/ChatStore.js';
 import MessageInput from './MessageInput.jsx';
 import formatMessageTime from '../../../lib/utils.js';
 import socket from './Socket.js'; // Import the Socket.IO client
 
 const ChatContainer = ({ user, currentUser }) => {
+    console.log('ChatContainer rendered'); // Debugging
     const {
         messages,
         isMessageLoading,
@@ -45,6 +46,8 @@ const ChatContainer = ({ user, currentUser }) => {
 
     // Connect to Socket.IO and handle messages
     useEffect(() => {
+        console.log('Socket.IO event listener attached'); // Debugging
+
         // Connect to the Socket.IO server
         socket.connect();
 
@@ -55,14 +58,19 @@ const ChatContainer = ({ user, currentUser }) => {
 
         // Listen for incoming messages
         const handleReceiveMessage = (newMessage) => {
-            // Check if the message already exists in the messages list
-            const messageExists = messages.some((msg) => msg._id === newMessage._id);
+            console.log('Received new message:', newMessage); // Debugging
 
-            if (!messageExists) {
-                // Add the new message to the messages list
-                ChatStore.setState((state) => ({
-                    messages: [...state.messages, newMessage],
-                }));
+            // Only handle messages that are from the other user to avoid duplicates
+            if (newMessage.senderId !== currentUser.id) {
+                // Check if the message already exists in the messages list
+                const messageExists = messages.some((msg) => msg._id === newMessage._id);
+
+                if (!messageExists) {
+                    // Add the new message to the messages list
+                    ChatStore.setState((state) => ({
+                        messages: [...state.messages, newMessage],
+                    }));
+                }
             }
         };
 
@@ -71,31 +79,37 @@ const ChatContainer = ({ user, currentUser }) => {
 
         // Cleanup on component unmount
         return () => {
+            console.log('Socket.IO event listener removed'); // Debugging
+
             // Remove the event listener
             socket.off('receiveMessage', handleReceiveMessage);
 
             // Disconnect from the Socket.IO server
             socket.disconnect();
         };
-    }, [currentUser, messages]);
+    }, [currentUser?.id, messages]); // Include messages in dependency array to check for duplicates
 
     // Function to send a message
+    // Function to send a message
     const sendMessage = async (messageData) => {
-        const newMessage = {
-            ...messageData,
-            senderId: currentUser.id,
-            receiverId: user._id,
-            createdAt: new Date(),
-            _id: Date.now(), // Temporary ID for optimistic update
-        };
+        try {
+            // First save the message to the database via API
+            const newMessage = {
+                ...messageData,
+                senderId: currentUser.id,
+                receiverId: user._id,
+                createdAt: new Date(),
+            };
 
-        // Optimistically update the messages list
-        ChatStore.setState((state) => ({
-            messages: [...state.messages, newMessage],
-        }));
+            // Save the message to the database using the API
+            const savedMessage = await ChatStore.getState().sendMessage(newMessage);
 
-        // Emit the message to the server
-        socket.emit('sendMessage', newMessage);
+            // The message is now saved and added to the messages state
+            // We emit the saved message (with _id) to Socket.IO for delivery to the recipient
+            socket.emit('sendMessage', savedMessage);
+        } catch (error) {
+            console.error("Failed to send message:", error);
+        }
     };
 
     // Show loading skeleton if messages are being fetched
@@ -111,11 +125,10 @@ const ChatContainer = ({ user, currentUser }) => {
         <div className='flex flex-col h-screen'>
             {/* Chat Messages */}
             <div className='flex-1 overflow-y-auto p-4 space-y-4'>
-                {messages.map((message) => (
+                {messages.map((message, index) => (
                     <div
-                        key={message._id}
+                        key={message._id || index}
                         className={`flex ${message.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}
-                        ref={messageEndRef}
                     >
                         {/* Profile Picture for Other User */}
                         {message.senderId !== currentUser.id && (
@@ -168,6 +181,7 @@ const ChatContainer = ({ user, currentUser }) => {
                         )}
                     </div>
                 ))}
+                <div ref={messageEndRef} />
             </div>
 
             {/* Message Input */}
@@ -176,4 +190,4 @@ const ChatContainer = ({ user, currentUser }) => {
     );
 };
 
-export default ChatContainer;
+export default memo(ChatContainer);

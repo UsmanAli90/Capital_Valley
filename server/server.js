@@ -21,6 +21,7 @@ const Post = require('./models/Post.js');
 const { getUsers } = require('./controllers/userControlller.js');
 const { sendMessage } = require('./controllers/Messages.js');
 const { getMessages } = require('./controllers/Messages.js');
+const Message = require('./models/Message.js');
 
 dotenv.config();
 
@@ -180,6 +181,7 @@ app.post("/send/:id", attachUser, sendMessage);
 app.get('/:id', attachUser, getMessages);
 
 // Socket.IO connection handler
+// Socket.IO connection handler
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
@@ -190,18 +192,41 @@ io.on('connection', (socket) => {
     });
 
     // Handle sending messages
-    socket.on('sendMessage', (message) => {
-        const { senderId, receiverId } = message;
-
-        // Emit the message to the receiver
-        io.to(receiverId).emit('receiveMessage', message);
-
-        // Emit the message back to the sender
-        io.to(senderId).emit('receiveMessage', message);
-
-        console.log('Message sent:', message);
+    socket.on('sendMessage', async (message) => {
+        const { senderId, receiverId, text, _id } = message;
+    
+        try {
+            // Check if the message already has an _id (meaning it was already saved)
+            if (_id) {
+                // Message already saved, just forward it
+                console.log('Message already saved, just forwarding:', message);
+                
+                // Emit the message to the receiver's room
+                io.to(receiverId).emit('receiveMessage', message);
+                
+                // No need to emit back to sender as they already have it
+            } else {
+                // New message that needs to be saved
+                const newMessage = new Message({
+                    senderId,
+                    receiverId,
+                    text,
+                });
+                const savedMessage = await newMessage.save();
+            
+                // Emit the saved message to the receiver's room
+                io.to(receiverId).emit('receiveMessage', savedMessage);
+            
+                // Emit the saved message back to the sender's room
+                io.to(senderId).emit('receiveMessage', savedMessage);
+            
+                console.log('New message saved and sent:', savedMessage);
+            }
+        } catch (error) {
+            console.error("Error saving or sending message:", error);
+        }
     });
-
+    
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
