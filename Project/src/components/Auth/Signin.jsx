@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './ForgotPassword';
 import Modal from './Modal'
+import toast from "react-hot-toast";
 
 function Signin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -66,16 +67,19 @@ function Signin() {
       if (response.ok) {
         // Store user details in local storage
         localStorage.setItem("user", JSON.stringify(data.user));
-        setModal({ show: true, title: 'Success', message: 'Login successful!' });
+        // setModal({ show: true, title: 'Success', message: 'Login successful!' });
+        toast.success('Login Successful!')
         setTimeout(() => {
           navigate('/'); // Redirect to homepage or another page after login
         }, 2000);
         // navigate("/"); // Redirect to home page
       } else {
-        setModal({ show: true, title: 'Error', message: 'Invalid Credentials.' });
+        // setModal({ show: true, title: 'Error', message: 'Invalid Credentials.' });
+        toast.error("Invalid Credentials.")
       }
     } catch (error) {
-      setModal({ show: true, title: 'Error', message: 'An error occurred during login.' });
+      // setModal({ show: true, title: 'Error', message: 'An error occurred during login.' });
+      toast.error("An error occurred during login..")
     }
   };
 

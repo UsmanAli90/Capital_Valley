@@ -3,6 +3,8 @@ import axios from "axios";
 import logo from '../../assets/Home/CapitalValleyLogo.png';
 import { FiAlignJustify } from "react-icons/fi";
 import { FaHome, FaCommentAlt, FaBell, FaUserCircle, FaTimes, FaSearch } from "react-icons/fa";
+import { IoIosSettings } from "react-icons/io";
+import { Settings, House, MessageCircle, Bell, CircleUser } from "lucide-react";
 import { Link } from 'react-router-dom';
 import SubscriptionForm from "/src/Components/Subscription/SubscriptionForm.jsx";
 
@@ -47,7 +49,7 @@ const Header = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full max-w-sm pl-10 pr-4 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
+            className="w-full max-w-sm pl-10 pr-4 border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-400 transition duration-300 bg-white text-gray-900"
           />
           <FaSearch
             className="aleft text-white pl-1 cursor-pointer"
@@ -84,7 +86,12 @@ const Header = () => {
         <div className="hidden lg:flex items-center space-x-6">
           <Link to="/">
             <button className="text-grey hover:text-white flex items-center transition duration-300">
-              <FaHome size={20} />
+              <House />
+            </button>
+          </Link>
+          <Link to="/chat">
+            <button className="text-grey hover:text-white flex items-center transition duration-300">
+              <MessageCircle />
             </button>
           </Link >
           <button className="text-grey hover:text-white flex items-center transition duration-300">
@@ -93,12 +100,19 @@ const Header = () => {
           <SubscriptionForm/>
           <button className="text-grey hover:text-white flex items-center transition duration-300">
             <FaBell size={20} />
+
+            <Bell />
           </button>
           <button className="text-grey hover:text-white flex items-center transition duration-300">
             <Link to="/profile">
-              <FaUserCircle size={20} />
+              <CircleUser />
             </Link>
           </button>
+          {/* <button className="text-grey hover:text-white flex items-center transition duration-300">
+            <Link to="/settings">
+              <Settings />
+            </Link>
+          </button> */}
         </div>
 
         {/* Sidebar Toggle */}
@@ -108,48 +122,49 @@ const Header = () => {
         >
           {isSidebarOpen ? <FaTimes size={24} /> : <FiAlignJustify size={24} />}
         </button>
-      </header>
+      </header >
 
       {/* Sidebar Menu */}
-      {isSidebarOpen && (
-        <div className="fixed top-0 right-0 w-64 h-full bg-gradient-to-r from-green-800 to-green-600  shadow-lg z-20">
-          <div className="p-4 flex justify-between items-center border-b border-purple-300">
-            <h2 className="font-bold text-white text-lg">Menu</h2>
-            <button
-              className="text-white hover:text-gray-200 transition duration-300"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              <FaTimes size={20} />
-            </button>
-          </div>
-          <nav className="p-4">
-            <ul className="space-y-4">
-              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
-                <Link to="/">
-                  <button className="text-grey hover:text-white flex items-center transition duration-300">
-                    <FaHome size={20} className="mr-2" />  Home
-                  </button>
-                </Link>
-              </li>
-              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
-                <FaCommentAlt className="mr-2" /> Chat
-              </li>
-              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
-                <FaBell className="mr-2" /> Notifications
-              </li>
-              <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
-                <Link to="/profile">
-                  <button className="text-grey hover:text-white flex items-center transition duration-300">
-                  <FaUserCircle size={20} className="mr-2" />Profile
-                </button>
-              </Link>
+      {
+        isSidebarOpen && (
+          <div className="fixed top-0 right-0 w-64 h-full bg-gradient-to-r from-green-800 to-green-600  shadow-lg z-20">
+            <div className="p-4 flex justify-between items-center border-b border-purple-300">
+              <h2 className="font-bold text-white text-lg">Menu</h2>
+              <button
+                className="text-white hover:text-gray-200 transition duration-300"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+            <nav className="p-4">
+              <ul className="space-y-4">
+                <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
+                  <Link to="/">
+                    <button className="text-grey hover:text-white flex items-center transition duration-300">
+                      <FaHome size={20} className="mr-2" />  Home
+                    </button>
+                  </Link>
+                </li>
+                <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
+                  <FaCommentAlt className="mr-2" /> Chat
+                </li>
+                <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
+                  <FaBell className="mr-2" /> Notifications
+                </li>
+                <li className="text-white hover:text-gray-200 flex items-center transition duration-300">
+                  <Link to="/profile">
+                    <button className="text-grey hover:text-white flex items-center transition duration-300">
+                      <FaUserCircle size={20} className="mr-2" />Profile
+                    </button>
+                  </Link>
 
-            </li>
-          </ul>
-        </nav>
-        </div>
-  )
-}
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )
+      }
     </div >
   );
 };

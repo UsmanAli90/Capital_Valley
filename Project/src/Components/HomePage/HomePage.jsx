@@ -113,7 +113,7 @@ const HomePage = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data from server:", data); // <-- This logs the response
+          // console.log("Fetched data from server:", data); // <-- This logs the response
           const initializedPosts = data.map((post) => ({
             ...post,
             upvotes: post.upvotes || 0, // Ensure all posts have upvote initialized
@@ -138,45 +138,60 @@ const HomePage = () => {
   const handleUpvote = async (index) => {
     const newPosts = [...posts];
     const post = newPosts[index];
+
     if (!post) {
-      console.error("No post found at index:", index);
-      return;
+        console.error("No post found at index:", index);
+        return;
     }
 
     if (!post._id) {
-      console.error("Post is missing a valid _id:", post);
-      return;
+        console.error("Post is missing a valid _id:", post);
+        return;
     }
 
-    console.log("Valid post _id:", post._id);
+    if (!user || !user.id) {
+        console.error("User is not defined or missing _id:", user);
+        return;
+    }
 
-    // Upvote logic: toggle upvote
-    const upvoteChange = post.hasUpvoted ? -1 : 1; // +1 if upvoting, -1 if removing upvote
+    console.log("Valid post _id:", post._id, "User ID:", user._id);
+
+    // Toggle upvote state
+    const upvoteChange = post.hasUpvoted ? -1 : 1;
     post.upvotes += upvoteChange;
-    post.hasUpvoted = !post.hasUpvoted; // Toggle the upvote state
+    post.hasUpvoted = !post.hasUpvoted;
 
+    // Update UI optimistically
     setPosts(newPosts);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/posts/${post._id}/upvote`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ upvoteChange }), // Send the change (+1 or -1)
+        const response = await fetch(`http://localhost:3000/posts/${post._id}/upvote`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId: user.id, upvoteChange }), // ✅ Send userId and upvoteChange
+        });
+
+        if (!response.ok) {
+            console.error("Failed to upvote. Reverting UI...");
+            // Revert UI if request fails
+            post.upvotes -= upvoteChange;
+            post.hasUpvoted = !post.hasUpvoted;
+            setPosts([...newPosts]);
+        } else {
+            const updatedPost = await response.json();
+            console.log("Updated post from server:", updatedPost);
         }
-      );
-
-      if (!response.ok) {
-        console.error("Failed to upvote");
-      }
     } catch (error) {
-      console.error("Unexpected error during fetch", error);
+        console.error("Unexpected error during fetch:", error);
+        // Revert UI on network error
+        post.upvotes -= upvoteChange;
+        post.hasUpvoted = !post.hasUpvoted;
+        setPosts([...newPosts]);
     }
+};
 
-  };
 
 
 
