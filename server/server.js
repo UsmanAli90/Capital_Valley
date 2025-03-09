@@ -26,6 +26,7 @@ const { getUsers } = require('./controllers/userControlller.js');
 const { sendMessage } = require('./controllers/Messages.js');
 const { getMessages } = require('./controllers/Messages.js');
 const Message = require('./models/Message.js');
+const { saveContract, getContracts } = require("./controllers/ContractController.js");
 
 dotenv.config();
 
@@ -334,6 +335,9 @@ io.on('connection', (socket) => {
     });
 });
 
+
+app.post("/contracts", saveContract); // Save contract details
+app.get("/getcontracts", getContracts); // Get all contracts
 
 // Start Server with WebSocket
 const PORT = process.env.PORT || 3000;
