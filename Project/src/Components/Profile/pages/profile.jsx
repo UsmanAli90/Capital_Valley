@@ -140,7 +140,7 @@ const Profile = () => {
       });
 
       if (response.ok) {
-        toast.success('Logged out!')
+        toast.success("Logged out!");
         navigate("/signin");
       } else {
         alert("Logout failed. Try again.");
@@ -186,8 +186,8 @@ const Profile = () => {
           <title>User Profile</title>
         </Helmet>
         <Header />
-        <div className="flex justify-center items-center min-h-screen">
-          <Text as="p" className="text-gray-600">Loading...</Text>
+        <div className="flex justify-center items-center min-h-screen bg-gray-50">
+          <Text as="p" className="text-gray-600 text-lg">Loading...</Text>
         </div>
       </>
     );
@@ -199,24 +199,24 @@ const Profile = () => {
         <title>User Profile</title>
       </Helmet>
       <Header />
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="w-full max-w-2xl bg-white shadow-md p-6 border-2 border-green-800 rounded-lg">
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 py-8">
+        <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 border border-green-200">
           {/* Profile Info */}
-          <div className="flex flex-col items-center border-b pb-4">
+          <div className="flex flex-col items-center border-b border-gray-200 pb-6">
             <Img
               src="profileAssets/images/user.png"
               alt="Profile Image"
-              className="h-[70px] w-[6%] rounded-[34px] object-contain"
+              className="h-20 w-20 rounded-full object-cover border-2 border-green-200 shadow-md hover:shadow-lg transition-shadow"
             />
-            <Text as="p" className="text-lg font-bold">
+            <Text as="h1" className="text-xl font-bold text-gray-800 mt-4">
               {user ? user.username : "Your name"}
             </Text>
-            <Text as="p" className="text-sm text-gray-600">
+            <Text as="p" className="text-sm text-gray-500 mt-1">
               {user ? user.email : "yourname@gmail.com"}
             </Text>
 
             {/* Buttons: Conditional based on whether it's the logged-in user */}
-            <div className="mt-4 flex gap-4">
+            <div className="mt-6 flex gap-4">
               {isLoggedInUser ? (
                 <>
                   <Button
@@ -245,19 +245,19 @@ const Profile = () => {
 
           {/* Tabs for "My Ideas" & "Liked Ideas" */}
           <div className="mt-6">
-            <div className="flex border-b">
+            <div className="flex border-b border-gray-200">
               <button
-                className={`w-1/2 py-2 text-center font-bold ${
-                  selectedTab === "myIdeas" ? "border-b-4 border-green-600 text-green-700" : "text-gray-500"
-                }`}
+                className={`w-1/2 py-2 text-center font-semibold ${
+                  selectedTab === "myIdeas" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500 hover:text-gray-700"
+                } transition-colors duration-200`}
                 onClick={() => setSelectedTab("myIdeas")}
               >
                 {isLoggedInUser ? "My Ideas" : "Ideas Posted"}
               </button>
               <button
-                className={`w-1/2 py-2 text-center font-bold ${
-                  selectedTab === "likedIdeas" ? "border-b-4 border-green-600 text-green-700" : "text-gray-500"
-                }`}
+                className={`w-1/2 py-2 text-center font-semibold ${
+                  selectedTab === "likedIdeas" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500 hover:text-gray-700"
+                } transition-colors duration-200`}
                 onClick={() => setSelectedTab("likedIdeas")}
               >
                 Liked Ideas
@@ -266,18 +266,27 @@ const Profile = () => {
 
             {/* My Ideas / Ideas Posted Section */}
             {selectedTab === "myIdeas" && user?.type === "startup" && (
-              <div className="mt-4">
+              <div className="mt-6">
                 {postedIdeas.length === 0 ? (
-                  <Text as="p" className="text-gray-600 mt-2">
+                  <Text as="p" className="text-gray-500 text-center mt-4">
                     {isLoggedInUser ? "No ideas posted yet." : "No ideas posted by this user."}
                   </Text>
                 ) : (
                   <div className="space-y-4">
                     {postedIdeas.map((post) => (
-                      <div key={post._id} className="border p-4 rounded-lg shadow-md">
-                        <Text as="h3" className="text-lg font-bold">{post.problem}</Text>
-                        <Text as="p" className="text-gray-700">{post.solution}</Text>
-                        <Text as="p" className="text-sm text-gray-500 mt-2">{post.companyName}</Text>
+                      <div
+                        key={post._id}
+                        className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <Text as="h3" className="text-lg font-semibold text-gray-800">
+                          {post.problem}
+                        </Text>
+                        <Text as="p" className="text-gray-600 mt-2">
+                          {post.solution}
+                        </Text>
+                        <Text as="p" className="text-sm text-gray-500 mt-1">
+                          {post.companyName}
+                        </Text>
                       </div>
                     ))}
                   </div>
@@ -287,22 +296,31 @@ const Profile = () => {
 
             {/* Liked Ideas Section */}
             {selectedTab === "likedIdeas" && (
-              <div className="mt-4">
+              <div className="mt-6">
                 {likedPosts.length === 0 ? (
-                  <Text as="p" className="text-gray-600 mt-2">
+                  <Text as="p" className="text-gray-500 text-center mt-4">
                     {isLoggedInUser ? "No liked ideas yet." : "No liked ideas by this user."}
                   </Text>
                 ) : (
                   <div className="space-y-4">
                     {likedPosts.map((post) => (
-                      <div key={post._id} className="border p-4 rounded-lg shadow-md">
-                        <Text as="h3" className="text-lg font-bold">{post.problem}</Text>
-                        <Text as="p" className="text-gray-700">{post.solution}</Text>
-                        <Text as="p" className="text-sm text-gray-500 mt-2">{post.companyName}</Text>
-                        <div className="flex items-center mt-2">
+                      <div
+                        key={post._id}
+                        className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <Text as="h3" className="text-lg font-semibold text-gray-800">
+                          {post.problem}
+                        </Text>
+                        <Text as="p" className="text-gray-600 mt-2">
+                          {post.solution}
+                        </Text>
+                        <Text as="p" className="text-sm text-gray-500 mt-1">
+                          {post.companyName}
+                        </Text>
+                        <div className="flex items-center mt-3">
                           <Button
                             onClick={() => handleUpvote(post._id, post.upvotedBy.includes(user?._id))}
-                            className="bg-gray-200 p-1 rounded"
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-md text-sm transition-colors"
                           >
                             {post.upvotedBy.includes(user?._id) ? "Remove Upvote" : "Upvote"} ({post.upvotes})
                           </Button>

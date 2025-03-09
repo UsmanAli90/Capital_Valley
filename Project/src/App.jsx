@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signin from "./Components/Auth/Signin.jsx";
 import Signup from "./Components/Auth/Signup.jsx";
-import HomePage from "./components/HomePage/HomePage.jsx";
+import HomePage from "./Components/HomePage/HomePage.jsx";
 import Profile from "./Components/Profile/pages/profile.jsx";
 import ProfileSetting from "./components/Profile/pages/profileSetting.jsx";
 import Notfound from "./components/Profile/pages/NotFound.jsx";
@@ -9,7 +9,7 @@ import ForgotPassword from './Components/Auth/ForgotPassword.jsx';
 import OTPPage from './Components/Auth/OTPPage.jsx';
 import ResetPasswordPage from './Components/Auth/ResetPasswordPage.jsx';
 import PaymentPage from "./Components/Subscription/PaymentPage.jsx"; 
-
+import VerifyIdea from "./Components/verifyIdea.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Chat from "../src/Components/Chat/Chat.jsx"
 // import { ThemeStore } from "../src/store/ThemeStore.js"
@@ -49,7 +49,7 @@ function App() {
             {/* Chat routes (requires authentication) */}
             <Route path="/chat" element={<ProtectedRoute element={Chat} />} />
             <Route path="/payment" element={<PaymentPage />} />
-
+            <Route path="/verify-idea/:hash" element={<VerifyIdea />} />
             {/* Settings route (requires authentication) */}
             {/* <Route path="/settings" element={<ProtectedRoute element={Settings} />} /> */}
 
