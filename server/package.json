@@ -25,6 +25,8 @@
     "mongoose": "^8.8.3",
     "node-fetch": "^2.6.7",
     "nodemailer": "^6.9.16",
+    "pinata": "^2.0.1",
+    "profanity-js": "^0.1.4",
     "socket.io": "^4.8.1",
     "stripe": "^17.7.0",
     "validator": "^13.12.0"
