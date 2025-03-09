@@ -29,10 +29,6 @@ const { Blob } = require("buffer");
 
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const { getUsers } = require('./controllers/userControlller.js');
-const { sendMessage } = require('./controllers/Messages.js');
-const { getMessages } = require('./controllers/Messages.js');
-const Message = require('./models/Message.js');
 const { saveContract, getContracts } = require("./controllers/ContractController.js");
 
 // Initialize Pinata SDK
