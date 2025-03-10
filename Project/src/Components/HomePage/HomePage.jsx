@@ -353,9 +353,9 @@ const HomePage = () => {
                     <p className="text-gray-700">
                       <span className="font-medium text-green-700">Problem:</span> {post.problem}
                     </p>
-                    <p className="text-gray-600">
+                    {/* <p className="text-gray-600">
                       <span className="font-medium text-green-700">Abstract:</span> {post.abstract}
-                    </p>
+                    </p> */}
                     <p className="text-gray-600">
                       <span className="font-medium text-green-700">Niche:</span> {post.niches.join(", ")}
                     </p>
