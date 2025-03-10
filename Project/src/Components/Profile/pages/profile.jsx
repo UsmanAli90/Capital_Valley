@@ -164,6 +164,21 @@ const Profile = () => {
       if (response.ok) {
         const updatedPost = await response.json();
         console.log("Updated Post:", updatedPost);
+
+        // Update the likedPosts state locally
+        setLikedPosts((prevLikedPosts) =>
+          prevLikedPosts.map((post) =>
+            post._id === postId
+              ? {
+                  ...post,
+                  upvotes: updatedPost.upvotes,
+                  upvotedBy: updatedPost.upvotedBy,
+                }
+              : post
+          )
+        );
+      } else {
+        console.error("Failed to update upvote:", await response.json());
       }
     } catch (error) {
       console.log("user: ", user.id);
@@ -246,16 +261,18 @@ const Profile = () => {
           {/* Tabs for "My Ideas" & "Liked Ideas" */}
           <div className="mt-6">
             <div className="flex border-b border-gray-200">
+              {user?.type === "startup" && (
+                <button
+                  className={`w-1/2 py-2 text-center font-semibold ${
+                    selectedTab === "myIdeas" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500 hover:text-gray-700"
+                  } transition-colors duration-200`}
+                  onClick={() => setSelectedTab("myIdeas")}
+                >
+                  {isLoggedInUser ? "My Ideas" : "Ideas Posted"}
+                </button>
+              )}
               <button
-                className={`w-1/2 py-2 text-center font-semibold ${
-                  selectedTab === "myIdeas" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500 hover:text-gray-700"
-                } transition-colors duration-200`}
-                onClick={() => setSelectedTab("myIdeas")}
-              >
-                {isLoggedInUser ? "My Ideas" : "Ideas Posted"}
-              </button>
-              <button
-                className={`w-1/2 py-2 text-center font-semibold ${
+                className={`w-${user?.type === "startup" ? "1/2" : "full"} py-2 text-center font-semibold ${
                   selectedTab === "likedIdeas" ? "border-b-2 border-green-600 text-green-700" : "text-gray-500 hover:text-gray-700"
                 } transition-colors duration-200`}
                 onClick={() => setSelectedTab("likedIdeas")}
@@ -319,10 +336,10 @@ const Profile = () => {
                         </Text>
                         <div className="flex items-center mt-3">
                           <Button
-                            onClick={() => handleUpvote(post._id, post.upvotedBy.includes(user?._id))}
+                            onClick={() => handleUpvote(post._id, post.upvotedBy?.includes(user.id))}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-md text-sm transition-colors"
                           >
-                            {post.upvotedBy.includes(user?._id) ? "Remove Upvote" : "Upvote"} ({post.upvotes})
+                            {post.upvotedBy?.includes(user.id) ? "Remove Upvote" : "Upvote"} ({post.upvotes})
                           </Button>
                         </div>
                       </div>
