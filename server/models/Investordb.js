@@ -56,6 +56,10 @@ const investorSchema = new mongoose.Schema({
     type: String,
     default: "/avatars/default.png", // Default avatar
   },
+  isSubscribed: { 
+    type: Boolean,
+    default: false,
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Investor", investorSchema);

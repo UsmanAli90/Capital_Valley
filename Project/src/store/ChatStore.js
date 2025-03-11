@@ -78,8 +78,9 @@ export const ChatStore = create((set, get) => ({
     getMessages: async (userID) => {
         set({ isMessageLoading: true });
         try {
+            console.log("In getMessages Fetching messages for userID:", userID); // Debugging
             // console.log("Fetching messages for userID:", userID); // Debugging
-            const response = await fetch(`${BASE_URL}/${userID}`, {
+            const response = await fetch(`${BASE_URL}/messages/${userID}`, {
                 credentials: 'include', // Send cookies for authentication
             });
             // console.log("Response status:", response.status); // Debugging

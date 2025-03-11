@@ -29,10 +29,11 @@ const { PinataSDK } = require("pinata");
 const { Blob } = require("buffer");
 const { updateContractAcceptance } = require('./controllers/updateContractAcceptance.js');
 const { declineContract } = require('./controllers/updateContractDecline.js');
+const { checkSubscription } = require("./controllers/SubscriptionController.js");
 
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const { saveContract, getContracts } = require("./controllers/ContractController.js");
+// const { saveContract, getContracts } = require("./controllers/ContractController.js");
 
 const pinata = new PinataSDK({
   pinataJwt: process.env.PINATA_JWT,
@@ -368,11 +369,12 @@ app.use("/api/payment", processPayment);
 
 app.get("/chat", attachUser, getUsers);
 app.post("/send/:id", attachUser, sendMessage);
-app.get("/:id", attachUser, getMessages);
+app.get("/messages/:id", attachUser, getMessages);
 app.post("/contracts/:id",attachUser, saveContract); 
 app.get('/getcontract/:id',attachUser, getContracts);
 app.put('/contract/:contractID/accept', updateContractAcceptance);
 app.put('/contract/:contractID/decline', declineContract);
+app.get("/check-subscription", attachUser, checkSubscription);
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);

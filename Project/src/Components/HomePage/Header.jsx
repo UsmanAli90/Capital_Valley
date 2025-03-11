@@ -12,14 +12,19 @@ import {
 import { FiAlignJustify } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import SubscriptionForm from "/src/Components/Subscription/SubscriptionForm.jsx";
+import toast from "react-hot-toast";
 
 const Header = () => {
+  const BASE_URL = "http://localhost:3000";
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [user, setUser] = useState(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem("user")); // Fetch current user from localStorage
+  const [hasSubscription, setHasSubscription] = useState(false);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -28,6 +33,11 @@ const Header = () => {
       setUser(storedUser);
     }
   }, []);
+  useEffect(() => {
+    if (user && user.id) {
+      checkSubscriptionStatus();
+    }
+  }, [user]);
 
   const handleSearch = async () => {
     if (!query) return;
@@ -61,6 +71,79 @@ const Header = () => {
     navigate("/signin");
   };
 
+  const checkSubscriptionStatus = async () => {
+    try {
+      const params = new URLSearchParams({
+        userId: user.id,
+        type: user.type,
+      });
+
+      const response = await fetch(`${BASE_URL}/check-subscription?${params.toString()}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to check subscription status.");
+      }
+
+      const data = await response.json();
+      setHasSubscription(data.hasSubscription);
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+    }
+  };
+  const handleChatClick = async () => {
+    setIsChecking(true);
+
+    try {
+      // Construct the query parameters
+      const params = new URLSearchParams({
+        userId: user.id,
+        type: user.type, // "startup" or "investor"
+      });
+      console.log("usertype is:", user.type);
+      console.log("userid is:", user.id);
+
+      // Retrieve the session ID from localStorage
+      // const sessionId = localStorage.getItem("sessionId");
+
+      // Call the backend API to check subscription status using fetch
+      const response = await fetch(`${BASE_URL}/check-subscription?${params.toString()}`, {
+        method: "GET",
+        credentials: "include", // Include cookies (if sessions are cookie-based)
+        // headers: {
+        //     "Session-ID": sessionId, // Include the session ID in the headers
+        // },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to check subscription status.");
+      }
+      console.log("Subscription check response status in Header.jsx:", response.status);
+      
+      const data = await response.json();
+      const { hasSubscription } = data;
+      console.log("Subscription check response data in header.jsx:", data);
+      console.log("Has subscription in Header.jsx:", data.hasSubscription);
+      if (hasSubscription) {
+        // Navigate to the chat component
+        toast.success("Subscription is active. Redirecting to chat...");
+        navigate("/chat");
+      } else {
+        // Show a prompt to purchase a subscription
+        toast.error("You need to purchase a subscription to access the chat.");
+        navigate("/payment"); // Redirect to the payment page
+      }
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+      toast.error("Failed to check subscription status.");
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+
   return (
     <div className="bg-white shadow-md sticky top-0 z-50">
       <header className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
@@ -77,9 +160,8 @@ const Header = () => {
             </span>
           </Link>
         </div>
-
         {/* Search Bar */}
-        <div className="flex-1 flex items-center justify-center mx-4 relative hidden lg:block">
+        <div className="flex-1 flex items-center justify-center mx-4 relative lg:block">
           <div className="relative w-full max-w-xl">
             <input
               type="text"
@@ -126,12 +208,17 @@ const Header = () => {
           <Link to="/home" className="text-gray-600 hover:text-green-600 transition-colors hidden md:block">
             <FaHome size={20} />
           </Link>
-          <Link to="/chat" className="text-gray-600 hover:text-green-600 transition-colors hidden md:block">
-            <FaCommentAlt size={20} />
+          <Link onClick={handleChatClick} className="text-gray-600 hover:text-green-600 transition-colors hidden md:block">
+            <FaCommentAlt
+              
+              size={20}
+            />
           </Link>
-          <SubscriptionForm />
-          <Link to="/notifications" className="text-gray-600 hover:text-green-600 transition-colors hidden md:block">
-            <FaBell size={20} />
+          <Link to="/notifications">
+            <FaBell
+              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+              size={20}
+            />
           </Link>
           {user ? (
             <>
@@ -142,8 +229,8 @@ const Header = () => {
                     alt="User Avatar"
                     className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 hover:border-green-600 transition-all"
                     onError={(e) =>
-                      (e.target.src =
-                        "http://localhost:3000/avatars/default-avatar.png")
+                    (e.target.src =
+                      "http://localhost:3000/avatars/default-avatar.png")
                     } // Fallback
                   />
                 ) : (
@@ -175,9 +262,9 @@ const Header = () => {
             {isSidebarOpen ? <FaTimes size={24} /> : <FiAlignJustify size={24} />}
           </button>
         </div>
-
-        {/* Sidebar */}
-        {isSidebarOpen && (
+        
+{/* Sidebar */}
+{isSidebarOpen && (
           <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 border-l border-gray-200 transform transition-transform duration-300">
             <div className="p-4 flex justify-between items-center border-b border-gray-200">
               <h2 className="font-semibold text-gray-800 text-lg">Menu</h2>

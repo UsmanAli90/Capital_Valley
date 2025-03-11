@@ -48,6 +48,10 @@ const startupSchema = new mongoose.Schema({
     type: String,
     default: "/avatars/default.png", // Default avatar
   },
+  isSubscribed: { 
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model('Startup', startupSchema);
