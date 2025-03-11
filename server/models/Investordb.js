@@ -28,12 +28,8 @@ const investorSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: [
-      /^(?:\d{5}-\d{7}-\d|\d{13})$/,
-      'Please provide a valid CNIC (format: 12345-1234567-1 or 1234512345671)',
-    ],
+    match: [/^(?:\d{5}-\d{7}-\d|\d{13})$/, 'Please provide a valid CNIC (format: 12345-1234567-1 or 1234512345671)'],
   },
-
   areasOfInterest: {
     type: String,
     required: [true, "Areas of interest are required"],
@@ -43,10 +39,10 @@ const investorSchema = new mongoose.Schema({
     required: [true, "You must agree to the terms"],
   },
   otp: {
-    type: String, 
+    type: String,
   },
   otpExpires: {
-    type: Date, 
+    type: Date,
   },
   createdAt: {
     type: Date,
@@ -54,8 +50,12 @@ const investorSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    value: "investor",
-  }
+    default: "investor", // Changed from value to default
+  },
+  avatar: {
+    type: String,
+    default: "/avatars/default.png", // Default avatar
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Investor", investorSchema);
