@@ -33,6 +33,7 @@ const InvestorsignIn = async (req, res) => {
       email: investoruser1.email,
       username: investoruser1.username,
       type: investoruser1.type,
+      avatar: investoruser1.avatar,
     };
 
     console.log("Session set with user data:", req.session.user);
