@@ -171,8 +171,9 @@ app.post("/updateProfile", async (req, res) => {
 app.get("/posts", async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("owner", "email username")
+      .populate("owner", "email username avatar") // Ensure avatar is included
       .sort({ createdAt: -1 });
+    console.log("Fetched posts:", posts); // Debug
     res.json(posts);
   } catch (error) {
     console.error("Error fetching posts:", error);
