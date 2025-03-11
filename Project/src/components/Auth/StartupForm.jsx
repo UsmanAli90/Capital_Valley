@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-function StartupForm() {
+function StartupForm({ usertype }) {
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -20,6 +20,7 @@ function StartupForm() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   const validate = () => {
     const newErrors = {};
 
@@ -32,10 +33,8 @@ function StartupForm() {
     } else if (/[^a-zA-Z0-9._%+-@]/.test(formData.email)) {
       newErrors.email = "Email contains invalid characters.";
     } else if (/[+-]/.test(formData.email)) {
-      newErrors.email =
-        "Email should not contain negative signs or plus signs.";
+      newErrors.email = "Email should not contain negative signs or plus signs.";
     } else {
-      // Additional check to ensure the email domain is valid
       const domain = formData.email.split("@")[1];
       const validDomains = [
         "gmail.com",
@@ -46,11 +45,9 @@ function StartupForm() {
         "icloud.com",
         "mail.com",
         "zoho.com",
-        // Add more valid domains as needed
       ];
       if (!validDomains.includes(domain)) {
-        newErrors.email =
-          "Please enter a valid email address with a commonly used domain.";
+        newErrors.email = "Please enter a valid email address with a commonly used domain.";
       }
     }
 
@@ -63,8 +60,7 @@ function StartupForm() {
     } else if (/[^a-zA-Z0-9._-]/.test(formData.username)) {
       newErrors.username = "Username contains invalid characters.";
     } else if (/[+-]/.test(formData.username)) {
-      newErrors.username =
-        "Username should not contain negative signs or plus signs.";
+      newErrors.username = "Username should not contain negative signs or plus signs.";
     } else if (formData.username.length < 3) {
       newErrors.username = "Username must be at least 3 characters long.";
     } else if (formData.username.length > 50) {
@@ -90,29 +86,21 @@ function StartupForm() {
       !/^\d{5}-\d{7}-\d$/.test(formData.cnic) &&
       !/^\d{13}$/.test(formData.cnic)
     ) {
-      newErrors.cnic =
-        "CNIC must be exactly 13 digits or follow the format 12345-1234567-1.";
+      newErrors.cnic = "CNIC must be exactly 13 digits or follow the format 12345-1234567-1.";
     } else if (/^0+$/.test(formData.cnic.replace(/-/g, ""))) {
       newErrors.cnic = "CNIC cannot be all zeros.";
     } else if (/[+-]/.test(formData.cnic)) {
       newErrors.cnic = "CNIC should not contain negative signs or plus signs.";
     } else if (/[a-zA-Z]/.test(formData.cnic)) {
-      newErrors.cnic =
-        "CNIC should not contain alphabets, only numbers are allowed.";
+      newErrors.cnic = "CNIC should not contain alphabets, only numbers are allowed.";
     } else {
       const parts = formData.cnic.split("-");
       if (parts.length === 3) {
-        if (
-          parts[0] === "00000" ||
-          parts[1] === "0000000" ||
-          parts[2] === "0"
-        ) {
+        if (parts[0] === "00000" || parts[1] === "0000000" || parts[2] === "0") {
           newErrors.cnic = "CNIC cannot be dominated by zeros.";
         }
       }
-
     }
-
 
     if (!formData.description) {
       newErrors.description = "Startup description is required.";
@@ -140,18 +128,17 @@ function StartupForm() {
         });
 
         if (response.ok) {
-          toast.success('Account created successfully! Redirecting to login page...');
-          // alert("Account created successfully!");
-          navigate("/signin");
+          toast.success("Account created successfully! Redirecting to login page...");
+          setTimeout(() => {
+            navigate("/signin");
+          }, 2000);
         } else {
           const errorData = await response.json();
-          toast.error("Unable to sign up.")
-          // alert("Error: " + errorData.message || "Unable to sign up.");
+          toast.error(errorData.message || "Unable to sign up.");
         }
       } catch (error) {
         console.error("Error creating account:", error);
-        toast.error("An error occurred. Please try again.")
-        // alert("An error occurred. Please try again.");
+        toast.error("An error occurred. Please try again.");
       }
     }
   };
@@ -165,119 +152,146 @@ function StartupForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-green-200">
-      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-center text-green-600 mb-4">Create Your Startup Account</h1>
-        <p className="text-center text-gray-600 mb-8">Join Capital Valley and start your journey</p>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+    <div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Row 1: Email and Username */}
+        <div className="flex flex-col md:flex-row md:space-x-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
             <input
               type="email"
-              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all bg-white text-sm placeholder-gray-400"
               placeholder="Enter your email"
               name="email"
               value={formData.email}
               onChange={handleChange}
             />
-            {errors.email && <small className="text-danger">{errors.email}</small>}
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
           </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Username</label>
+          <div className="flex-1 mt-2 md:mt-0">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Username
+            </label>
             <input
               type="text"
-              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all bg-white text-sm placeholder-gray-400"
               placeholder="Enter your username"
               name="username"
               value={formData.username}
               onChange={handleChange}
             />
-            {errors.username && <small className="text-danger">{errors.username}</small>}
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+            )}
           </div>
+        </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <div className="input-group">
+        {/* Row 2: Password and CNIC */}
+        <div className="flex flex-col md:flex-row md:space-x-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
-                className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+                type={showPassword ? "text" : "password"}
+                className="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all bg-white text-sm placeholder-gray-400"
                 placeholder="Enter your password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
               />
-              <div className="input-group-append">
-                <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+              </button>
             </div>
-            <small className="text-muted">
-              • Use 8 or more characters
-              <br />• One uppercase, lowercase, special character, and number
-            </small>
-            {errors.password && <small className="text-danger">{errors.password}</small>}
+            <p className="text-gray-500 text-xs mt-1">
+              • 8+ characters, uppercase, lowercase, number, special
+            </p>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
           </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">CNIC</label>
+          <div className="flex-1 mt-2 md:mt-0">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              CNIC
+            </label>
             <input
               type="text"
-              className="form-control rounded-pill w-full px-3 py-2 border border-gray-300"
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all bg-white text-sm placeholder-gray-400"
               placeholder="Enter your CNIC"
               name="cnic"
               value={formData.cnic}
               onChange={handleChange}
             />
-            {errors.cnic && <small className="text-danger">{errors.cnic}</small>}
+            {errors.cnic && (
+              <p className="text-red-500 text-xs mt-1">{errors.cnic}</p>
+            )}
           </div>
+        </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Startup Description</label>
-            <textarea
-              className="form-control w-full px-3 py-2 border border-gray-300 rounded-lg"
-              rows="2"
-              placeholder="Enter your startup description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-            ></textarea>
-            {errors.description && <small className="text-danger">{errors.description}</small>}
-          </div>
+        {/* Row 3: Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Startup Description
+          </label>
+          <textarea
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all bg-white text-sm placeholder-gray-400"
+            rows="2"
+            placeholder="Enter your startup description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+          ></textarea>
+          {errors.description && (
+            <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+          )}
+        </div>
 
-          <div className="form-check mb-4">
+        {/* Row 4: Checkbox and Terms */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <input
-              className="form-check-input"
               type="checkbox"
-              id="email-updates"
+              className="form-checkbox h-4 w-4 text-green-600"
               name="agree"
               checked={formData.agree}
               onChange={handleChange}
             />
-            <label className="form-check-label" htmlFor="email-updates">
-              I want to receive emails about the product, feature updates, and events.
+            <label className="ml-2 text-sm text-gray-700">
+              I want to receive emails about updates and events.
             </label>
-            {errors.agree && <small className="text-danger">{errors.agree}</small>}
           </div>
-
-          <p className="small text-muted mb-4">
+          <p className="text-sm text-gray-600">
             By creating an account, you agree to the{" "}
-            <a href="#" className="text-decoration-none text-green-600 hover:underline">
-              Terms of Use
+            <a href="#" className="text-green-600 hover:underline">
+              Terms
             </a>{" "}
             and{" "}
-            <a href="#" className="text-decoration-none text-green-600 hover:underline">
+            <a href="#" className="text-green-600 hover:underline">
               Privacy Policy
-            </a>
-            .
+            </a>.
           </p>
+        </div>
 
-          <button type="submit" className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200">
-            Create an account
+        {/* Row 5: Submit Button */}
+        <div className="text-center mt-4">
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-2 px-4 rounded-full font-semibold hover:bg-green-700 transition-all duration-300 shadow-md text-sm"
+          >
+            Create Account
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }

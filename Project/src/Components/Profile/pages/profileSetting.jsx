@@ -1,12 +1,9 @@
 import { Helmet } from "react-helmet";
-import Button from "../component/button";
-import Text from "../component/text";
-import Input from "../component/input";
-import Header from "../../HomePage/Header";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../../HomePage/Header"; // Try this path, adjust if necessary
 
-export default function ProfilesettingPage() {
+export default function ProfileSettingPage() {
   const [userData, setUserData] = useState({ name: "", email: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -58,6 +55,7 @@ export default function ProfilesettingPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
@@ -100,98 +98,70 @@ export default function ProfilesettingPage() {
   return (
     <>
       <Helmet>
-        <title>Profile Settings Update Your Personal Information</title>
+        <title>Profile Settings - Update Your Personal Information</title>
         <meta
           name="description"
           content="Keep your profile up-to-date with your latest information. Add or change your email, mobile number, and location settings easily."
         />
       </Helmet>
       <Header />
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="border-2 border-green-800 rounded-lg w-full max-w-md bg-white shadow-md p-6 transform transition duration-700 hover:scale-105">
-          <form
-            className="flex flex-col items-start gap-6 bg-white-a700 p-6 sm:p-8 "
-            onSubmit={handleSubmit}
-          >
-            <div className="self-stretch ">
-              <div className="flex flex-col gap-4 ">
-                <div className="flex flex-1 flex-col items-start">
-                  <Text
-                    size="texts"
-                    as="p"
-                    className="text-[14px] sm:text-[16px] font-normal text-blue_gray-900"
-                  >
-                    {userData.name || "Your name"}
-                  </Text>
-                  <Text
-                    as="p"
-                    className="text-[12px] sm:text-[14px] font-normal text-gray-600"
-                  >
-                    {userData.email || "yourname@gmail.com"}
-                  </Text>
-                </div>
-                <div className="h-px w-full bg-gray-200" />
-                <div className="flex flex-wrap gap-4 self-stretch">
-                  <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <Text
-                      size="texts"
-                      as="p"
-                      className="text-[14px] sm:text-[16px] font-normal text-blue_gray-900"
-                    >
-                      Name
-                    </Text>
-                    <Input
-                      type="text"
-                      name="name"
-                      value={userData.name}
-                      onChange={handleChange}
-                      className={`text-[14px] sm:text-[16px] font-normal text-blue_gray-700 p-1 sm:p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 w-full sm:w-auto ${
-                        errors.name ? "border-red-500" : ""
-                      }`}
-                    />
-                    {errors.name && (
-                      <div className="text-red-500 text-xs mt-1">
-                        {errors.name}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="h-px w-full bg-gray-100" />
-                <div className="flex flex-wrap gap-4 self-stretch">
-                  <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <Text
-                      size="texts"
-                      as="p"
-                      className="text-[14px] sm:text-[16px] font-normal text-blue_gray-900"
-                    >
-                      Email
-                    </Text>
-                    <Input
-                      type="email"
-                      name="email"
-                      value={userData.email}
-                      onChange={handleChange}
-                      className={`text-[14px] sm:text-[16px] font-normal text-blue_gray-700 p-1 sm:p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 w-full sm:w-auto ${
-                        errors.email ? "border-red-500" : ""
-                      }`}
-                    />
-                    {errors.email && (
-                      <div className="text-red-500 text-xs mt-1">
-                        {errors.email}
-                      </div>
-                    )}
-                  </div>
-                </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 py-2">
+        <div className="w-full max-w-5xl mx-4 flex flex-col lg:flex-row">
+          {/* Left Side - Branding */}
+          <div className="w-full lg:w-1/3 bg-gradient-to-br from-green-500 to-emerald-700 text-white p-6 flex items-center justify-center">
+            <div className="text-center">
+              {/* Placeholder for Logo */}
+              <div className="w-24 h-24 mx-auto mb-4 bg-gray-300 rounded-full flex items-center justify-center">
+                {/* Add your logo image here, e.g., <img src="/path/to/logo.png" alt="Logo" /> */}
               </div>
+              <h1 className="text-3xl font-bold mb-2">Capital Valley</h1>
+              <p className="text-sm">Update your profile settings.</p>
             </div>
-            <Button
-              type="submit"
-              shape="round"
-              className="min-w-[144px] bg-gradient-to-r from-green-600 to-green-800 shadow-lg text-white py-2 px-4 rounded-lg hover:bg-green-900 sm:px-5 transition duration-300 hover:scale-105"
-            >
-              Save
-            </Button>
-          </form>
+          </div>
+
+          {/* Right Side - Profile Settings Form */}
+          <div className="w-full lg:w-2/3 bg-white p-6 rounded-r-lg shadow-lg">
+            <div className="border-2 border-green-800 rounded-lg p-6">
+              <div className="mb-6">
+                <p className="text-gray-600 text-sm">{userData.name || "Your name"}</p>
+                <p className="text-gray-500 text-xs">{userData.email || "yourname@gmail.com"}</p>
+              </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-2">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={userData.name}
+                    onChange={handleChange}
+                    className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all ${
+                      errors.name ? "border-red-500" : ""
+                    }`}
+                  />
+                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                </div>
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={userData.email}
+                    onChange={handleChange}
+                    className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all ${
+                      errors.email ? "border-red-500" : ""
+                    }`}
+                  />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                </div>
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-green-600 to-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-green-700 transition-all duration-200"
+                >
+                  Save
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </>
