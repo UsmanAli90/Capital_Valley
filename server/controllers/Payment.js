@@ -66,5 +66,3 @@ processPayment = async (req, res) => {
 module.exports = {
     processPayment,
   };
-
-

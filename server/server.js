@@ -27,6 +27,7 @@ const Message = require("./models/Message.js");
 const crypto = require("crypto");
 const { PinataSDK } = require("pinata");
 const { Blob } = require("buffer");
+const { saveContract, getContracts } = require("./controllers/ContractController.js");
 const { updateContractAcceptance } = require('./controllers/updateContractAcceptance.js');
 const { declineContract } = require('./controllers/updateContractDecline.js');
 const { checkSubscription } = require("./controllers/SubscriptionController.js");
@@ -185,7 +186,7 @@ app.get("/posts", async (req, res) => {
 
     try {
         const posts = await Post.find()
-            .populate("owner", "email username avatar") // Populate owner with email and username
+            .populate("owner", "email username") // Populate owner with email and username
             .sort({ createdAt: -1 });
         res.json(posts);
     } catch (error) {
@@ -412,3 +413,4 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
