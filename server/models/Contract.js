@@ -1,60 +1,68 @@
 const mongoose = require("mongoose");
 
+const generateRandomEthAddress = () => {
+    const randomHex = [...Array(40)]
+        .map(() => Math.floor(Math.random() * 16).toString(16))
+        .join("");
+    return `0x${randomHex}`;
+};
+
 const contractSchema = new mongoose.Schema({
-  contractAddress: {
-    type: String,
-    required: true,
-    unique: true,
-    default: () => {
-      // Generate a random Ethereum-like address (42 characters, starts with 0x)
-      const randomHex = "0x" + Array.from({ length: 40 }, () => 
-        Math.floor(Math.random() * 16).toString(16)
-      ).join("");
-      return randomHex;
+
+    senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    investmentAmount: {
+        type: Number,
+        required: true,
     },
-  },
-  investmentAmount: {
-    type: Number,
-    required: true,
-  },
-  equityPercentage: {
-    type: Number,
-    required: true,
-  },
-  conditions: {
-    type: String,
-    default: "", // Default to an empty string if no conditions are provided
-  },
-  paymentDate: {
-    type: Date,
-    required: true,
-  },
-  investor: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function (v) {
-        // Basic Ethereum address validation (42 characters, starts with 0x)
-        return /^0x[a-fA-F0-9]{40}$/.test(v);
-      },
-      message: (props) => `${props.value} is not a valid Ethereum address!`,
+    equityPercentage: {
+        type: Number,
+        required: true,
     },
-  },
-  startup: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function (v) {
-        // Basic Ethereum address validation (42 characters, starts with 0x)
-        return /^0x[a-fA-F0-9]{40}$/.test(v);
-      },
-      message: (props) => `${props.value} is not a valid Ethereum address!`,
+    conditions: {
+        type: String,
     },
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+    investor: {
+        type: String,
+        required: true,
+        default: generateRandomEthAddress,
+        validate: {
+            validator: function (v) {
+                return /^0x[a-fA-F0-9]{40}$/.test(v);
+            },
+            message: (props) => `${props.value} is not a valid Ethereum address!`,
+        },
+    },
+    startup: {
+        type: String,
+        required: true,
+        default: generateRandomEthAddress,
+        validate: {
+            validator: function (v) {
+                return /^0x[a-fA-F0-9]{40}$/.test(v);
+            },
+            message: (props) => `${props.value} is not a valid Ethereum address!`,
+        },
+    },
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post'
+    },
+    postName: {
+        type: String
+    },
+    isAccepted: {
+        type: Boolean,
+        default: false,
+    },
+    isDeclined: {
+        type: Boolean,
+        default: false,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
 module.exports = mongoose.model("Contract", contractSchema);

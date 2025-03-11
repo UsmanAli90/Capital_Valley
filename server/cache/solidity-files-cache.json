@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "D:\\Capital_Valley\\server\\Contracts\\InvestmentContract.sol": {
-      "lastModificationDate": 1741515408247,
-      "contentHash": "4598b905499283e740a4f3e60d1697a1",
+      "lastModificationDate": 1741677996150,
+      "contentHash": "6e403ae4f5ab9713a2f0e60c529c891c",
       "sourceName": "Contracts/InvestmentContract.sol",
       "solcConfig": {
         "version": "0.8.0",
