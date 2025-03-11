@@ -46,7 +46,11 @@ const HomePage = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) navigate("/signin");
-    else setUser(JSON.parse(storedUser));
+    else {
+      const parsedUser = JSON.parse(storedUser);
+      console.log("Stored user in HomePage:", parsedUser);
+      setUser(parsedUser);
+    }
     setIsLoading(false);
   }, [navigate]);
 
@@ -70,14 +74,11 @@ const HomePage = () => {
     setPosts(newPosts);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/posts/${post._id}/upvote`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.id, upvoteChange }),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/posts/${post._id}/upvote`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, upvoteChange }),
+      });
       if (!response.ok) {
         console.error("Failed to upvote. Reverting UI...");
         post.upvotes -= upvoteChange;
@@ -152,9 +153,7 @@ const HomePage = () => {
         setIsFullTime("");
         setIsFormVisible(false);
       } else {
-        alert(
-          "Your post contains prohibited content. Please revise and try again."
-        );
+        alert("Your post contains prohibited content. Please revise and try again.");
       }
     } catch (error) {
       console.error("Error saving post:", error);
@@ -186,7 +185,6 @@ const HomePage = () => {
             )}
           </div>
 
-          {/* Modernized Idea Post Modal */}
           {isFormVisible && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
               <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl transform transition-all duration-300 scale-100 hover:scale-105 max-h-[90vh] overflow-y-auto">
@@ -360,12 +358,16 @@ const HomePage = () => {
                     {post.owner?.avatar ? (
                       <img
                         src={post.owner.avatar}
-                        alt="Owner Avatar"
+                        alt={`${post.owner?.username || post.owner?.email || "User"}'s Avatar`}
                         className="h-12 w-12 rounded-full object-cover border-2 border-gray-300"
+                        onError={(e) => {
+                          console.log(`Failed to load avatar for post ${post._id}: ${post.owner.avatar}`);
+                          e.target.src = "/default-avatar.png";
+                        }}
                       />
                     ) : (
                       <div className="h-12 w-12 bg-gray-300 rounded-full flex items-center justify-center text-xl font-semibold text-gray-700">
-                        {post.owner?.email?.[0] || "U"}
+                        {post.owner?.email?.[0]?.toUpperCase() || "U"}
                       </div>
                     )}
                     <div>
@@ -373,7 +375,7 @@ const HomePage = () => {
                         className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-green-600 transition-colors"
                         onClick={() => handleViewProfile(post.owner?._id || post.owner)}
                       >
-                        {post.owner?.email || "Unknown User"}
+                        {post.owner?.username || post.owner?.email || "Unknown User"}
                       </h2>
                       <span className="text-sm text-gray-500">{timeAgo(post.createdAt)}</span>
                     </div>
