@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import logo from "../../assets/Home/CapitalValleyLogo.png";
 import {
@@ -8,8 +8,8 @@ import {
   FaUserCircle,
   FaTimes,
   FaSearch,
-} from "react-icons/fa"; // Font Awesome icons
-import { FiAlignJustify } from "react-icons/fi"; // Feather Icons for FiAlignJustify
+} from "react-icons/fa";
+import { FiAlignJustify } from "react-icons/fi";
 import { IoIosSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
 import SubscriptionForm from "/src/Components/Subscription/SubscriptionForm.jsx";
@@ -19,6 +19,15 @@ const Header = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      console.log("Stored user in Header:", storedUser);
+      setUser(storedUser);
+    }
+  }, []);
 
   const handleSearch = async () => {
     if (!query) return;
@@ -68,7 +77,6 @@ const Header = () => {
               size={18}
               onClick={handleSearch}
             />
-            {/* Search Results Dropdown */}
             {results.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 max-h-60 overflow-y-auto z-20">
                 {results.map((result) => (
@@ -76,7 +84,7 @@ const Header = () => {
                     to={`/profile/${result._id}`}
                     key={result._id}
                     className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
-                    onClick={() => setResults([])} // Clear results on click
+                    onClick={() => setResults([])}
                   >
                     {result.username || result.email}
                   </Link>
@@ -108,12 +116,17 @@ const Header = () => {
           <Link to="/notifications">
             <FaBell className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={20} />
           </Link>
-          <Link to={`/profile/${JSON.parse(localStorage.getItem("user"))?.id || "me"}`}>
-            <FaUserCircle className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={20} />
+          <Link to={`/profile/${user?.id || "me"}`}>
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt="User Avatar"
+                className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 hover:border-green-600 transition-all" // Increased size to h-10 w-10
+              />
+            ) : (
+              <FaUserCircle className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={32} /> // Increased fallback icon size
+            )}
           </Link>
-          {/* <Link to="/settings">
-            <IoIosSettings className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={24} />
-          </Link> */}
         </div>
 
         {/* Mobile Sidebar Toggle */}
@@ -168,22 +181,22 @@ const Header = () => {
               </li>
               <li>
                 <Link
-                  to={`/profile/${JSON.parse(localStorage.getItem("user"))?.id || "me"}`}
+                  to={`/profile/${user?.id || "me"}`}
                   className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                  <FaUserCircle size={20} className="mr-3" /> Profile
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt="User Avatar"
+                      className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 mr-3" // Increased size to h-10 w-10
+                    />
+                  ) : (
+                    <FaUserCircle size={32} className="mr-3" /> // Increased fallback icon size
+                  )}
+                  Profile
                 </Link>
               </li>
-              {/* <li>
-                <Link
-                  to="/settings"
-                  className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <IoIosSettings size={24} className="mr-3" /> Settings
-                </Link>
-              </li> */}
             </ul>
           </nav>
         </div>
