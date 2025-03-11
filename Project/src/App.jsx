@@ -11,49 +11,37 @@ import ResetPasswordPage from './Components/Auth/ResetPasswordPage.jsx';
 import PaymentPage from "./Components/Subscription/PaymentPage.jsx"; 
 import VerifyIdea from "./Components/verifyIdea.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
-import Chat from "../src/Components/Chat/Chat.jsx"
-// import { ThemeStore } from "../src/store/ThemeStore.js"
-// import Settings from '../src/Components/Pages/Settings.jsx'
+import Chat from "../src/Components/Chat/Chat.jsx";
+import LandingPage from "./Components/LandingPage/LandingPage.jsx"; // New import
 import { Toaster } from 'react-hot-toast';
 
 function App() {
-  // const { theme } = ThemeStore();
   return (
-
     <>
       <div>
-      <Toaster position="top-center" reverseOrder={false} />
+        <Toaster position="top-center" reverseOrder={false} />
         <Router>
           <Routes>
-            {/* Root path (requires authentication) */}
-            <Route path="/" element={<ProtectedRoute element={HomePage} />} />
+            {/* Public Landing Page as Root */}
+            <Route path="/" element={<LandingPage />} />
 
-            {/* Authentication routes (public) */}
+            {/* Authentication Routes (public) */}
             <Route path="/signin" element={<Signin />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp/:userId" element={<OTPPage />} />
-            <Route path="/reset-password/:userId" element={< ResetPasswordPage />} />
-            <Route
-              path="/chat"
-              element={<ProtectedRoute element={Chat} />}
-            />
-            {/* <Route path="/settings" element={<Settings />} /> */}
+            <Route path="/reset-password/:userId" element={<ResetPasswordPage />} />
 
-
-            {/* Profile routes (requires authentication) */}
+            {/* Protected Routes */}
+            <Route path="/home" element={<ProtectedRoute element={HomePage} />} />
             <Route path="/profile" element={<ProtectedRoute element={Profile} />} />
             <Route path="/profile/:id" element={<ProtectedRoute element={Profile} />} />
             <Route path="/profileSetting" element={<ProtectedRoute element={ProfileSetting} />} />
-
-            {/* Chat routes (requires authentication) */}
             <Route path="/chat" element={<ProtectedRoute element={Chat} />} />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/verify-idea/:hash" element={<VerifyIdea />} />
-            {/* Settings route (requires authentication) */}
-            {/* <Route path="/settings" element={<ProtectedRoute element={Settings} />} /> */}
 
-            {/* Fallback route for 404 */}
+            {/* Fallback Route for 404 */}
             <Route path="*" element={<Notfound />} />
           </Routes>
         </Router>

@@ -62,10 +62,11 @@ const Header = () => {
   };
 
   return (
-    <div className="bg-white shadow-md">
-      <header className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative z-10">
+    <div className="bg-white shadow-md sticky top-0 z-50">
+      <header className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
+        {/* Logo and Branding */}
         <div className="flex items-center space-x-4">
-          <Link to="/" className="flex items-center">
+          <Link to="/home" className="flex items-center">
             <img
               src={logo}
               alt="Capital Valley Logo"
@@ -77,7 +78,8 @@ const Header = () => {
           </Link>
         </div>
 
-        <div className="flex-1 flex items-center justify-center mx-6 relative">
+        {/* Search Bar */}
+        <div className="flex-1 flex items-center justify-center mx-4 relative hidden lg:block">
           <div className="relative w-full max-w-xl">
             <input
               type="text"
@@ -85,7 +87,7 @@ const Header = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all bg-gray-50 text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all bg-gray-50 text-gray-900 placeholder-gray-500"
             />
             <FaSearch
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-green-600 transition-colors"
@@ -93,7 +95,7 @@ const Header = () => {
               onClick={handleSearch}
             />
             {results.length > 0 && (
-              <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 max-h-60 overflow-y-auto z-20">
+              <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 max-h-40 overflow-y-auto z-20">
                 {results.map((result) => (
                   <Link
                     to={`/profile/${result._id}`}
@@ -119,29 +121,21 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-6">
-          <Link to="/">
-            <FaHome
-              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
-              size={20}
-            />
+        {/* Navigation and User Icons */}
+        <div className="flex items-center space-x-4">
+          <Link to="/home" className="text-gray-600 hover:text-green-600 transition-colors hidden md:block">
+            <FaHome size={20} />
           </Link>
-          <Link to="/chat">
-            <FaCommentAlt
-              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
-              size={20}
-            />
+          <Link to="/chat" className="text-gray-600 hover:text-green-600 transition-colors hidden md:block">
+            <FaCommentAlt size={20} />
           </Link>
           <SubscriptionForm />
-          <Link to="/notifications">
-            <FaBell
-              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
-              size={20}
-            />
+          <Link to="/notifications" className="text-gray-600 hover:text-green-600 transition-colors hidden md:block">
+            <FaBell size={20} />
           </Link>
           {user ? (
             <>
-              <Link to={`/profile/${user.id}`}>
+              <Link to={`/profile/${user.id}`} className="hidden md:block">
                 {user.avatar ? (
                   <img
                     src={`http://localhost:5173${user.avatar}`} // Updated to backend URL
@@ -154,112 +148,112 @@ const Header = () => {
                   />
                 ) : (
                   <FaUserCircle
-                    className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+                    className="text-gray-600 hover:text-green-600 transition-colors"
                     size={32}
                   />
                 )}
               </Link>
               <button
                 onClick={handleLogout}
-                className="bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-1.5 px-4 rounded-lg shadow-md hover:from-red-600 hover:to-red-800 transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-1.5 px-4 rounded-full shadow-md hover:from-red-600 hover:to-red-800 transition-all duration-300 transform hover:scale-105 hidden md:block"
               >
                 Logout
               </button>
             </>
           ) : (
-            <Link to="/signin">
+            <Link to="/signin" className="hidden md:block">
               <FaUserCircle
-                className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+                className="text-gray-600 hover:text-green-600 transition-colors"
                 size={32}
               />
             </Link>
           )}
+          <button
+            className="text-gray-600 hover:text-green-600 transition-colors md:hidden"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            {isSidebarOpen ? <FaTimes size={24} /> : <FiAlignJustify size={24} />}
+          </button>
         </div>
 
-        <button
-          className="text-gray-600 hover:text-green-600 lg:hidden transition-colors ml-4"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          {isSidebarOpen ? <FaTimes size={24} /> : <FiAlignJustify size={24} />}
-        </button>
-      </header>
-
-      {isSidebarOpen && (
-        <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-20 border-l border-gray-200 transform transition-transform duration-300">
-          <div className="p-4 flex justify-between items-center border-b border-gray-200">
-            <h2 className="font-semibold text-gray-800 text-lg">Menu</h2>
-            <button
-              className="text-gray-600 hover:text-green-600 transition-colors"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              <FaTimes size={20} />
-            </button>
-          </div>
-          <nav className="p-4">
-            <ul className="space-y-4">
-              <li>
-                <Link
-                  to="/"
-                  className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <FaHome size={20} className="mr-3" /> Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/chat"
-                  className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <FaCommentAlt size={20} className="mr-3" /> Chat
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/notifications"
-                  className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <FaBell size={20} className="mr-3" /> Notifications
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={`/profile/${user?.id || "me"}`}
-                  className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  {user?.avatar ? (
-                    <img
-                      src={`http://localhost:3000${user.avatar}`} // Updated to backend URL
-                      alt="User Avatar"
-                      className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 mr-3"
-                      onError={(e) =>
-                        (e.target.src =
-                          "http://localhost:3000/avatars/default-avatar.png")
-                      } // Fallback
-                    />
-                  ) : (
-                    <FaUserCircle size={32} className="mr-3" />
-                  )}
-                  Profile
-                </Link>
-              </li>
-              {user && (
+        {/* Sidebar */}
+        {isSidebarOpen && (
+          <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 border-l border-gray-200 transform transition-transform duration-300">
+            <div className="p-4 flex justify-between items-center border-b border-gray-200">
+              <h2 className="font-semibold text-gray-800 text-lg">Menu</h2>
+              <button
+                className="text-gray-600 hover:text-green-600 transition-colors"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+            <nav className="p-4">
+              <ul className="space-y-4">
                 <li>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center justify-center w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:from-red-600 hover:to-red-800 transition-all duration-300 transform hover:scale-105"
+                  <Link
+                    to="/home"
+                    className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                    onClick={() => setIsSidebarOpen(false)}
                   >
-                    Logout
-                  </button>
+                    <FaHome size={20} className="mr-3" /> Home
+                  </Link>
                 </li>
-              )}
-            </ul>
-          </nav>
-        </div>
-      )}
+                <li>
+                  <Link
+                    to="/chat"
+                    className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <FaCommentAlt size={20} className="mr-3" /> Chat
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/notifications"
+                    className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <FaBell size={20} className="mr-3" /> Notifications
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={`/profile/${user?.id || "me"}`}
+                    className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    {user?.avatar ? (
+                      <img
+                        src={`http://localhost:3000${user.avatar}`} // Updated to backend URL
+                        alt="User Avatar"
+                        className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 mr-3"
+                        onError={(e) =>
+                          (e.target.src =
+                            "http://localhost:3000/avatars/default-avatar.png")
+                        } // Fallback
+                      />
+                    ) : (
+                      <FaUserCircle size={32} className="mr-3" />
+                    )}
+                    Profile
+                  </Link>
+                </li>
+                {user && (
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:from-red-600 hover:to-red-800 transition-all duration-300 transform hover:scale-105"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                )}
+              </ul>
+            </nav>
+          </div>
+        )}
+      </header>
     </div>
   );
 };
