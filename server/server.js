@@ -6,6 +6,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const connectDB = require("./db.js");
 const Startup = require("./models/Startupdb.js");
+const Investor = require("./models/Investordb.js");
 const { createStartup } = require("./controllers/startupsignup.js");
 const { createInvestor } = require("./controllers/investorsignup.js");
 const { StartupsignIn } = require("./controllers/startupsignin.js");
@@ -24,7 +25,7 @@ const { sendMessage } = require("./controllers/Messages.js");
 const { getMessages } = require("./controllers/Messages.js");
 const Message = require("./models/Message.js");
 const crypto = require("crypto");
-const { PinataSDK } = require("pinata"); // Match documentation
+const { PinataSDK } = require("pinata");
 const { Blob } = require("buffer");
 const { saveContract, getContracts } = require("./controllers/ContractController.js");
 const { updateContractAcceptance } = require('./controllers/updateContractAcceptance.js');
@@ -32,17 +33,13 @@ const { declineContract } = require('./controllers/updateContractDecline.js');
 
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const { getUsers } = require('./controllers/userControlller.js');
-const { sendMessage } = require('./controllers/Messages.js');
-const { getMessages } = require('./controllers/Messages.js');
-const Message = require('./models/Message.js');
 const { saveContract, getContracts } = require("./controllers/ContractController.js");
 
-// Initialize Pinata SDK
 const pinata = new PinataSDK({
-    pinataJwt: process.env.PINATA_JWT,
-    pinataGateway: process.env.GATEWAY_URL,
-}); // Correct initialization
+  pinataJwt: process.env.PINATA_JWT,
+  pinataGateway: process.env.GATEWAY_URL,
+});
+
 
 const app = express();
 const server = http.createServer(app);
@@ -88,6 +85,51 @@ const attachUser = (req, res, next) => {
     }
 };
 
+// Define the /update-avatar route
+app.post("/update-avatar", attachUser, async (req, res) => {
+  console.log("Received /update-avatar request:", req.body);
+  const { avatar } = req.body;
+  if (!avatar) {
+    console.log("No avatar provided in request body");
+    return res.status(400).json({ message: "Avatar URL is required" });
+  }
+
+  try {
+    const userId = req.session.user.id;
+    console.log("User ID from session:", userId);
+    console.log("User type from session:", req.session.user.type);
+    console.log("Attempting to update avatar to:", avatar);
+
+    let updatedUser;
+
+    if (req.session.user.type === "startup") {
+      console.log("Updating Startup user with ID:", userId);
+      updatedUser = await Startup.findByIdAndUpdate(userId, { avatar }, { new: true });
+      console.log("Updated Startup user:", updatedUser);
+    } else if (req.session.user.type === "investor") {
+      console.log("Updating Investor user with ID:", userId);
+      updatedUser = await Investor.findByIdAndUpdate(userId, { avatar }, { new: true });
+      console.log("Updated Investor user:", updatedUser);
+    }
+
+    if (!updatedUser) {
+      console.log("No user found with ID:", userId);
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log("Updating session with new avatar:", avatar);
+    req.session.user.avatar = avatar;
+    console.log("Updated session user:", req.session.user);
+
+    res.status(200).json({ message: "Avatar updated", user: req.session.user });
+    console.log("Response sent successfully");
+  } catch (error) {
+    console.error("Error updating avatar:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Other routes
 app.post("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) return res.status(500).json({ message: "Logout failed" });
@@ -111,39 +153,17 @@ app.get("/profile", (req, res) => {
 });
 
 app.get("/profile/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
 
-        // First try to find in Startup collection
-        let user = await Startup.findById(id).select("id username email type");
-        if (!user) {
-            // If not found in Startup, try Investor collection
-            user = await Investor.findById(id).select("id username email type");
-        }
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                type: user.type,
-            },
-        });
-    } catch (error) {
-        console.error("Error fetching user profile:", error);
-        res.status(500).json({
-            success: false,
-            message: "Server error",
-        });
-    }
+  try {
+    const { id } = req.params;
+    let user = await Startup.findById(id).select("id username email type avatar");
+    if (!user) user = await Investor.findById(id).select("id username email type avatar");
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    res.status(200).json({ success: true, user: { id: user._id, username: user.username, email: user.email, type: user.type, avatar: user.avatar } });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 });
 
 
@@ -162,6 +182,7 @@ app.post("/updateProfile", async (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {
+
     try {
         const posts = await Post.find()
             .populate("owner", "email username") // Populate owner with email and username
@@ -306,6 +327,8 @@ app.post("/filterposts", filterAndValidatePost, async (req, res) => {
         console.error("Error in /filterposts:", error);
         res.status(500).json({ message: `Server error while creating post: ${error.message}` });
     }
+
+  
 });
 
 app.get("/verify-idea/:hash", async (req, res) => {
@@ -322,6 +345,7 @@ app.get("/verify-idea/:hash", async (req, res) => {
         const file = await pinata.gateways.get(post.ipfsHash);
         const fullIdea = JSON.parse(file.data.toString()); // Convert Buffer to string and parse JSON
         console.log("Fetched full idea:", fullIdea);
+
 
         res.status(200).json({ success: true, idea: fullIdea });
     } catch (error) {
@@ -359,23 +383,21 @@ io.on("connection", (socket) => {
         console.log(`User ${userId} joined room`);
     });
 
-    socket.on("sendMessage", async (message) => {
-        const { senderId, receiverId, text, _id } = message;
-        try {
-            if (_id) {
-                console.log("Message already saved, just forwarding:", message);
-                io.to(receiverId).emit("receiveMessage", message);
-            } else {
-                const newMessage = new Message({ senderId, receiverId, text });
-                const savedMessage = await newMessage.save();
-                io.to(receiverId).emit("receiveMessage", savedMessage);
-                io.to(senderId).emit("receiveMessage", savedMessage);
-                console.log("New message saved and sent:", savedMessage);
-            }
-        } catch (error) {
-            console.error("Error saving or sending message:", error);
-        }
-    });
+  socket.on("sendMessage", async (message) => {
+    const { senderId, receiverId, text, _id } = message;
+    try {
+      if (_id) {
+        io.to(receiverId).emit("receiveMessage", message);
+      } else {
+        const newMessage = new Message({ senderId, receiverId, text });
+        const savedMessage = await newMessage.save();
+        io.to(receiverId).emit("receiveMessage", savedMessage);
+        io.to(senderId).emit("receiveMessage", savedMessage);
+      }
+    } catch (error) {
+      console.error("Error saving or sending message:", error);
+    }
+  });
 
     socket.on("disconnect", () => {
         console.log("A user disconnected:", socket.id);

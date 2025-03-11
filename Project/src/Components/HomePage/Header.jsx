@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import logo from "../../assets/Home/CapitalValleyLogo.png";
 import {
@@ -8,24 +8,34 @@ import {
   FaUserCircle,
   FaTimes,
   FaSearch,
-} from "react-icons/fa"; // Font Awesome icons
-import { FiAlignJustify } from "react-icons/fi"; // Feather Icons for FiAlignJustify
-import { IoIosSettings } from "react-icons/io";
-import { Link } from "react-router-dom";
+} from "react-icons/fa";
+import { FiAlignJustify } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
 import SubscriptionForm from "/src/Components/Subscription/SubscriptionForm.jsx";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      console.log("Stored user in Header:", storedUser); // Debug
+      setUser(storedUser);
+    }
+  }, []);
 
   const handleSearch = async () => {
     if (!query) return;
-
     setIsSearching(true);
     try {
-      const { data } = await axios.get(`http://localhost:3000/search?query=${query}`);
+      const { data } = await axios.get(
+        `http://localhost:3000/search?query=${query}`
+      );
       console.log("Search results:", data);
       setResults([...data.investors, ...data.startups]);
     } catch (error) {
@@ -35,10 +45,25 @@ const Header = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:3000/logout",
+        {},
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/signin");
+  };
+
   return (
     <div className="bg-white shadow-md">
       <header className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative z-10">
-        {/* Logo and Branding */}
         <div className="flex items-center space-x-4">
           <Link to="/" className="flex items-center">
             <img
@@ -52,7 +77,6 @@ const Header = () => {
           </Link>
         </div>
 
-        {/* Search Bar */}
         <div className="flex-1 flex items-center justify-center mx-6 relative">
           <div className="relative w-full max-w-xl">
             <input
@@ -68,7 +92,6 @@ const Header = () => {
               size={18}
               onClick={handleSearch}
             />
-            {/* Search Results Dropdown */}
             {results.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 max-h-60 overflow-y-auto z-20">
                 {results.map((result) => (
@@ -76,7 +99,7 @@ const Header = () => {
                     to={`/profile/${result._id}`}
                     key={result._id}
                     className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
-                    onClick={() => setResults([])} // Clear results on click
+                    onClick={() => setResults([])}
                   >
                     {result.username || result.email}
                   </Link>
@@ -96,27 +119,63 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Navigation Icons */}
         <div className="flex items-center space-x-6">
           <Link to="/">
-            <FaHome className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={20} />
+            <FaHome
+              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+              size={20}
+            />
           </Link>
           <Link to="/chat">
-            <FaCommentAlt className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={20} />
+            <FaCommentAlt
+              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+              size={20}
+            />
           </Link>
           <SubscriptionForm />
           <Link to="/notifications">
-            <FaBell className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={20} />
+            <FaBell
+              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+              size={20}
+            />
           </Link>
-          <Link to={`/profile/${JSON.parse(localStorage.getItem("user"))?.id || "me"}`}>
-            <FaUserCircle className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={20} />
-          </Link>
-          {/* <Link to="/settings">
-            <IoIosSettings className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer" size={24} />
-          </Link> */}
+          {user ? (
+            <>
+              <Link to={`/profile/${user.id}`}>
+                {user.avatar ? (
+                  <img
+                    src={`http://localhost:5173${user.avatar}`} // Updated to backend URL
+                    alt="User Avatar"
+                    className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 hover:border-green-600 transition-all"
+                    onError={(e) =>
+                      (e.target.src =
+                        "http://localhost:3000/avatars/default-avatar.png")
+                    } // Fallback
+                  />
+                ) : (
+                  <FaUserCircle
+                    className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+                    size={32}
+                  />
+                )}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-1.5 px-4 rounded-lg shadow-md hover:from-red-600 hover:to-red-800 transition-all duration-300 transform hover:scale-105"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link to="/signin">
+              <FaUserCircle
+                className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+                size={32}
+              />
+            </Link>
+          )}
         </div>
 
-        {/* Mobile Sidebar Toggle */}
         <button
           className="text-gray-600 hover:text-green-600 lg:hidden transition-colors ml-4"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -125,7 +184,6 @@ const Header = () => {
         </button>
       </header>
 
-      {/* Sidebar Menu */}
       {isSidebarOpen && (
         <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-20 border-l border-gray-200 transform transition-transform duration-300">
           <div className="p-4 flex justify-between items-center border-b border-gray-200">
@@ -168,22 +226,36 @@ const Header = () => {
               </li>
               <li>
                 <Link
-                  to={`/profile/${JSON.parse(localStorage.getItem("user"))?.id || "me"}`}
+                  to={`/profile/${user?.id || "me"}`}
                   className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                  <FaUserCircle size={20} className="mr-3" /> Profile
+                  {user?.avatar ? (
+                    <img
+                      src={`http://localhost:3000${user.avatar}`} // Updated to backend URL
+                      alt="User Avatar"
+                      className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 mr-3"
+                      onError={(e) =>
+                        (e.target.src =
+                          "http://localhost:3000/avatars/default-avatar.png")
+                      } // Fallback
+                    />
+                  ) : (
+                    <FaUserCircle size={32} className="mr-3" />
+                  )}
+                  Profile
                 </Link>
               </li>
-              {/* <li>
-                <Link
-                  to="/settings"
-                  className="flex items-center text-gray-700 hover:text-green-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <IoIosSettings size={24} className="mr-3" /> Settings
-                </Link>
-              </li> */}
+              {user && (
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:from-red-600 hover:to-red-800 transition-all duration-300 transform hover:scale-105"
+                  >
+                    Logout
+                  </button>
+                </li>
+              )}
             </ul>
           </nav>
         </div>

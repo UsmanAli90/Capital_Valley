@@ -31,6 +31,7 @@ const StartupsignIn = async (req, res) => {
       email: startupuser1.email,
       username: startupuser1.username,
       type: startupuser1.type,
+      avatar: startupuser1.avatar,
     };
 
     console.log("Session set with user data:", req.session.user);

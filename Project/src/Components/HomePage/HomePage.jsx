@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-import { UserCircleIcon, HandThumbUpIcon } from "@heroicons/react/24/outline";
+import { HandThumbUpIcon } from "@heroicons/react/24/outline";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [niche, setNiche] = useState([]);
   const [problem, setProblem] = useState("");
   const [solution, setSolution] = useState("");
   const [costRange, setCostRange] = useState("");
-  const [feed, setFeed] = useState([]);
   const [companyName, setCompanyName] = useState("");
   const [companyUrl, setCompanyUrl] = useState("");
   const [productLink, setProductLink] = useState("");
@@ -48,7 +46,11 @@ const HomePage = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) navigate("/signin");
-    else setUser(JSON.parse(storedUser));
+    else {
+      const parsedUser = JSON.parse(storedUser);
+      console.log("Stored user in HomePage:", parsedUser);
+      setUser(parsedUser);
+    }
     setIsLoading(false);
   }, [navigate]);
 
@@ -72,14 +74,11 @@ const HomePage = () => {
     setPosts(newPosts);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/posts/${post._id}/upvote`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.id, upvoteChange }),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/posts/${post._id}/upvote`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, upvoteChange }),
+      });
       if (!response.ok) {
         console.error("Failed to upvote. Reverting UI...");
         post.upvotes -= upvoteChange;
@@ -154,9 +153,7 @@ const HomePage = () => {
         setIsFullTime("");
         setIsFormVisible(false);
       } else {
-        alert(
-          "Your post contains prohibited content. Please revise and try again."
-        );
+        alert("Your post contains prohibited content. Please revise and try again.");
       }
     } catch (error) {
       console.error("Error saving post:", error);
@@ -169,7 +166,7 @@ const HomePage = () => {
       console.error("No user ID provided for navigation");
       return;
     }
-    navigate(`/profile/${userId}`); // Navigate to profile page with user ID
+    navigate(`/profile/${userId}`);
   };
 
   return (
@@ -187,145 +184,169 @@ const HomePage = () => {
               </button>
             )}
           </div>
+
           {isFormVisible && (
-            <div className="p-6 bg-white rounded-xl shadow-lg border border-green-200 mt-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Post Your Idea</h2>
-              <form onSubmit={handlePostSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Select Niches</label>
-                  {["Finance", "Tech", "Health", "Education", "E-commerce"].map((nicheOption) => (
-                    <label key={nicheOption} className="flex items-center space-x-2 mt-2">
-                      <input
-                        type="checkbox"
-                        value={nicheOption}
-                        checked={niche.includes(nicheOption)}
-                        onChange={(e) =>
-                          e.target.checked
-                            ? setNiche([...niche, nicheOption])
-                            : setNiche(niche.filter((n) => n !== nicheOption))
-                        }
-                        className="form-checkbox h-5 w-5 text-green-600 border-gray-300 rounded"
-                      />
-                      <span className="text-gray-600">{nicheOption}</span>
-                    </label>
-                  ))}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Problem Statement</label>
-                  <input
-                    type="text"
-                    value={problem}
-                    onChange={(e) => setProblem(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Enter the problem statement of your idea"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Solution Overview</label>
-                  <textarea
-                    value={solution}
-                    onChange={(e) => setSolution(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Enter your USP/Value proposition"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Company Name</label>
-                  <input
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Enter your company name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Company URL</label>
-                  <input
-                    type="url"
-                    value={companyUrl}
-                    onChange={(e) => setCompanyUrl(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="https://example.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Add Link to Your Product</label>
-                  <input
-                    type="url"
-                    value={productLink}
-                    onChange={(e) => setProductLink(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="https://example.com/product"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Company Location</label>
-                  <select
-                    value={companyLocation}
-                    onChange={(e) => setCompanyLocation(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+              <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl transform transition-all duration-300 scale-100 hover:scale-105 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Post Your Idea</h2>
+                  <button
+                    onClick={toggleFormVisibility}
+                    className="text-gray-500 hover:text-gray-700 text-xl font-bold"
                   >
-                    <option value="">Select City</option>
-                    {["Karachi", "Lahore", "Islamabad", "Faisalabad", "Multan", "Rawalpindi"].map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
+                    ×
+                  </button>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Active Users</label>
-                  <input
-                    type="number"
-                    value={activeUsers}
-                    onChange={(e) => setActiveUsers(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Enter number of active users/customers"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Working Full-Time</label>
-                  <div className="mt-2 flex space-x-6">
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        value="Yes"
-                        checked={isFullTime === "Yes"}
-                        onChange={(e) => setIsFullTime(e.target.value)}
-                        className="form-radio h-5 w-5 text-green-600 border-gray-300"
-                      />
-                      <span className="text-gray-600">Yes</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        value="No"
-                        checked={isFullTime === "No"}
-                        onChange={(e) => setIsFullTime(e.target.value)}
-                        className="form-radio h-5 w-5 text-red-600 border-gray-300"
-                      />
-                      <span className="text-gray-600">No</span>
-                    </label>
+                <form onSubmit={handlePostSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">Select Niches</label>
+                    <div className="mt-2 flex flex-wrap gap-4">
+                      {["Finance", "Tech", "Health", "Education", "E-commerce"].map((nicheOption) => (
+                        <label key={nicheOption} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            value={nicheOption}
+                            checked={niche.includes(nicheOption)}
+                            onChange={(e) =>
+                              e.target.checked
+                                ? setNiche([...niche, nicheOption])
+                                : setNiche(niche.filter((n) => n !== nicheOption))
+                            }
+                            className="form-checkbox h-5 w-5 text-green-600 border-gray-300 rounded"
+                          />
+                          <span className="text-gray-600">{nicheOption}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Money Looking to Raise</label>
-                  <input
-                    type="text"
-                    value={costRange}
-                    onChange={(e) => setCostRange(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Enter amount you are looking to raise"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white py-3 px-6 rounded-lg shadow-lg hover:from-green-700 hover:to-emerald-800 transition-all duration-300"
-                >
-                  Submit Idea
-                </button>
-              </form>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Problem Statement</label>
+                    <input
+                      type="text"
+                      value={problem}
+                      onChange={(e) => setProblem(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      placeholder="Problem statement"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Solution Overview</label>
+                    <input
+                      type="text"
+                      value={solution}
+                      onChange={(e) => setSolution(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      placeholder="Solution overview"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Company Name</label>
+                    <input
+                      type="text"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      placeholder="Company name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Company URL</label>
+                    <input
+                      type="url"
+                      value={companyUrl}
+                      onChange={(e) => setCompanyUrl(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Product Link</label>
+                    <input
+                      type="url"
+                      value={productLink}
+                      onChange={(e) => setProductLink(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      placeholder="https://example.com/product"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Company Location</label>
+                    <select
+                      value={companyLocation}
+                      onChange={(e) => setCompanyLocation(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                    >
+                      <option value="">Select City</option>
+                      {["Karachi", "Lahore", "Islamabad", "Faisalabad", "Multan", "Rawalpindi"].map((city) => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Active Users</label>
+                    <input
+                      type="number"
+                      value={activeUsers}
+                      onChange={(e) => setActiveUsers(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      placeholder="Active users"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Money to Raise</label>
+                    <input
+                      type="text"
+                      value={costRange}
+                      onChange={(e) => setCostRange(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      placeholder="Funding goal"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">Working Full-Time</label>
+                    <div className="mt-2 flex space-x-6">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          value="Yes"
+                          checked={isFullTime === "Yes"}
+                          onChange={(e) => setIsFullTime(e.target.value)}
+                          className="form-radio h-5 w-5 text-green-600 border-gray-300"
+                        />
+                        <span className="text-gray-600">Yes</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          value="No"
+                          checked={isFullTime === "No"}
+                          onChange={(e) => setIsFullTime(e.target.value)}
+                          className="form-radio h-5 w-5 text-red-600 border-gray-300"
+                        />
+                        <span className="text-gray-600">No</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="col-span-2 flex justify-end gap-4 mt-4">
+                    <button
+                      type="button"
+                      onClick={toggleFormVisibility}
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-lg transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-gradient-to-r from-green-600 to-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:from-green-700 hover:to-emerald-800 transition-all duration-300"
+                    >
+                      Submit Idea
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
+
           <div className="mt-8 grid gap-6">
             {posts.map((post, index) => (
               <div
@@ -334,15 +355,27 @@ const HomePage = () => {
               >
                 <div className="p-6 bg-gradient-to-r from-green-100 to-white flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 bg-gray-300 rounded-full flex items-center justify-center text-xl font-semibold text-gray-700">
-                      {post.owner?.email?.[0] || "U"}
-                    </div>
+                    {post.owner?.avatar ? (
+                      <img
+                        src={post.owner.avatar}
+                        alt={`${post.owner?.username || post.owner?.email || "User"}'s Avatar`}
+                        className="h-12 w-12 rounded-full object-cover border-2 border-gray-300"
+                        onError={(e) => {
+                          console.log(`Failed to load avatar for post ${post._id}: ${post.owner.avatar}`);
+                          e.target.src = "/default-avatar.png";
+                        }}
+                      />
+                    ) : (
+                      <div className="h-12 w-12 bg-gray-300 rounded-full flex items-center justify-center text-xl font-semibold text-gray-700">
+                        {post.owner?.email?.[0]?.toUpperCase() || "U"}
+                      </div>
+                    )}
                     <div>
                       <h2
                         className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-green-600 transition-colors"
                         onClick={() => handleViewProfile(post.owner?._id || post.owner)}
                       >
-                        {post.owner?.email || "Unknown User"}
+                        {post.owner?.username || post.owner?.email || "Unknown User"}
                       </h2>
                       <span className="text-sm text-gray-500">{timeAgo(post.createdAt)}</span>
                     </div>
@@ -352,9 +385,6 @@ const HomePage = () => {
                   <div className="space-y-4">
                     <p className="text-gray-700">
                       <span className="font-medium text-green-700">Problem:</span> {post.problem}
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-medium text-green-700">Abstract:</span> {post.abstract}
                     </p>
                     <p className="text-gray-600">
                       <span className="font-medium text-green-700">Niche:</span> {post.niches.join(", ")}
