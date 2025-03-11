@@ -6,16 +6,20 @@ contract InvestmentContract {
     address public startup;
     uint public investmentAmount;
     uint public equityPercentage;
-    uint public paymentDate; // Timestamp for the payment date
+    // uint public paymentDate; // Timestamp for the payment date
     bool public investorSigned;
     bool public startupSigned;
 
-    constructor(address _investor, address _startup, uint _investmentAmount, uint _equityPercentage, uint _paymentDate) {
+    event ContractCreated(address indexed investor, address indexed startup, uint investmentAmount, uint equityPercentage);
+    event ContractAccepted(address indexed startup);
+    event ContractDeclined(address indexed startup);
+
+    constructor(address _investor, address _startup, uint _investmentAmount, uint _equityPercentage) {
         investor = _investor;
         startup = _startup;
         investmentAmount = _investmentAmount;
         equityPercentage = _equityPercentage;
-        paymentDate = _paymentDate;
+        emit ContractCreated(_investor, _startup, _investmentAmount, _equityPercentage);
     }
 
     // Investor signs the contract
@@ -28,12 +32,19 @@ contract InvestmentContract {
     function signByStartup() external {
         require(msg.sender == startup, "Only startup can sign");
         startupSigned = true;
+        emit ContractAccepted(startup);
+    }
+
+    // Startup declines the contract
+    function declineContract() external {
+        require(msg.sender == startup, "Only startup can decline");
+        emit ContractDeclined(startup);
     }
 
     // Optional: Function to release payment on the agreed date
     function releasePayment() external payable {
         require(investorSigned && startupSigned, "Both parties must sign first");
-        require(block.timestamp >= paymentDate, "Payment date has not arrived yet");
+        // require(block.timestamp >= paymentDate, "Payment date has not arrived yet");
         require(msg.value == investmentAmount, "Incorrect investment amount");
         payable(startup).transfer(msg.value);
     }

@@ -50,28 +50,27 @@ const io = new Server(server, {
   },
 });
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+    })
 );
 connectDB(process.env.MONGO_URI);
 
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "default-secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60,
-      httpOnly: true,
-      sameSite: "strict",
-    },
-  })
+    session({
+        secret: process.env.SESSION_SECRET || "default-secret",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 1000 * 60 * 60,
+            httpOnly: true,
+            sameSite: "strict",
+        },
+    })
 );
 
 const attachUser = (req, res, next) => {
@@ -96,7 +95,10 @@ app.post("/logout", (req, res) => {
 
 app.get("/profile", (req, res) => {
   if (req.session && req.session.user) {
-    res.status(200).json({ success: true, user: req.session.user });
+        res.status(200).json({
+            success: true,
+            user: req.session.user,
+        });
   } else {
     res.status(401).json({ success: false, message: "Session expired" });
   }
