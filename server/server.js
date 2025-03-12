@@ -187,7 +187,7 @@ app.get("/posts", async (req, res) => {
 
     try {
         const posts = await Post.find()
-            .populate("owner", "email username") // Populate owner with email and username
+            .populate("owner", "email username avatar") // Populate owner with email and username
             .sort({ createdAt: -1 });
         res.json(posts);
     } catch (error) {
