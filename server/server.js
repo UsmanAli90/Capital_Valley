@@ -32,15 +32,15 @@ const { updateContractAcceptance } = require('./controllers/updateContractAccept
 const { declineContract } = require('./controllers/updateContractDecline.js');
 const { checkSubscription } = require("./controllers/SubscriptionController.js");
 const { getAllUserContracts } = require('./controllers/getAllUserContracts.js');
-const {getPostSolutionById}=require('./controllers/PostSolution.js');
+const { getPostSolutionById } = require('./controllers/PostSolution.js');
 
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // const { saveContract, getContracts } = require("./controllers/ContractController.js");
 
 const pinata = new PinataSDK({
-  pinataJwt: process.env.PINATA_JWT,
-  pinataGateway: process.env.GATEWAY_URL,
+    pinataJwt: process.env.PINATA_JWT,
+    pinataGateway: process.env.GATEWAY_URL,
 });
 
 
@@ -90,46 +90,46 @@ const attachUser = (req, res, next) => {
 
 // Define the /update-avatar route
 app.post("/update-avatar", attachUser, async (req, res) => {
-  console.log("Received /update-avatar request:", req.body);
-  const { avatar } = req.body;
-  if (!avatar) {
-    console.log("No avatar provided in request body");
-    return res.status(400).json({ message: "Avatar URL is required" });
-  }
-
-  try {
-    const userId = req.session.user.id;
-    console.log("User ID from session:", userId);
-    console.log("User type from session:", req.session.user.type);
-    console.log("Attempting to update avatar to:", avatar);
-
-    let updatedUser;
-
-    if (req.session.user.type === "startup") {
-      console.log("Updating Startup user with ID:", userId);
-      updatedUser = await Startup.findByIdAndUpdate(userId, { avatar }, { new: true });
-      console.log("Updated Startup user:", updatedUser);
-    } else if (req.session.user.type === "investor") {
-      console.log("Updating Investor user with ID:", userId);
-      updatedUser = await Investor.findByIdAndUpdate(userId, { avatar }, { new: true });
-      console.log("Updated Investor user:", updatedUser);
+    console.log("Received /update-avatar request:", req.body);
+    const { avatar } = req.body;
+    if (!avatar) {
+        console.log("No avatar provided in request body");
+        return res.status(400).json({ message: "Avatar URL is required" });
     }
 
-    if (!updatedUser) {
-      console.log("No user found with ID:", userId);
-      return res.status(404).json({ message: "User not found" });
+    try {
+        const userId = req.session.user.id;
+        console.log("User ID from session:", userId);
+        console.log("User type from session:", req.session.user.type);
+        console.log("Attempting to update avatar to:", avatar);
+
+        let updatedUser;
+
+        if (req.session.user.type === "startup") {
+            console.log("Updating Startup user with ID:", userId);
+            updatedUser = await Startup.findByIdAndUpdate(userId, { avatar }, { new: true });
+            console.log("Updated Startup user:", updatedUser);
+        } else if (req.session.user.type === "investor") {
+            console.log("Updating Investor user with ID:", userId);
+            updatedUser = await Investor.findByIdAndUpdate(userId, { avatar }, { new: true });
+            console.log("Updated Investor user:", updatedUser);
+        }
+
+        if (!updatedUser) {
+            console.log("No user found with ID:", userId);
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        console.log("Updating session with new avatar:", avatar);
+        req.session.user.avatar = avatar;
+        console.log("Updated session user:", req.session.user);
+
+        res.status(200).json({ message: "Avatar updated", user: req.session.user });
+        console.log("Response sent successfully");
+    } catch (error) {
+        console.error("Error updating avatar:", error);
+        res.status(500).json({ message: "Server error" });
     }
-
-    console.log("Updating session with new avatar:", avatar);
-    req.session.user.avatar = avatar;
-    console.log("Updated session user:", req.session.user);
-
-    res.status(200).json({ message: "Avatar updated", user: req.session.user });
-    console.log("Response sent successfully");
-  } catch (error) {
-    console.error("Error updating avatar:", error);
-    res.status(500).json({ message: "Server error" });
-  }
 });
 
 // Other routes
@@ -157,16 +157,16 @@ app.get("/profile", (req, res) => {
 
 app.get("/profile/:id", async (req, res) => {
 
-  try {
-    const { id } = req.params;
-    let user = await Startup.findById(id).select("id username email type avatar");
-    if (!user) user = await Investor.findById(id).select("id username email type avatar");
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-    res.status(200).json({ success: true, user: { id: user._id, username: user.username, email: user.email, type: user.type, avatar: user.avatar } });
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
+    try {
+        const { id } = req.params;
+        let user = await Startup.findById(id).select("id username email type avatar");
+        if (!user) user = await Investor.findById(id).select("id username email type avatar");
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+        res.status(200).json({ success: true, user: { id: user._id, username: user.username, email: user.email, type: user.type, avatar: user.avatar } });
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
 });
 
 
@@ -331,7 +331,7 @@ app.post("/filterposts", filterAndValidatePost, async (req, res) => {
         res.status(500).json({ message: `Server error while creating post: ${error.message}` });
     }
 
-  
+
 });
 
 app.get("/verify-idea/:hash", async (req, res) => {
@@ -373,13 +373,13 @@ app.use("/api/payment", processPayment);
 app.get("/chat", attachUser, getUsers);
 app.post("/send/:id", attachUser, sendMessage);
 app.get("/messages/:id", attachUser, getMessages);
-app.post("/contracts/:id",attachUser, saveContract); 
-app.get('/getcontract/:id',attachUser, getContracts);
+app.post("/contracts/:id", attachUser, saveContract);
+app.get('/getcontract/:id', attachUser, getContracts);
 app.put('/contract/:contractID/accept', updateContractAcceptance);
 app.put('/contract/:contractID/decline', declineContract);
 app.get("/check-subscription", attachUser, checkSubscription);
 app.get('/getUserContracts', attachUser, getAllUserContracts);
-app.get('/getPostSolution/:postId', attachUser,getPostSolutionById);
+app.get('/getPostSolution/:postId', attachUser, getPostSolutionById);
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
@@ -389,21 +389,52 @@ io.on("connection", (socket) => {
         console.log(`User ${userId} joined room`);
     });
 
-  socket.on("sendMessage", async (message) => {
-    const { senderId, receiverId, text, _id } = message;
-    try {
-      if (_id) {
-        io.to(receiverId).emit("receiveMessage", message);
-      } else {
-        const newMessage = new Message({ senderId, receiverId, text });
-        const savedMessage = await newMessage.save();
-        io.to(receiverId).emit("receiveMessage", savedMessage);
-        io.to(senderId).emit("receiveMessage", savedMessage);
-      }
-    } catch (error) {
-      console.error("Error saving or sending message:", error);
-    }
-  });
+    socket.on('sendMessage', async (message) => {
+        // Check if message is null or undefined
+        if (!message) {
+            console.error('Received null or undefined message object');
+            return; // Exit the function early
+        }
+
+        // Check if message has the required properties
+        if (!message.senderId || !message.receiverId) {
+            console.error('Message missing required fields:', message);
+            return; // Exit the function early
+        }
+
+        const { senderId, receiverId, text, _id } = message;
+
+        try {
+            // Check if the message already has an _id (meaning it was already saved)
+            if (_id) {
+                // Message already saved, just forward it
+                console.log('Message already saved, just forwarding:', message);
+
+                // Emit the message to the receiver's room
+                io.to(receiverId).emit('receiveMessage', message);
+
+                // No need to emit back to sender as they already have it
+            } else {
+                // New message that needs to be saved
+                const newMessage = new Message({
+                    senderId,
+                    receiverId,
+                    text,
+                });
+                const savedMessage = await newMessage.save();
+
+                // Emit the saved message to the receiver's room
+                io.to(receiverId).emit('receiveMessage', savedMessage);
+
+                // Emit the saved message back to the sender's room
+                io.to(senderId).emit('receiveMessage', savedMessage);
+
+                console.log('New message saved and sent:', savedMessage);
+            }
+        } catch (error) {
+            console.error("Error saving or sending message:", error);
+        }
+    });
 
     socket.on("disconnect", () => {
         console.log("A user disconnected:", socket.id);

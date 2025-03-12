@@ -11,6 +11,7 @@ import ContractABI from "./ContractABI"; // Import your contract ABI
 const ChatContainer = ({ user, currentUser, contractDetails, createContract }) => {
     console.log("Contract Deatils ", contractDetails);
     const [contracts, setContracts] = useState([]);
+    const currentUser1 = JSON.parse(localStorage.getItem('user'));
     const BASE_URL = "http://localhost:3000";
     const {
         messages,
@@ -156,6 +157,27 @@ const ChatContainer = ({ user, currentUser, contractDetails, createContract }) =
         fetchContracts();
     }, [user]);
     // Function to send a message
+    // const sendMessage = async (messageData) => {
+    //     try {
+    //         // First save the message to the database via API
+    //         const newMessage = {
+    //             ...messageData,
+    //             senderId: currentUser.id,
+    //             receiverId: user._id,
+    //             createdAt: new Date(),
+    //         };
+
+    //         // Save the message to the database using the API
+    //         const savedMessage = await ChatStore.getState().sendMessage(newMessage);
+
+    //         // The message is now saved and added to the messages state
+    //         // We emit the saved message (with _id) to Socket.IO for delivery to the recipient
+    //         socket.emit('sendMessage', savedMessage);
+    //     } catch (error) {
+    //         console.error("Failed to send message:", error);
+    //     }
+    // };
+
     const sendMessage = async (messageData) => {
         try {
             // First save the message to the database via API
@@ -165,6 +187,9 @@ const ChatContainer = ({ user, currentUser, contractDetails, createContract }) =
                 receiverId: user._id,
                 createdAt: new Date(),
             };
+            console.log("In chatcontainer New Message is", newMessage);
+            console.log("Current User is", currentUser.id);
+            console.log("User is", user._id);
 
             // Save the message to the database using the API
             const savedMessage = await ChatStore.getState().sendMessage(newMessage);
@@ -258,7 +283,10 @@ const ChatContainer = ({ user, currentUser, contractDetails, createContract }) =
                     <div
                         key={message._id || index}
                         className={`flex ${message.senderId === currentUser.id ? "justify-end" : "justify-start"}`}
+                        
                     >
+                        {console.log("message.senderId",user._id)}
+                        {console.log("currentUser.id", currentUser.id)}
                         {/* Message Content */}
                         <div className="flex flex-col">
                             <div

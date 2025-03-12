@@ -100,7 +100,9 @@ export const ChatStore = create((set, get) => ({
 
     // Send a message
     sendMessage: async (messageData) => {
+        console.log("In sendMessage messageData:", messageData); // Debugging
         const { selectedUser, messages } = get();
+        console.log("Selected user in sendMessage:", selectedUser); // Debugging
         if (!selectedUser) {
             toast.error('No user selected');
             return;
@@ -129,6 +131,11 @@ export const ChatStore = create((set, get) => ({
         }
     },
 
+    // In your ChatStore.js
+
+    // sendMessage: async (messageData) => {
+
+    // },
     // Subscribe to new messages
     subscribeToNewMessages: () => {
         const { selectedUser, socket } = get();

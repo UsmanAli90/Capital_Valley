@@ -36,6 +36,7 @@ const Startup = require('../models/Startupdb.js');
 const Investor = require('../models/Investordb.js');
 const Message = require('../models/Message.js');
 const { getReceiverSocketId, io } = require('../utils/socket.cjs'); // Ensure the path is correct
+const mongoose = require('mongoose');
 
 const getUsersForSidebar = async (req, res) => {
     try {
@@ -95,11 +96,60 @@ const getMessages = async (req, res) => {
     }
 };
 
+// const sendMessage = async (req, res) => {
+//     const { id: receiverId } = req.params;
+//     const { text, senderId } = req.body;
+
+//     try {
+//         // Save the message to the database
+//         const newMessage = new Message({
+//             senderId,
+//             receiverId,
+//             text,
+//         });
+//         await newMessage.save();
+
+//         // Emit the message to the receiver using Socket.IO
+//         io.to(receiverId).emit('receiveMessage', newMessage);
+
+//         // Respond with the saved message
+//         res.status(200).json(newMessage);
+//     } catch (error) {
+//         console.error("Error sending message:", error);
+//         res.status(500).json({ message: "Internal Server Error" });
+//     }
+// };
+
 const sendMessage = async (req, res) => {
-    const { id: receiverId } = req.params;
+    console.log("MessagController",req.body)
+    console.log("Request params",req.params)
+    const { receiverId } = req.body;
     const { text, senderId } = req.body;
 
     try {
+        // Validate receiverId and senderId
+        if (!receiverId || receiverId === "undefined") {
+            return res.status(400).json({ 
+                success: false,
+                message: "Invalid receiver ID" 
+            });
+        }
+
+        if (!senderId || senderId === "undefined") {
+            return res.status(400).json({ 
+                success: false,
+                message: "Invalid sender ID" 
+            });
+        }
+
+        // Validate that both IDs are valid ObjectIds
+        if (!mongoose.Types.ObjectId.isValid(receiverId) || !mongoose.Types.ObjectId.isValid(senderId)) {
+            return res.status(400).json({ 
+                success: false,
+                message: "Invalid ID format" 
+            });
+        }
+
         // Save the message to the database
         const newMessage = new Message({
             senderId,
@@ -109,13 +159,20 @@ const sendMessage = async (req, res) => {
         await newMessage.save();
 
         // Emit the message to the receiver using Socket.IO
-        io.to(receiverId).emit('receiveMessage', newMessage);
+        io.to(receiverId.toString()).emit('receiveMessage', newMessage);
 
         // Respond with the saved message
-        res.status(200).json(newMessage);
+        res.status(200).json({
+            success: true,
+            message: newMessage
+        });
     } catch (error) {
         console.error("Error sending message:", error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.status(500).json({ 
+            success: false,
+            message: "Internal Server Error",
+            error: error.message 
+        });
     }
 };
 
