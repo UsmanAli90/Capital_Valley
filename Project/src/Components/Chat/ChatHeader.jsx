@@ -304,7 +304,7 @@ const ChatHeader = ({ user, onClose, setIsModalOpen, isModalOpen, onContractSubm
                     <div>
                         <div className="flex items-center gap-3">
                             <img
-                                src={user.profilepic || "/avatar.png"}
+                                src={user.avatar || "/avatar.png"}
                                 alt={user.username}
                                 className="size-12 object-cover rounded-full"
                             />

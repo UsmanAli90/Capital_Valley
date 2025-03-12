@@ -32,6 +32,7 @@ const { updateContractAcceptance } = require('./controllers/updateContractAccept
 const { declineContract } = require('./controllers/updateContractDecline.js');
 const { checkSubscription } = require("./controllers/SubscriptionController.js");
 const { getAllUserContracts } = require('./controllers/getAllUserContracts.js');
+const {getPostSolutionById}=require('./controllers/PostSolution.js');
 
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -378,6 +379,7 @@ app.put('/contract/:contractID/accept', updateContractAcceptance);
 app.put('/contract/:contractID/decline', declineContract);
 app.get("/check-subscription", attachUser, checkSubscription);
 app.get('/getUserContracts', attachUser, getAllUserContracts);
+app.get('/getPostSolution/:postId', attachUser,getPostSolutionById);
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);

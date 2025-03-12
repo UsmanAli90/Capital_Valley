@@ -13,6 +13,7 @@ const Sidebar = ({ selectedUser, onSelectUser }) => {
 
     // Filter users based on online status
     const filteredUsers = showOnlineOnly ? users.filter((user) => onlineUsers.includes(user._id)) : users;
+    console.log("Filtered users are", filteredUsers);
 
     return (
         <aside className="h-full w-20 lg:w-72 border-r border-gray-300 flex flex-col transition-all duration-200">
@@ -49,7 +50,7 @@ const Sidebar = ({ selectedUser, onSelectUser }) => {
                     >
                         <div className="relative mx-auto lg:mx-0">
                             <img
-                                src={user.profilepic || "/avatar.png"}
+                                src={user.avatar }
                                 alt={user.username}
                                 className="size-12 object-cover rounded-full"
                             />
