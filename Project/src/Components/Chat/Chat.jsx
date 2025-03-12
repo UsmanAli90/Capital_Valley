@@ -7,6 +7,7 @@ import Header from "../HomePage/Header";
 import toast from "react-hot-toast";
 import Web3 from "web3";
 import socket from "./Socket"; // Import Socket.IO client
+import ContractDisplay from "./ContractDisplay";
 
 const Chat = () => {
     const BASE_URL = "http://localhost:3000";
@@ -112,6 +113,12 @@ const Chat = () => {
                             />
                             {/* Chat Container */}
                             <ChatContainer
+                                user={selectedUser}
+                                currentUser={currentUser}
+                                contractDetails={contractDetails} // Pass contractDetails as a prop
+                            // createContract={createContract}
+                            />
+                            <ContractDisplay
                                 user={selectedUser}
                                 currentUser={currentUser}
                                 contractDetails={contractDetails} // Pass contractDetails as a prop

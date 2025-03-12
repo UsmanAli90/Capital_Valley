@@ -14,6 +14,7 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import Chat from "../src/Components/Chat/Chat.jsx";
 import LandingPage from "./Components/LandingPage/LandingPage.jsx"; // New import
 import { Toaster } from 'react-hot-toast';
+import ContractDisplay from "./Components/Chat/ContractDisplay.jsx";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="/chat" element={<ProtectedRoute element={Chat} />} />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/verify-idea/:hash" element={<VerifyIdea />} />
+            <Route path="/contract" element={<ContractDisplay />} />
 
             {/* Fallback Route for 404 */}
             <Route path="*" element={<Notfound />} />
