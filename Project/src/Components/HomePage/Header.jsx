@@ -8,6 +8,7 @@ import {
   FaUserCircle,
   FaTimes,
   FaSearch,
+  FaFileContract 
 } from "react-icons/fa";
 import { FiAlignJustify } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
@@ -220,6 +221,13 @@ const Header = () => {
               size={20}
             />
           </Link>
+          <Link to="/contract">
+            <FaFileContract
+              className="text-gray-600 hover:text-green-600 transition-colors cursor-pointer"
+              size={20}
+            />
+            </Link>
+          
           {user ? (
             <>
               <Link to={`/profile/${user.id}`} className="hidden md:block">
@@ -262,7 +270,7 @@ const Header = () => {
             {isSidebarOpen ? <FaTimes size={24} /> : <FiAlignJustify size={24} />}
           </button>
         </div>
-        
+
 {/* Sidebar */}
 {isSidebarOpen && (
           <div className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 border-l border-gray-200 transform transition-transform duration-300">
