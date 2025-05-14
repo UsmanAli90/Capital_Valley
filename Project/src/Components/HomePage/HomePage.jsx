@@ -20,7 +20,7 @@ const HomePage = () => {
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  // filepath: c:\Users\hp\Desktop\Capital_Valley\Project\src\Components\HomePage\HomePage.jsx
+  // This component handles the homepage functionality, including fetching and displaying posts.
   const fetchPosts = async () => {
   try {
     const response = await fetch("http://localhost:3000/recommended-posts", {
