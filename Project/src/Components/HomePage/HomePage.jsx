@@ -20,7 +20,38 @@ const HomePage = () => {
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
 
+  // This component handles the homepage functionality, including fetching and displaying posts.
   const fetchPosts = async () => {
+  try {
+    const response = await fetch("http://localhost:3000/recommended-posts", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Received recommended posts:", data.length);
+      
+      // Make sure posts have the hasUpvoted property set
+      const initializedPosts = data.map((post) => ({
+        ...post,
+        hasUpvoted: post.upvotedBy?.includes(user?.id) || false,
+      }));
+      
+      setPosts(initializedPosts);
+    } else {
+      console.error("Failed to fetch posts:", response.status, response.statusText);
+      fallbackToRegularPosts();
+    }
+  } catch (error) {
+    console.error("Error fetching recommended posts:", error);
+    fallbackToRegularPosts();
+  }
+};
+
+  // Add this fallback function
+  const fallbackToRegularPosts = async () => {
     try {
       const response = await fetch("http://localhost:3000/posts", {
         method: "GET",
@@ -29,17 +60,17 @@ const HomePage = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched data from server:", data);
+        console.log("Fetched regular posts from server:", data);
         const initializedPosts = data.map((post) => ({
           ...post,
-          hasUpvoted: false,
+          hasUpvoted: post.upvotedBy?.includes(user?.id) || false,
         }));
         setPosts(initializedPosts);
       } else {
-        console.error("Failed to fetch posts:", response.statusText);
+        console.error("Failed to fetch regular posts:", response.statusText);
       }
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      console.error("Error fetching regular posts:", error);
     }
   };
 
@@ -55,8 +86,10 @@ const HomePage = () => {
   }, [navigate]);
 
   useEffect(() => {
+  if (user) {
     fetchPosts();
-  }, []);
+  }
+}, [user]);
 
   if (isLoading) return <p className="text-center text-gray-500">Loading...</p>;
 
