@@ -33,6 +33,9 @@ const { declineContract } = require('./controllers/updateContractDecline.js');
 const { checkSubscription } = require("./controllers/SubscriptionController.js");
 const { getAllUserContracts } = require('./controllers/getAllUserContracts.js');
 const { getPostSolutionById } = require('./controllers/PostSolution.js');
+const { spawn } = require('child_process');
+const path = require('path');
+const mongoose = require('mongoose');
 
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -196,6 +199,144 @@ app.get("/posts", async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+
+app.get("/recommended-posts", attachUser, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        // console.log("[Recommendation] Request for user:", userId);
+        
+        if (!userId) {
+            // console.log("[Recommendation] No user ID found");
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        
+        // Call Python script
+        // console.log("[Recommendation] Spawning Python process");
+        const pythonProcess = spawn('python', [
+            path.join(__dirname, 'recommendation.py'),
+            userId
+        ]);
+        
+        let pythonData = "";
+        let pythonError = "";
+        
+        // Collect data from script
+        pythonProcess.stdout.on('data', (data) => {
+            const chunk = data.toString();
+            // console.log(`[Recommendation] Python stdout: ${chunk}`);
+            pythonData += chunk;
+        });
+        
+        // Collect any errors
+        pythonProcess.stderr.on('data', (data) => {
+            const chunk = data.toString();
+            // console.error(`[Recommendation] Python stderr: ${chunk}`);
+            pythonError += chunk;
+        });
+        
+        // When the script closes
+        pythonProcess.on('close', async (code) => {
+            // console.log(`[Recommendation] Python process exited with code ${code}`);
+            
+            if (code !== 0) {
+                // console.error("[Recommendation] Python process failed");
+                return res.status(500).json({ message: "Error in recommendation system", error: pythonError });
+            }
+            
+            try {
+                // Clean up the Python output to extract just the JSON
+                // console.log("[Recommendation] Raw Python output:", pythonData);
+                
+                // Find the JSON part in the output
+                let jsonData = pythonData;
+                
+                // Try to extract just a JSON array if there's other text
+                const jsonMatch = pythonData.match(/\[(.*?)]/s);
+                if (jsonMatch) {
+                    jsonData = jsonMatch[0];
+                    // console.log("[Recommendation] Extracted JSON array:", jsonData);
+                }
+                
+                // Parse the recommended post IDs
+                let recommendedIds;
+                try {
+                    recommendedIds = JSON.parse(jsonData);
+                    // console.log(`[Recommendation] Parsed ${recommendedIds.length} recommendation IDs`);
+                } catch (parseError) {
+                    // console.error("[Recommendation] JSON parse error:", parseError);
+                    // Try another approach - look for the last line that might be valid JSON
+                    const lines = pythonData.trim().split('\n');
+                    const lastLine = lines[lines.length - 1];
+                    // console.log("[Recommendation] Trying last line as JSON:", lastLine);
+                    recommendedIds = JSON.parse(lastLine);
+                    // console.log(`[Recommendation] Parsed ${recommendedIds.length} recommendation IDs from last line`);
+                }
+                
+                if (!recommendedIds || recommendedIds.error) {
+                    // console.error("[Recommendation] Error from Python script:", recommendedIds?.error);
+                    return res.status(500).json({ message: "Error in recommendation system" });
+                }
+                
+                if (recommendedIds.length === 0) {
+                    // console.log("[Recommendation] No recommendations, returning empty array");
+                    return res.json([]);
+                }
+                
+                // console.log("[Recommendation] Converting IDs to ObjectIDs");
+                // Fetch the actual posts in the recommended order
+                const objectIds = recommendedIds.map(id => {
+                    try {
+                        return new mongoose.Types.ObjectId(id);
+                    } catch (e) {
+                        // console.error(`[Recommendation] Invalid ObjectId: ${id}:`, e.message);
+                        return null;
+                    }
+                }).filter(Boolean);
+                
+                // console.log(`[Recommendation] Querying for ${objectIds.length} posts by ID`);
+                const posts = await Post.find({
+                    _id: { $in: objectIds }
+                }).populate("owner", "email username avatar");
+                
+                // console.log(`[Recommendation] Found ${posts.length} posts from database`);
+                if (posts.length === 0) {
+                    // console.log("[Recommendation] No posts found, falling back to regular posts");
+                    // If no recommended posts found, fall back to regular posts
+                    const regularPosts = await Post.find()
+                        .populate("owner", "email username avatar")
+                        .sort({ createdAt: -1 });
+                    // console.log(`[Recommendation] Returning ${regularPosts.length} regular posts`);
+                    return res.json(regularPosts);
+                }
+                
+                // Sort the posts according to the recommended order
+                const sortedPosts = [];
+                for (const id of recommendedIds) {
+                    const post = posts.find(post => post._id.toString() === id);
+                    if (post) sortedPosts.push(post);
+                }
+                
+                // console.log(`[Recommendation] Returning ${sortedPosts.length} sorted posts to client`);
+                return res.json(sortedPosts);
+            } catch (jsonError) {
+                // console.error("[Recommendation] Error processing Python output:", jsonError);
+                // console.error("[Recommendation] Raw Python output:", pythonData);
+                
+                // Fall back to regular posts
+                // console.log("[Recommendation] Falling back to regular posts");
+                const posts = await Post.find()
+                    .populate("owner", "email username avatar")
+                    .sort({ createdAt: -1 });
+                return res.json(posts);
+            }
+        });
+    } catch (error) {
+        // console.error("[Recommendation] Error in endpoint:", error);
+        return res.status(500).json({ message: "Server error", error: error.toString() });
+    }
+});
+// ...existing code...
 
 app.get("/share-full-idea/:postId", async (req, res) => {
     try {
