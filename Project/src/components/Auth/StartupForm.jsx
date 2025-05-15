@@ -15,10 +15,67 @@ function StartupForm({ usertype }) {
 
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [verificationCodeSent, setVerificationCodeSent] = useState(false);
+  const [enteredCode, setEnteredCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleSendCode = async () => {
+    if (!formData.email) {
+      toast.error("Please enter your email first.");
+      return;
+    }
+    try {
+      setVerifying(true);
+       const res = await fetch("http://localhost:3000/api/email/send-verification-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      if (res.ok) {
+        setVerificationCodeSent(true);
+        toast.success("Verification code sent to your email.");
+      } else {
+        const data = await res.json();
+        toast.error(data.message || "Failed to send code.");
+      }
+    } catch (err) {
+      toast.error("Error sending code.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (!enteredCode) {
+      toast.error("Please enter the code.");
+      return;
+    }
+    try {
+      setVerifying(true);
+      const res = await fetch("http://localhost:3000/api/email/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, code: enteredCode }),
+      });
+      if (res.ok) {
+        setIsEmailVerified(true);
+        toast.success("Email verified!");
+      } else {
+        const data = await res.json();
+        toast.error(data.message || "Invalid code.");
+      }
+    } catch (err) {
+      toast.error("Error verifying code.");
+    } finally {
+      setVerifying(false);
+    }
   };
 
   const validate = () => {
@@ -117,6 +174,11 @@ function StartupForm({ usertype }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isEmailVerified) {
+      toast.error("Please verify your email first.");
+      return;
+    }
+
     if (validate()) {
       try {
         const response = await fetch("http://localhost:3000/startupsignup", {
@@ -167,7 +229,40 @@ function StartupForm({ usertype }) {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              disabled={isEmailVerified}
             />
+            {!isEmailVerified && (
+              <button
+                type="button"
+                className="mt-2 text-green-600 underline text-xs"
+                onClick={handleSendCode}
+                disabled={verifying || verificationCodeSent}
+              >
+                {verificationCodeSent ? "Code Sent" : "Send Verification Code"}
+              </button>
+            )}
+            {verificationCodeSent && !isEmailVerified && (
+              <div className="mt-2 flex items-center space-x-2">
+                <input
+                  type="text"
+                  className="w-32 px-2 py-1 border border-gray-300 rounded text-sm"
+                  placeholder="Enter code"
+                  value={enteredCode}
+                  onChange={(e) => setEnteredCode(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="text-green-600 underline text-xs"
+                  onClick={handleVerifyCode}
+                  disabled={verifying}
+                >
+                  Verify
+                </button>
+              </div>
+            )}
+            {isEmailVerified && (
+              <p className="text-green-600 text-xs mt-1">Email verified!</p>
+            )}
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email}</p>
             )}
@@ -287,6 +382,7 @@ function StartupForm({ usertype }) {
           <button
             type="submit"
             className="w-full bg-green-600 text-white py-2 px-4 rounded-full font-semibold hover:bg-green-700 transition-all duration-300 shadow-md text-sm"
+            disabled={!isEmailVerified}
           >
             Create Account
           </button>

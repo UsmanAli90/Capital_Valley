@@ -185,6 +185,7 @@ const HomePage = () => {
         setActiveUsers("");
         setIsFullTime("");
         setIsFormVisible(false);
+        await fetchPosts();
       } else {
         alert("Your post contains prohibited content. Please revise and try again.");
       }

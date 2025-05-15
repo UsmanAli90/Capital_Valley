@@ -49,7 +49,7 @@ def get_recommendations(user_id):
         try:
             user_id_obj = ObjectId(user_id)
             # logger.info(f"Converted user_id to ObjectId: {user_id_obj}")
-        except InvalidId:
+        except:
             # logger.info(f"Could not convert user_id to ObjectId, using as is: {user_id}")
             user_id_obj = user_id
         

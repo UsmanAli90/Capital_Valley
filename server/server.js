@@ -13,6 +13,7 @@ const { StartupsignIn } = require("./controllers/startupsignin.js");
 const { InvestorsignIn } = require("./controllers/investorsignin.js");
 const { forgotPassword, verifyOTP } = require("./controllers/forgotPassword");
 const { forgotPassword1, verifyOTP1 } = require("./controllers/forgotPasswordInvestor.js");
+const { sendVerificationCode, verifyCode } = require("./controllers/emailVerification");
 const { resetPassword } = require("./controllers/resetPassword.js");
 const { resetPassword1 } = require("./controllers/resetPasswordIvestor.js");
 const { searchProfiles } = require("./controllers/searchcontroller.js");
@@ -521,6 +522,9 @@ app.put('/contract/:contractID/decline', declineContract);
 app.get("/check-subscription", attachUser, checkSubscription);
 app.get('/getUserContracts', attachUser, getAllUserContracts);
 app.get('/getPostSolution/:postId', attachUser, getPostSolutionById);
+
+app.post("/api/email/send-verification-code", sendVerificationCode);
+app.post("/api/email/verify-code", verifyCode);
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
